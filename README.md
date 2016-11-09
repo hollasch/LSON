@@ -41,8 +41,25 @@ Sample Humon File
     commas: "are" just: "white space"
 
 
-Character Escapes
------------------
+Numbers
+-------
+Numbers can be expressed in standard scientific notation, as in JSON. In addition, numbers can be
+expressed with leading or trailing decimal points, can begin with a plus sign, and can also be
+written in hexadecimal notation when prefixed with the characters `"0x"`.
+
+
+Strings
+-------
+Strings may be quoted with any of the following pairs:
+
+| Quotes | Character Codes |
+|:------:|:---------------:|
+|  " "   |  U+0022 U+0022  |
+|  ' '   |  U+0027 U+0027  |
+|  « »   |  U+00ab U+00bb  |
+|  “ ”   |  U+201c U+201d  |
+|  ‘ ’   |  U+2018 U+2019  |
+|  ‹ ›   |  U+2039 U+203a  |
 
 Strings may contain the following escaped characters:
 
