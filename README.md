@@ -48,14 +48,16 @@ Strings may contain the following escaped characters:
 
 | Sequence   | Description
 |:-----------|:-----------------------------------------------------
-| `\\`       | (backslash)
-| `\"`       | (double quote)
-| `\'`       | (single quote)
-| `\n`       | (new line)
-| `\r`       | (carriage return)
-| `\t`       | (horizontal tab)
-| `\u####`   | (Unicode character with four hexadecimal digits)
-| `\U######` | (Unicode character with six hexadecimal digits)
+| `\\`       | backslash
+| `\"`       | double quote
+| `\'`       | single quote
+| `\n`       | new line
+| `\<cr><lf>`| empty
+| `\<lf>`    | empty
+| `\r`       | carriage return
+| `\t`       | horizontal tab
+| `\u####`   | Unicode character with four hexadecimal digits
+| `\U######` | Unicode character with six hexadecimal digits
 
 
 Optional String Quoting
