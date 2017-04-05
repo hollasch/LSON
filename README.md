@@ -17,8 +17,7 @@ Key Differences from JSON
 3. String quoting is optional when unnecessary.
 4. New special values are supported (NaN, Infinity).
 5. String values may be broken across lines.
-6. Block strings are supported.
-7. CSV-like tabular notation without row brackets?
+6. Includes templated objects (structures).
 
 
 Sample Humon File
