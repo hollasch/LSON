@@ -1,12 +1,10 @@
 Humon (Human-Friendly Object Notation)
-================================================================================
+====================================================================================================
 
-Humon is a concise data representation that has the simplicity and
-expressiveness of JSON, but differs in two primary areas:
+Humon is a concise data representation that has the simplicity and expressiveness of JSON, but
+differs in two primary areas:
 
-  1. It's intended to be concise and friendly to _both_ computers and humans,
-     and
-
+  1. It's intended to be concise and friendly to _both_ computers and humans, and
   2. It does not aim to mirror JavaScript.
 
 Any legal JSON string can be encoded as a Humon string.
@@ -14,7 +12,6 @@ Any legal JSON string can be encoded as a Humon string.
 
 Key Differences from JSON
 -------------------------
-
 1. Rich comments are supported.
 2. Commas are treated as whitespace. Put them anywhere you want, or nowhere.
 3. String quoting is optional when unnecessary.
@@ -26,8 +23,7 @@ Key Differences from JSON
 
 Sample Humon File
 ------------------
-
-    (First, notice that you can have comments. Take that, JSON.)
+    (First, anything in parentheses is a comment. Take that, JSON.)
 
     ((  Double-parentheses comments require whitespace after the opener and
         before the closer (new lines count as whitespace). This means that
@@ -52,14 +48,14 @@ Strings
 -------
 Strings may be quoted with any of the following pairs:
 
-| Quotes | Character Codes |
-|:------:|:---------------:|
-|  " "   |  U+0022 U+0022  |
-|  ' '   |  U+0027 U+0027  |
-|  « »   |  U+00ab U+00bb  |
-|  “ ”   |  U+201c U+201d  |
-|  ‘ ’   |  U+2018 U+2019  |
-|  ‹ ›   |  U+2039 U+203a  |
+|  Quotes    | Character Codes |
+|:----------:|:---------------:|
+|  "string"  |  U+0022 U+0022  |
+|  'string'  |  U+0027 U+0027  |
+|  «string»  |  U+00ab U+00bb  |
+|  “string”  |  U+201c U+201d  |
+|  ‘string’  |  U+2018 U+2019  |
+|  ‹string›  |  U+2039 U+203a  |
 
 Strings may contain the following escaped characters:
 
@@ -79,22 +75,21 @@ Strings may contain the following escaped characters:
 
 Optional String Quoting
 -----------------------
-
-Strings that do not contain whitespace do not require quotes.
+Quoting is optional for strings that do not contain whitespace.
 
 It it important to note that this feature is more useful than just as a shorthand for more efficient
-representation: it also provides a great mechanism for handling special values.
+representation: it also provides an excellent mechanism for handling special values.
 
 For example, consider the values `null`, `undefined`, `QNaN`, `SNaN`, and `Maybe`. Various targets
 will be able to support subsets of this set. For example, C++ has no concept of `undefined`, `null`
 only applies to pointers, and has no support for`Maybe` (an indefinite Boolean value).
 In JavaScript, a `NaN` value is a `QNaN`, doesn't provide a way to create `SNaN`, and doesn't
-support `Maybe`. One of the weaknesses of standard JSON is that it implicitely favors JavaScript's
+support `Maybe`. One of the weaknesses of standard JSON is that it implicitly favors JavaScript's
 data model.
 
-If single-word strings don't require quotes, then special values can be naturally expressed in
-humon, and interpreters can handle them as native values, or as string values. In order to make such
-values durable, it is best if encoders always omit quotes when possible.
+Since single-word strings don't require quotes, special values can be naturally expressed in humon,
+and interpreters can handle them as native values, or fall back to string values. In order to make
+such values durable, it is best if encoders always omit quotes when possible.
 
 For example, consider the following fragment:
 
@@ -125,13 +120,12 @@ A C++ decoder might yield the following equivalent:
         "null", "undefined", true, "maybe"
     };
 
-Note that this suggests that special values can be introduced at will, though it is likely that
-decoders will interpret these values as strings.
+**NOTE**: This allows special (and arbitrarily complex) values to be introduced at will, though it
+is likely that decoders will interpret these values as strings.
 
 
-Reserved Words
+Reserved Values
 ---------------
-
 The following special values are reserved in Humon:
 
   - `null`
@@ -140,10 +134,12 @@ The following special values are reserved in Humon:
   - `NaN`
   - `infinity`
 
+In other words, `null` always means the value `null`, and never the string `"null"`. Similarly for
+all other reserved values.
+
 
 String Concatenation
 --------------------
-
 In order to support human-readable long strings, the `+` operator may be used to construct
 concatenations. For example:
 
@@ -154,23 +150,21 @@ concatenations. For example:
                 + "Who's there?\n"
     }
 
-Note that string concatenation promotes all values to strings. Non-string values are promoted to
-strings of their verbatim representation. Thus:
-
+Note that the concatenation operator always promotes all values to strings. Non-string values are
+promoted to strings of their verbatim representation. Thus:
 
     X: 1.000 + null + false    (Gets the string value "1.000nullfalse")
 
 
 Structures
 ----------
-
 The following fragment:
 
     {
         someStruct <key1 key2 key3>: [
             < thing1 false  3 >
             < thing2 false 13 >
-            < thing3  true 37 >
+            < thing3 true  37 >
         ]
     }
 
@@ -193,7 +187,10 @@ is a concise way to express the following:
         ]
     }
 
-Note that this is not the most efficient way to express CSV, would be more like this:
+If more values are given for a row than were specified in the structure template, they will be
+ignored. If fewer values are given, they will be interpreted as `null`.
+
+As a side note, this is _not_ the most efficient way to express CSV. That would be more like this:
 
     {
         fields: [ key1 key2 key3 ]
@@ -216,8 +213,7 @@ or just this (where row 0 is special):
 
 Macros / Definitions
 --------------------
-Developers have long lamented the lack of any decent macro or definition construct in CSS. Such
-features improve readability, decrease errors, and significantly improve maintainability. Adding
+Macros improve readability, decrease errors, and significantly improve maintainability. Adding
 macros to object notation, however, should not be taken lightly, as this introduces all sorts of
 non-trivial complexity. For example:
 
@@ -272,26 +268,28 @@ Ugh again.
 This hasn't even gotten into parameterized definitions like this:
 
     {
-        logMsg(type,msg) = "[" + type + "] " + msg
+        !! logMsg <type msg> = "[" + type + "] " + msg
 
-        noFile:   logMsg (ERROR,   "Can't find file")
-        openFail: logMsg (ERROR,   "Can't open file")
-        dateFail: logMsg (WARNING, "Couldn't update file date")
+        noFile:   !logMsg <ERROR   "Can't find file">
+        openFail: !logMsg <ERROR   "Can't open file">
+        dateFail: !logMsg <WARNING "Couldn't update file date">
     }
 
-And so forth. However, just because this could get vastly more complicated, that doesn't mean we
-should close the door on every subset. It should be pretty clear that simple value definition is
-immediately and widely useful, and relatively easy to implement. Undefining a variable is as easy as
-restoring default behavior:
+And so forth.
+
+However, just because this could get vastly more complicated, that doesn't mean we should close the
+door on every subset. It should be pretty clear that simple value definition is immediately and
+widely useful, and relatively easy to implement. Undefining a variable is as easy as restoring
+default behavior:
 
     previously_defined_definition = "previously_defined_definition"
 
-Definitions can have two scopes: global and object. Definitions can appear anywhere in an object,
-but must occur before use.
+Definitions can have two scopes: global and object/array. Definitions can appear anywhere in an
+object, but must occur before use.
 
-Definitions can cascade. Each definition is resolved _immediately_ as it is encountered. If it uses
-other definitions, their already-resolved values are used in the new definition. This allows a large
-degree of composition at minimal cost and without risk of infinite recursion. For example:
+Definitions can cascade, but each definition is resolved _immediately_ as it is encountered. If it
+uses other definitions, their already-resolved values are used in the new definition. This allows a
+large degree of composition at minimal cost and without risk of infinite recursion. For example:
 
     A = B             (A = "B")
     B = A + foo       (B = "Bfoo")
