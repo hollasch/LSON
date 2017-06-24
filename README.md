@@ -22,6 +22,7 @@ Key Differences from JSON
 
 Sample Humon File
 ------------------
+```
     (First, anything in parentheses is a comment. Take that, JSON.)
 
     ((  Double-parentheses comments require whitespace after the opener and
@@ -32,15 +33,18 @@ Sample Humon File
         comment, then just use ") )" or any other "escape" character, like this:
         ((x)_).
     ))
+```
 
-    commas: "are" just: "white space"
 
+Separators
+----------
+```
+commas: "are" just: "white space"
 
-Numbers
--------
-Numbers can be expressed in standard scientific notation, as in JSON. In addition, numbers can be
-expressed with leading or trailing decimal points, can begin with a plus sign, and can also be
-written in hexadecimal notation when prefixed with the characters `"0x"`.
+you: "can",
+use: "them",
+as: "you wish"
+```
 
 
 Strings
@@ -121,6 +125,30 @@ A C++ decoder might yield the following equivalent:
 
 **NOTE**: This allows special (and arbitrarily complex) values to be introduced at will, though it
 is likely that decoders will interpret these values as strings.
+
+
+Numbers
+-------
+Numbers can be expressed in standard exponential notation, as in JSON. In addition, numbers can be
+expressed with leading or trailing decimal points, can begin with a plus sign. The number notation
+is more like C than like JSON — there are many reasonable values that are illegal in JSON.
+
+|  Value  | Legal JSON? |
+|--------:|:-----------:|
+|      0  |     Yes     |
+|    0.1  |     Yes     |
+|     .1  |     No      |
+|    -10  |     Yes     |
+|    +10  |     No      |
+|     1.  |     No      |
+|   1.2e2 |     Yes     |
+|  1.2e-2 |     Yes     |
+|  1.2e+2 |     Yes     |
+
+Note that alternate number formats, such as `0xffeb` or `0b00100001` will fail to be recognized as
+Humon numbers, and will instead be interpreted as unquoted strings. Optional string quoting then
+allows such numbers can be interpreted naturally by a particular interpreter (such as C++), so that
+these special formats can be recognized & processed natively.
 
 
 Reserved Values
