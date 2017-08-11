@@ -238,8 +238,8 @@ or just this (where row 0 is special):
     ]
 
 
-Macros / Definitions
---------------------
+Macros / Definitions (abandoned)
+--------------------------------
 Macros improve readability, decrease errors, and significantly improve maintainability. Adding
 macros to object notation, however, should not be taken lightly, as this introduces all sorts of
 non-trivial complexity. For example:
