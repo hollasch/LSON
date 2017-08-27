@@ -1,13 +1,13 @@
-Humon (Human-Friendly Object Notation)
+LSON: Lucid Serialized Object Notation
 ====================================================================================================
 
-Humon is a concise data representation that has the simplicity and expressiveness of JSON, but
+LSON is a concise data representation that has the simplicity and expressiveness of JSON, but
 differs in two primary areas:
 
   1. It's intended to be concise and friendly to _both_ computers and humans, and
   2. It does not aim to mirror JavaScript.
 
-Any legal JSON string can be encoded as a Humon string.
+Any legal JSON string can be encoded as a LSON string.
 
 
 Key Differences from JSON
@@ -20,7 +20,7 @@ Key Differences from JSON
 6. Includes templated objects (structures).
 
 
-Sample Humon File
+Sample LSON File
 ------------------
 ```
     (First, anything in parentheses is a comment. Take that, JSON.)
@@ -90,7 +90,7 @@ In JavaScript, a `NaN` value is a `QNaN`, doesn't provide a way to create `SNaN`
 support `Maybe`. One of the weaknesses of standard JSON is that it implicitly favors JavaScript's
 data model.
 
-Since single-word strings don't require quotes, special values can be naturally expressed in humon,
+Since single-word strings don't require quotes, special values can be naturally expressed in LSON,
 and interpreters can handle them as native values, or fall back to string values. In order to make
 such values durable, it is best if encoders always omit quotes when possible.
 
@@ -146,14 +146,14 @@ is more like C than like JSON — there are many reasonable values that are ille
 |  1.2e+2 |     Yes     |
 
 Note that alternate number formats, such as `0xffeb` or `0b00100001` will fail to be recognized as
-Humon numbers, and will instead be interpreted as unquoted strings. Optional string quoting then
+LSON numbers, and will instead be interpreted as unquoted strings. Optional string quoting then
 allows such numbers can be interpreted naturally by a particular interpreter (such as C++), so that
 these special formats can be recognized & processed natively.
 
 
 Reserved Values
 ---------------
-The following special values are reserved in Humon:
+The following special values are reserved in LSON:
 
   - `null`
   - `true`
