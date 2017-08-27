@@ -4,10 +4,10 @@ LSON: Lucid Serialized Object Notation
 LSON is a concise data representation that has the simplicity and expressiveness of JSON, but
 differs in two primary areas:
 
-  1. It's intended to be concise and friendly to _both_ computers and humans, and
+  1. It's intended to be concise and friendly to humans as well as computers,
   2. It does not aim to mirror JavaScript.
 
-Any legal JSON string can be encoded as a LSON string.
+Any legal JSON content can be interpreted as legal LSON.
 
 
 Key Differences from JSON
@@ -15,15 +15,15 @@ Key Differences from JSON
 1. Rich comments are supported.
 2. Commas are treated as whitespace. Put them anywhere you want, or nowhere.
 3. String quoting is optional when unnecessary.
-4. New special values are supported (NaN, Infinity).
+4. Special values are handled seamlessly (_e.g._ NaN, infinity, undefined, 0xfffe, #ff8800).
 5. String values may be broken across lines.
 6. Includes templated objects (structures).
 
 
-Sample LSON File
-------------------
+Comments
+--------
 ```
-    (First, anything in parentheses is a comment. Take that, JSON.)
+    (Anything in parentheses is a comment. Take that, JSON.)
 
     ((  Double-parentheses comments require whitespace after the opener and
         before the closer (new lines count as whitespace). This means that
@@ -51,29 +51,27 @@ Strings
 -------
 Strings may be quoted with any of the following pairs:
 
-|  Quotes    | Character Codes |
-|:----------:|:---------------:|
-|  "string"  |  U+0022 U+0022  |
-|  'string'  |  U+0027 U+0027  |
-|  «string»  |  U+00ab U+00bb  |
-|  “string”  |  U+201c U+201d  |
-|  ‘string’  |  U+2018 U+2019  |
-|  ‹string›  |  U+2039 U+203a  |
+|  Quotes    | Character Codes                                                      |
+|:----------:|:---------------------------------------------------------------------|
+|  "string"  |  U+0022 U+0022 (_Quotation Mark_)                                    |
+|  'string'  |  U+0027 U+0027 (_Apostrophe_)                                        |
+|  «string»  |  U+00ab U+00bb (_{Left,Right}-Pointing Double Angle Quotation Mark_) |
+|  ‘string’  |  U+2018 U+2019 (_{Left,Right} Single Quotation Mark_)                |
+|  “string”  |  U+201c U+201d (_{Left,Right} Double Quotation Mark_)                |
+|  ‹string›  |  U+2039 U+203a (_Single {Left,Right}-Pointing Angle Quotation Mark_) |
 
-Strings may contain the following escaped characters:
+Strings may contain the following escape sequences:
 
-| Sequence   | Description
-|:-----------|:-----------------------------------------------------
-| `\\`       | backslash
-| `\"`       | double quote
-| `\'`       | single quote
-| `\n`       | new line
-| `\<cr><lf>`| empty
-| `\<lf>`    | empty
-| `\r`       | carriage return
-| `\t`       | horizontal tab
-| `\u####`   | Unicode character with four hexadecimal digits
-| `\U######` | Unicode character with six hexadecimal digits
+| Sequence   | Description                                    |
+|:-----------|:-----------------------------------------------|
+| `\n`       | new line                                       |
+| `\<cr><lf>`| empty                                          |
+| `\<lf>`    | empty                                          |
+| `\r`       | carriage return                                |
+| `\t`       | horizontal tab                                 |
+| `\u####`   | Unicode character with four hexadecimal digits |
+| `\U######` | Unicode character with six hexadecimal digits  |
+| `\<any>`   | Yields that character unchanged                |
 
 
 Optional String Quoting
