@@ -50,31 +50,83 @@ Example LSON
 {
     glossary: {
         title: 'example glossary' (There are six legal string-delimeter pairs.)
-        GlossDiv: {
+        "Gloss Div": {
             title: S
-            GlossList: {
-                GlossEntry: {
+            "Gloss List": {
+                "Gloss Entry": {
                     (Strings may be unquoted as long as they contain no whitespace.)
                     ID: SGML
 
-                    SortAs:    SGML
-                    GlossTerm: "Standard Generalized Markup Language"
-                    Acronym:   SGML
+                    SortAs:  SGML
+                    Acronym: SGML
+                    "Gloss Term": "Standard Generalized Markup Language"
 
                     (Unquoted strings may contain whitespace if escaped.)
                     Abbrev: ISO\ 8879:1986
 
-                    GlossDef: {
+                    "Gloss Def": {
                         para: "A meta-markup language, used to create markup languages "
                             + "such as DocBook."
 
-                        (Note that commas are considered whitespace.)
-                        GlossSeeAlso: [ GML, XML ]
-
-                        GlossSee: markup
+                        (Note that commas and semicolons are considered whitespace.)
+                        "Gloss SeeAlso": [ GML, XML ];
+                        "Gloss See": markup;
                     }
                 }
             }
+        }
+    }
+}
+```
+
+```
+(An Example Menu Description)
+{
+    menu: {
+        id:    file;
+        value: file;
+        popup: {
+            menuitem <value, onclick>: [       (Structured objects)
+                < New,   CreateNewDoc() >
+                < Open,  OpenDoc()      >
+                < Close, CloseDoc()     >
+            ]
+        };
+    }
+}
+```
+
+```
+{
+    widget: {
+        debug: on
+        "debug:Level"=  1.0      (The literal string value "1.0")
+        "debug:Weight": Infinity (Converts to floating-point +infinity if understood, else string)
+        "debug:Prefix": null     (Converts to null value if understood, otherwise string)
+        "debug:Mask":   0xffe0   (Converts to hex number value if understood, else string)
+
+        window: {
+            title:  "Sample Konfabulator Widget"
+            name:   main_window
+            width:  500  (Converts to number value if understood)
+            height: 500
+        }
+        image: {
+            src:       Images/Sun.png
+            name:      sun1
+            hOffset:   250
+            vOffset:   250
+            alignment: center
+        }
+        text: {
+            data:      Click\ Here
+            size:      36
+            style:     bold
+            name:      text1
+            hOffset:   250
+            vOffset:   100
+            alignment: center
+            onMouseUp: "sun1.opacity = (sun1.opacity / 100) * 90;"
         }
     }
 }
