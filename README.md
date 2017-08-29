@@ -1,6 +1,27 @@
 LSON: Lucid Serialized Object Notation
 ====================================================================================================
 
+1. Introduction
+2. Example LSON
+3. Whitespace
+4. Comments
+5. Strings
+   1. Quoted Strings
+   2. Unquoted Strings
+   3. Escape Sequences
+   4. String Concatenation
+6. Numbers
+7. Reserved Values
+8. Arrays
+9. Dictionaries
+10. Structures
+11. Appendix
+    1. Macros / Definitions (Abandoned)
+
+
+Introduction
+------------
+
 LSON is a concise data representation that has the simplicity and expressiveness of JSON, but
 differs in two primary areas:
 
@@ -10,14 +31,90 @@ differs in two primary areas:
 Any legal JSON content can be interpreted as legal LSON.
 
 
-Key Differences from JSON
--------------------------
+### Key Differences from JSON
 1. Rich comments are supported.
 2. Commas are treated as whitespace. Put them anywhere you want, or nowhere.
 3. String quoting is optional when unnecessary.
 4. Special values are handled seamlessly (_e.g._ NaN, infinity, undefined, 0xfffe, #ff8800).
 5. String values may be broken across lines.
 6. Includes templated objects (structures).
+
+
+Example LSON
+------------
+```
+(Comments are delimited by parentheses, or by doubled parentheses.)
+
+(( This is an example using doubled parentheses. They must be separated by whitespace. ))
+
+{
+    glossary: {
+        title: 'example glossary' (There are six legal string-delimeter pairs.)
+        GlossDiv: {
+            title: S
+            GlossList: {
+                GlossEntry: {
+                    (Strings may be unquoted as long as they contain no whitespace.)
+                    ID: SGML
+
+                    SortAs:    SGML
+                    GlossTerm: "Standard Generalized Markup Language"
+                    Acronym:   SGML
+
+                    (Unquoted strings may contain whitespace if escaped.)
+                    Abbrev: ISO\ 8879:1986
+
+                    GlossDef: {
+                        para: "A meta-markup language, used to create markup languages "
+                            + "such as DocBook."
+
+                        (Note that commas are considered whitespace.)
+                        GlossSeeAlso: [ GML, XML ]
+
+                        GlossSee: markup
+                    }
+                }
+            }
+        }
+    }
+}
+```
+
+
+Whitespace
+----------
+In addition to the standard Unicode whitespace characters, LSON also considers commans and
+semicolons to be whitespace:
+
+| Unicode | Escape | Description
+|:-------:|:------:|:-----------
+| U+0009  |  \t    | Tab
+| U+000a  |  \n    | Newline, or line feed
+| U+000b  | \u000b | Vertical tab
+| U+000c  |  \f    | Form feed
+| U+000d  |  \r    | Carriage return
+| U+0020  | \u0020 | Standard space character
+| U+002c  | \u002c | Comma
+| U+003b  | \u003b | Semicolon
+| U+0085  | \u0085 | Next line
+| U+00a0  | \u00a0 | No-break space
+| U+1680  | \u1680 | Ogham space mark
+| U+2000  | \u2000 | En quad
+| U+2001  | \u2001 | Em quad (mutton quad)
+| U+2002  | \u2002 | En space (nut)
+| U+2003  | \u2003 | Em space (mutton)
+| U+2004  | \u2004 | Three-per-em-space (thick space)
+| U+2005  | \u2005 | Four-per-em-space (mid space)
+| U+2006  | \u2006 | Six-per-em-space
+| U+2007  | \u2007 | Figure space
+| U+2008  | \u2008 | Punctuation space
+| U+2009  | \u2009 | Thin space
+| U+200a  | \u200a | Hair space
+| U+2028  | \u2028 | Line separator
+| U+2029  | \u2029 | Paragraph separator
+| U+202f  | \u202f | Narrow no-break space
+| U+205f  | \u205f | Medium mathematical space
+| U+3000  | \u3000 | Ideographic space
 
 
 Comments
@@ -36,19 +133,11 @@ Comments
 ```
 
 
-Separators
-----------
-```
-commas: "are" just: "white space"
-
-you: "can",
-use: "them",
-as: "you wish"
-```
-
-
 Strings
 -------
+
+### Quoted Strings
+
 Strings may be quoted with any of the following pairs:
 
 |  Quotes    | Character Codes                                                      |
@@ -60,28 +149,14 @@ Strings may be quoted with any of the following pairs:
 |  “string”  |  U+201c U+201d (_{Left,Right} Double Quotation Mark_)                |
 |  ‹string›  |  U+2039 U+203a (_Single {Left,Right}-Pointing Angle Quotation Mark_) |
 
-Strings may contain the following escape sequences:
-
-| Sequence   | Description                                    |
-|:-----------|:-----------------------------------------------|
-| `\n`       | new line                                       |
-| `\<cr><lf>`| empty                                          |
-| `\<lf>`    | empty                                          |
-| `\r`       | carriage return                                |
-| `\t`       | horizontal tab                                 |
-| `\u####`   | Unicode character with four hexadecimal digits |
-| `\U######` | Unicode character with six hexadecimal digits  |
-| `\<any>`   | Yields that character unchanged                |
-
-
-Optional String Quoting
------------------------
-Quoting is optional for strings that do not contain whitespace.
+### Unquoted Strings
+Strings require quotes only if they contain unescaped whitespace. Remember that in LSON, commas and
+semicolons are considered whitespace.
 
 It it important to note that this feature is more useful than just as a shorthand for more efficient
 representation: it also provides an excellent mechanism for handling special values.
 
-For example, consider the values `null`, `undefined`, `QNaN`, `SNaN`, and `Maybe`. Various targets
+For example, consider the values `null`, `undefined`, `QNaN`, `SNaN`, and `maybe`. Various targets
 will be able to support subsets of this set. For example, C++ has no concept of `undefined`, `null`
 only applies to pointers, and has no support for`Maybe` (an indefinite Boolean value).
 In JavaScript, a `NaN` value is a `QNaN`, doesn't provide a way to create `SNaN`, and doesn't
@@ -124,6 +199,35 @@ A C++ decoder might yield the following equivalent:
 **NOTE**: This allows special (and arbitrarily complex) values to be introduced at will, though it
 is likely that decoders will interpret these values as strings.
 
+### Escape Sequences
+Strings may contain the following escape sequences:
+
+| Sequence   | Description                                    |
+|:-----------|:-----------------------------------------------|
+| `\n`       | new line                                       |
+| `\r`       | carriage return                                |
+| `\t`       | horizontal tab                                 |
+| `\u####`   | Unicode character with four hexadecimal digits |
+| `\U######` | Unicode character with six hexadecimal digits  |
+| `\<any>`   | Yields that character unchanged                |
+
+
+### String Concatenation
+In order to support human-readable long strings, the `+` operator may be used to construct
+concatenations. For example:
+
+    {
+        strBlock: "Knock knock.\n"
+                + "Who's there?\n"
+                + "Bug in your state machine.\n"
+                + "Who's there?\n"
+    }
+
+Note that the concatenation operator always promotes all values to strings. Non-string values are
+promoted to strings of their verbatim representation. Thus:
+
+    X: 1.000 + null + false    (Gets the string value "1.000nullfalse")
+
 
 Numbers
 -------
@@ -163,22 +267,32 @@ In other words, `null` always means the value `null`, and never the string `"nul
 all other reserved values.
 
 
-String Concatenation
---------------------
-In order to support human-readable long strings, the `+` operator may be used to construct
-concatenations. For example:
+Arrays
+------
+Arrays encode ordered lists of items. They have the following properties:
 
-    {
-        strBlock: "Knock knock.\n"
-                + "Who's there?\n"
-                + "Bug in your state machine.\n"
-                + "Who's there?\n"
-    }
+1. They begin with a left square bracket (`[`, `U+005b`), followed by zero or more values, and
+   terminated with a right square bracket (`]`, `U+005d`).
 
-Note that the concatenation operator always promotes all values to strings. Non-string values are
-promoted to strings of their verbatim representation. Thus:
+2. Array values may be strings, arrays, or dictionaries.
 
-    X: 1.000 + null + false    (Gets the string value "1.000nullfalse")
+3. Array values are separated by whitespace.
+
+4. Arrays are contiguous. That is, there is no way in LSON to indicate an undefined element. For
+   example, the LSON value `[ a, b,,, e ]` yields the array `[ "a", "b", "e" ]`. In this example,
+   `a`, `b` and `e` are considered unquoted strings, and commas and spaces are considred whitespace.
+   If sparse arrays are desired for a particular encoding, it is recommended that dictionaries be
+   used with numeric key values. Encoders should follow the same convention, encoding sparse arrays
+   as dictionaries.
+
+
+Dictionaries
+------------
+Dictionaries (referred to as objects in JSON) are sets of key-value pairs. Keys are string values,
+and hence may be either quoted or unquoted. Dictionaries have the following properties:
+
+1. They begin with a left curly bracket (`{`, `U+007b`), followed by zero or more key-value pairs,
+   followed by a right curly bracket (`}`, `U+007d`).
 
 
 Structures
@@ -236,8 +350,10 @@ or just this (where row 0 is special):
     ]
 
 
-Macros / Definitions (abandoned)
---------------------------------
+Appendix
+--------
+
+### Macros / Definitions (abandoned)
 Macros improve readability, decrease errors, and significantly improve maintainability. Adding
 macros to object notation, however, should not be taken lightly, as this introduces all sorts of
 non-trivial complexity. For example:
