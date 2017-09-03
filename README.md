@@ -2,6 +2,8 @@ LSON: Lucid Serialized Object Notation
 ====================================================================================================
 
 1. Introduction
+   1. Key Differences from JSON
+   2. Special Values
 2. Example LSON
 3. Whitespace
 4. Comments
@@ -10,13 +12,11 @@ LSON: Lucid Serialized Object Notation
    2. Unquoted Strings
    3. Escape Sequences
    4. String Concatenation
-6. Numbers
-7. Reserved Values
-8. Arrays
-9. Dictionaries
-10. Structures
-11. Appendix
-    1. Macros / Definitions (Abandoned)
+6. Arrays
+7. Dictionaries
+8. Structures
+9. Appendix
+   1. Macros / Definitions (Abandoned)
 
 
 Introduction
@@ -32,16 +32,43 @@ Any legal JSON content can be interpreted as legal LSON.
 
 
 ### Key Differences from JSON
-1. Rich comments are supported.
-2. Commas are treated as whitespace. Put them anywhere you want, or nowhere.
+1. LSON supports comments.
+2. Commas (and semicolons) are treated as whitespace. Put them anywhere you want, or nowhere.
 3. String quoting is optional when unnecessary.
 4. Special values are handled seamlessly (_e.g._ NaN, infinity, undefined, 0xfffe, #ff8800).
-5. String values may be broken across lines.
-6. Includes templated objects (structures).
+5. LSON supports templated objects (structures).
+
+
+### Special Values
+
+Of particular significance is item 4 above, relating to special values. JSON defines several special
+values: `true`, `false`, `null` and numbers. Numbers are a _subset_ of legal JavaScript (the “J” in
+JSON) representations. They lack, for example, numbers of the form ".12", where JSON requires a
+leading zero. In addition, the IEEE special values `NaN` and `Infinity` are unsupported. Other
+JavaScript values, such as `0x77` and `undefined` are also lacking.
+
+The elegance of JSON, however, has been an immediate and very successful hit with data interchange
+for all kinds of situations. In this sense, it's as useful for Python or C++ as it is for
+JavaScript. Given this, however,  what to do about Python's `None`, CSS's `#23ec98`, C++'s
+`0xfffe` or Scala's `Any`? The temptation for those who wish to expand on JSON is to formalize these
+values, usually starting with additional JavaScript values.
+
+LSON takes a different approach. Instead of adding additional value types, LSON handles all of them
+as simple strings. This approach provides implicit support for any and all special value types where
+it makes sense – the encoders and decoders decide.
+
+For example, a decoder may encounter the LSON string value `"#ff7e22"`. If a C++ decoder encounters
+this value, it treats is as a C++ string with that value. A CSS decoder, however, _might_ parse this
+string as a color, with value `rgb(255,126,34)`. Or it might not. It's really not the job of the
+serialization protocol to determine utility. Note, however, what happens on re-serialization: the
+C++ encoder writes the value back out as string `"#ff7e22"`, and the CSS encoder writes it back out
+as value `"#ff7e22"` as well. If the value is transformed, then it's written out according to the
+application's needs. It's not up to the serialization format to dictate usage.
 
 
 Example LSON
 ------------
+Following are some example LSON snippets to illustrate various 
 ```
 (Comments are delimited by parentheses, or by doubled parentheses.)
 
@@ -254,14 +281,15 @@ is likely that decoders will interpret these values as strings.
 ### Escape Sequences
 Strings may contain the following escape sequences:
 
-| Sequence   | Description                                    |
-|:-----------|:-----------------------------------------------|
-| `\n`       | new line                                       |
-| `\r`       | carriage return                                |
-| `\t`       | horizontal tab                                 |
-| `\u####`   | Unicode character with four hexadecimal digits |
-| `\U######` | Unicode character with six hexadecimal digits  |
-| `\<any>`   | Yields that character unchanged                |
+| Sequence   | Description                                        |
+|:-----------|:---------------------------------------------------|
+| `\0`       | Null byte                                          |
+| `\n`       | new line                                           |
+| `\r`       | carriage return                                    |
+| `\t`       | horizontal tab                                     |
+| `\u####`   | Unicode character with four hexadecimal digits     |
+| `\U######` | Unicode character with six hexadecimal digits      |
+| `\<any>`   | Yields that character unchanged, such as \' or \\  |
 
 
 ### String Concatenation
@@ -281,43 +309,6 @@ promoted to strings of their verbatim representation. Thus:
     X: 1.000 + null + false    (Gets the string value "1.000nullfalse")
 
 
-Numbers
--------
-Numbers can be expressed in standard exponential notation, as in JSON. In addition, numbers can be
-expressed with leading or trailing decimal points, can begin with a plus sign. The number notation
-is more like C than like JSON — there are many reasonable values that are illegal in JSON.
-
-|  Value  | Legal JSON? |
-|--------:|:-----------:|
-|      0  |     Yes     |
-|    0.1  |     Yes     |
-|     .1  |     No      |
-|    -10  |     Yes     |
-|    +10  |     No      |
-|     1.  |     No      |
-|   1.2e2 |     Yes     |
-|  1.2e-2 |     Yes     |
-|  1.2e+2 |     Yes     |
-
-Note that alternate number formats, such as `0xffeb` or `0b00100001` will fail to be recognized as
-LSON numbers, and will instead be interpreted as unquoted strings. Optional string quoting then
-allows such numbers can be interpreted naturally by a particular interpreter (such as C++), so that
-these special formats can be recognized & processed natively.
-
-
-Reserved Values
----------------
-The following special values are reserved in LSON:
-
-  - `null`
-  - `true`
-  - `false`
-  - `NaN`
-  - `infinity`
-
-In other words, `null` always means the value `null`, and never the string `"null"`. Similarly for
-all other reserved values.
-
 
 Arrays
 ------
@@ -336,6 +327,7 @@ Arrays encode ordered lists of items. They have the following properties:
    If sparse arrays are desired for a particular encoding, it is recommended that dictionaries be
    used with numeric key values. Encoders should follow the same convention, encoding sparse arrays
    as dictionaries.
+
 
 
 Dictionaries
@@ -400,6 +392,7 @@ or just this (where row 0 is special):
         [ thing2 false 13 ]
         [ thing3  true 37 ]
     ]
+
 
 
 Appendix
