@@ -1,22 +1,22 @@
 LSON: Lucid Serialized Object Notation
 ====================================================================================================
 
-1. Introduction
-   1. Key Differences from JSON
-   2. Special Values
-2. Example LSON
-3. Whitespace
-4. Comments
-5. Strings
-   1. Quoted Strings
-   2. Unquoted Strings
-   3. Escape Sequences
-   4. String Concatenation
-6. Arrays
-7. Dictionaries
-8. Structures
-9. Appendix
-   1. Macros / Definitions (Abandoned)
+1. [Introduction]
+   1. [Key Differences from JSON]
+   2. [Special Values]
+2. [Example LSON]
+3. [Whitespace]
+4. [Comments]
+5. [Strings]
+   1. [Quoted Strings]
+   2. [Unquoted Strings]
+   3. [Escape Sequences]
+   4. [String Concatenation]
+6. [Arrays]
+7. [Dictionaries]
+8. [Structures]
+9. [Appendix]
+   1. [Macros / Definitions (Abandoned)]
 
 
 Introduction
@@ -483,3 +483,22 @@ large degree of composition at minimal cost and without risk of infinite recursi
     C = C + B         (C = "BB")
     D = D + A         (D = "DB")
     B = A + C         (B = "BBB")
+
+
+
+[Introduction]:                     #introduction
+[Key Differences from JSON]:        #key-differences-from-json
+[Special Values]:                   #special-values
+[Example LSON]:                     #example-lson
+[Whitespace]:                       #whitespace
+[Comments]:                         #comments
+[Strings]:                          #strings
+[Quoted Strings]:                   #quoted-strings
+[Unquoted Strings]:                 #unquoted-strings
+[Escape Sequences]:                 #escape-sequences
+[String Concatenation]:             #string-concatenation
+[Arrays]:                           #arrays
+[Dictionaries]:                     #dictionaries
+[Structures]:                       #structures
+[Appendix]:                         #appendix
+[Macros / Definitions (Abandoned)]: #macros--definitions-abandoned
