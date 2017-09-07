@@ -8,15 +8,14 @@ LSON: Lucid Serialized Object Notation
 3. [Whitespace]
 4. [Comments]
 5. [Strings]
-   1. [Quoted Strings]
-   2. [Unquoted Strings]
-   3. [Escape Sequences]
-   4. [String Concatenation]
-6. [Arrays]
-7. [Dictionaries]
-8. [Structures]
-9. [Appendix]
-   1. [Macros / Definitions (Abandoned)]
+   1. [Escape Sequences]
+   2. [String Concatenation]
+6. [Words]
+   1. [Word Concatenation]
+7. [Arrays]
+8. [Dictionaries]
+9. [Structures]
+10. [Conclusion]
 
 
 Introduction
@@ -37,33 +36,6 @@ Any legal JSON content can be interpreted as legal LSON.
 3. String quoting is optional when unnecessary.
 4. Special values are handled seamlessly (_e.g._ NaN, infinity, undefined, 0xfffe, #ff8800).
 5. LSON supports templated objects (structures).
-
-
-### Special Values
-
-Of particular significance is item 4 above, relating to special values. JSON defines several special
-values: `true`, `false`, `null` and numbers. Numbers are a _subset_ of legal JavaScript (the “J” in
-JSON) representations. They lack, for example, numbers of the form ".12", where JSON requires a
-leading zero. In addition, the IEEE special values `NaN` and `Infinity` are unsupported. Other
-JavaScript values, such as `0x77` and `undefined` are also lacking.
-
-The elegance of JSON, however, has been an immediate and very successful hit with data interchange
-for all kinds of situations. In this sense, it's as useful for Python or C++ as it is for
-JavaScript. Given this, however,  what to do about Python's `None`, CSS's `#23ec98`, C++'s
-`0xfffe` or Scala's `Any`? The temptation for those who wish to expand on JSON is to formalize these
-values, usually starting with additional JavaScript values.
-
-LSON takes a different approach. Instead of adding additional value types, LSON handles all of them
-as simple strings. This approach provides implicit support for any and all special value types where
-it makes sense – the encoders and decoders decide.
-
-For example, a decoder may encounter the LSON string value `"#ff7e22"`. If a C++ decoder encounters
-this value, it treats is as a C++ string with that value. A CSS decoder, however, _might_ parse this
-string as a color, with value `rgb(255,126,34)`. Or it might not. It's really not the job of the
-serialization protocol to determine utility. Note, however, what happens on re-serialization: the
-C++ encoder writes the value back out as string `"#ff7e22"`, and the CSS encoder writes it back out
-as value `"#ff7e22"` as well. If the value is transformed, then it's written out according to the
-application's needs. It's not up to the serialization format to dictate usage.
 
 
 Example LSON
@@ -198,8 +170,9 @@ semicolons to be whitespace:
 
 Comments
 --------
-```
     (Anything in parentheses is a comment. Take that, JSON.)
+
+    (You can escape a closing parentheses (like this\), if you really must.)
 
     ((  Double-parentheses comments require whitespace after the opener and
         before the closer (new lines count as whitespace). This means that
@@ -209,15 +182,11 @@ Comments
         comment, then just use ") )" or any other "escape" character, like this:
         ((x)_).
     ))
-```
 
 
 Strings
 -------
-
-### Quoted Strings
-
-Strings may be quoted with any of the following pairs:
+Strings are delimited with any of the following character pairs:
 
 |  Quotes    | Character Codes                                                      |
 |:----------:|:---------------------------------------------------------------------|
@@ -227,56 +196,6 @@ Strings may be quoted with any of the following pairs:
 |  ‘string’  |  U+2018 U+2019 (_{Left,Right} Single Quotation Mark_)                |
 |  “string”  |  U+201c U+201d (_{Left,Right} Double Quotation Mark_)                |
 |  ‹string›  |  U+2039 U+203a (_Single {Left,Right}-Pointing Angle Quotation Mark_) |
-
-### Unquoted Strings
-Strings require quotes only if they contain unescaped whitespace. Remember that in LSON, commas and
-semicolons are considered whitespace.
-
-It it important to note that this feature is more useful than just as a shorthand for more efficient
-representation: it also provides an excellent mechanism for handling special values.
-
-For example, consider the values `null`, `undefined`, `QNaN`, `SNaN`, and `maybe`. Various targets
-will be able to support subsets of this set. For example, C++ has no concept of `undefined`, `null`
-only applies to pointers, and has no support for`Maybe` (an indefinite Boolean value).
-In JavaScript, a `NaN` value is a `QNaN`, doesn't provide a way to create `SNaN`, and doesn't
-support `Maybe`. One of the weaknesses of standard JSON is that it implicitly favors JavaScript's
-data model.
-
-Since single-word strings don't require quotes, special values can be naturally expressed in LSON,
-and interpreters can handle them as native values, or fall back to string values. In order to make
-such values durable, it is best if encoders always omit quotes when possible.
-
-For example, consider the following fragment:
-
-    {
-        redLevel: null
-        blueLevel: undefined
-        isElevated: true
-        isReady: maybe
-    }
-
-In this case, a JavaScript decoder would yield the following object:
-
-    {
-        redLevel: null,
-        blueLevel: undefined,
-        isElevated: true,
-        isReady: "maybe"
-    }
-
-A C++ decoder might yield the following equivalent:
-
-    struct {
-        char *redLevel;
-        char *blueLevel;
-        bool  isElevated;
-        char *isReady;
-    } {
-        "null", "undefined", true, "maybe"
-    };
-
-**NOTE**: This allows special (and arbitrarily complex) values to be introduced at will, though it
-is likely that decoders will interpret these values as strings.
 
 ### Escape Sequences
 Strings may contain the following escape sequences:
@@ -291,7 +210,6 @@ Strings may contain the following escape sequences:
 | `\U######` | Unicode character with six hexadecimal digits      |
 | `\<any>`   | Yields that character unchanged, such as \' or \\  |
 
-
 ### String Concatenation
 In order to support human-readable long strings, the `+` operator may be used to construct
 concatenations. For example:
@@ -303,11 +221,51 @@ concatenations. For example:
                 + "Who's there?\n"
     }
 
-Note that the concatenation operator always promotes all values to strings. Non-string values are
-promoted to strings of their verbatim representation. Thus:
 
-    X: 1.000 + null + false    (Gets the string value "1.000nullfalse")
+Words
+-----
+Words are unquoted strings. For example,
 
+    node: {
+        id:       1223-02
+        class:    sphere
+        weight:   112.23e-6
+        previous: null
+        next:     0xff128bc5
+    }
+
+It it important to note that this feature is more useful than just as a shorthand for string values:
+it also provides an excellent mechanism for conveying arbitrary special values.
+
+JSON defines several special values: `true`, `false`, `null` and numbers. Numbers are a _subset_ of
+legal JavaScript (the “J” in JSON) representations. They lack, for example, numbers of the form
+".12", where JSON requires a leading zero. In addition, the IEEE special values `NaN` and `Infinity`
+are unsupported. Other JavaScript values, such as `0x77` and `undefined` are also lacking.
+
+The elegance of JSON, however, has given rise to its overwhelming success as a data interchange
+format for all kinds of situations. In this sense, it's as useful for Python or C++ as it is for
+JavaScript. Given this, however,  what to do about Python's `None`, CSS's `#23ec98`, C++'s `0xfffe`
+or Scala's `Any`? The temptation for those who wish to expand on JSON is to formalize these special
+values, usually starting with the introduction of additional JavaScript values.
+
+LSON takes a different approach. Instead of adding additional value types, LSON handles all of them
+as simple bare words. This approach provides implicit support for any and all special value types
+where it makes sense – the encoders and decoders decide. If a decoder does not understand a special
+value (for example, a C++ parser that encounters the word `#ff7e22`), the word is simply interpreted
+as the string value `"#ff7e22"`. A decoder that understands CSS color values, however, _might_ parse
+this string as a color, with value `rgb(255,126,34)`. Or it might not. It's really not the job of
+the serialization protocol to determine interpretation. Note, however, what happens on
+re-serialization: the C++ encoder writes the value back out as the word value `#ff7e22`, and the CSS
+encoder writes it back out as the word value `#ff7e22` as well. If the value is transformed, then
+it's written out as the application deems proper. It's not up to the serialization format to dictate
+usage.
+
+This provides a simple, stable mechanism for the interchange of data across many different types of
+encoders and decoders, and additionally provides for a way to convey domain-specific data values.
+
+### Word Concatenation
+The concatenation operator always promotes words to strings, to produce a string-valued result. For
+example, the LSON `red + green + blue` would yield the string value `"redgreenblue"`.
 
 
 Arrays
@@ -332,7 +290,7 @@ Arrays encode ordered lists of items. They have the following properties:
 
 Dictionaries
 ------------
-Dictionaries (referred to as objects in JSON) are sets of key-value pairs. Keys are string values,
+Dictionaries (referred to as _objects_ in JSON) are sets of key-value pairs. Keys are string values,
 and hence may be either quoted or unquoted. Dictionaries have the following properties:
 
 1. They begin with a left curly bracket (`{`, `U+007b`), followed by zero or more key-value pairs,
@@ -341,6 +299,7 @@ and hence may be either quoted or unquoted. Dictionaries have the following prop
 
 Structures
 ----------
+A _structure_ is really just a shorthand for expressing dictionaries, without repeating key names.
 The following fragment:
 
     {
@@ -370,10 +329,38 @@ is a concise way to express the following:
         ]
     }
 
-If more values are given for a row than were specified in the structure template, they will be
-ignored. If fewer values are given, they will be interpreted as `null`.
+If more values are given for a row than were specified in the structure template, the additional
+values will be ignored. If fewer values are given, the missing values will be undefined. For
+example,
 
-As a side note, this is _not_ the most efficient way to express CSV. That would be more like this:
+    {
+        collection <value isPositive>: [
+            < -1.5 false >
+            <  0         >
+            <  2.4 true  red null >
+        ]
+    }
+
+would yield the same result as this LSON:
+
+    {
+        collection: [
+            {
+                value: -1.5
+                isPositive: false
+            }
+            {
+                value: 0
+            }
+            {
+                value: 2.4
+                isPositive: true
+            }
+        ]
+    }
+
+As a side note, this is _not_ the most efficient way to express tabular data. That would be more
+like this:
 
     {
         fields: [ key1 key2 key3 ]
@@ -394,95 +381,13 @@ or just this (where row 0 is special):
     ]
 
 
-
-Appendix
---------
-
-### Macros / Definitions (abandoned)
-Macros improve readability, decrease errors, and significantly improve maintainability. Adding
-macros to object notation, however, should not be taken lightly, as this introduces all sorts of
-non-trivial complexity. For example:
-
-- Should definitions be scoped?
-- Should there be an "undef" mechanism?
-- Should they be treated as a separate mechanism (like C's CPP) or integrated into the language?
-- Can definitions cascade?
-
-The first obvious addition would be a simple id-value replacement. For example:
-
-    {
-        lessThan    = -1
-        equalTo     =  0
-        greaterThan =  1
-
-        [
-            [  20,    5, greaterThan ]
-            [  17,   47, lessThan ]
-            [ 100, -200, greaterThan ]
-            [  40,   40, equalTo ]
-        ]
-    }
-
-There's a decision to be made about legal right-hand sides of a macro definition, which gets into
-all of the arcane aspects of the C++ processor, such as token pasting. For example, what about this:
-
-    {
-        start = {
-        end = }
-
-        start blah:blech end
-    }
-
-Of course, that then gets into scoping of the definition statement. It is to end of line? If so,
-should we introduce a line continuation operator? Ugh.
-
-And what about tricks like this (using C++'s CPP token-pasting operator ##):
-
-    {
-        foo = is
-        v0  = False
-        v1  = True
-        isFalse = false
-        isTrue  = true
-
-        x: foo##v0    (foo##v0 -> isFalse -> false)
-        y: foo##v1    (foo##v1 -> isTrue  -> true )
-    }
-
-Ugh again.
-
-This hasn't even gotten into parameterized definitions like this:
-
-    {
-        !! logMsg <type msg> = "[" + type + "] " + msg
-
-        noFile:   !logMsg <ERROR   "Can't find file">
-        openFail: !logMsg <ERROR   "Can't open file">
-        dateFail: !logMsg <WARNING "Couldn't update file date">
-    }
-
-And so forth.
-
-However, just because this could get vastly more complicated, that doesn't mean we should close the
-door on every subset. It should be pretty clear that simple value definition is immediately and
-widely useful, and relatively easy to implement. Undefining a variable is as easy as restoring
-default behavior:
-
-    previously_defined_definition = "previously_defined_definition"
-
-Definitions can have two scopes: global and object/array. Definitions can appear anywhere in an
-object, but must occur before use.
-
-Definitions can cascade, but each definition is resolved _immediately_ as it is encountered. If it
-uses other definitions, their already-resolved values are used in the new definition. This allows a
-large degree of composition at minimal cost and without risk of infinite recursion. For example:
-
-    A = B             (A = "B")
-    B = A + foo       (B = "Bfoo")
-    C = A             (C = "B")
-    C = C + B         (C = "BB")
-    D = D + A         (D = "DB")
-    B = A + C         (B = "BBB")
+Conclusion
+----------
+Wrapping up, LSON expresses data using five primitives: word, strings, arrays, dictionaries, and
+structures. It has no inherently special values like `true`, `false`, `null`, or numbers, and
+instead uses generic _words_ to express values that may have additional semantics and meaning to
+encoders beyond their string representation. Finally, LSON supports comments as a valuable tool for
+annotating source files.
 
 
 
@@ -493,12 +398,11 @@ large degree of composition at minimal cost and without risk of infinite recursi
 [Whitespace]:                       #whitespace
 [Comments]:                         #comments
 [Strings]:                          #strings
-[Quoted Strings]:                   #quoted-strings
-[Unquoted Strings]:                 #unquoted-strings
 [Escape Sequences]:                 #escape-sequences
 [String Concatenation]:             #string-concatenation
+[Words]:                            #words
+[Word Concatenation]:               #word-concatenation
 [Arrays]:                           #arrays
 [Dictionaries]:                     #dictionaries
 [Structures]:                       #structures
-[Appendix]:                         #appendix
-[Macros / Definitions (Abandoned)]: #macros--definitions-abandoned
+[Conclusion]:                       #conclusion
