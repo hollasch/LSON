@@ -42,9 +42,9 @@ Example LSON
 ------------
 Following are some example LSON snippets to illustrate various 
 ```
-(Comments are delimited by parentheses, or by doubled parentheses.)
+(Comments are delimited by parentheses, or by star parentheses.)
 
-(( This is an example using doubled parentheses. They must be separated by whitespace. ))
+(* This is an example using star parentheses. They must be separated by whitespace. *)
 
 {
     glossary: {
@@ -174,14 +174,13 @@ Comments
 
     (You can escape a closing parentheses (like this\), if you really must.)
 
-    ((  Double-parentheses comments require whitespace after the opener and
         before the closer (new lines count as whitespace). This means that
-        including ((doubled)) parentheses is fine as well (since they're only
-        closed with "<whitespace>))"). This is probably the best form for block
+        including (*non-whitespace*) parentheses is fine as well (since these
+        lack the required whitespace). This is probably the best form for block
         comments. If you must have multiple closing parentheses in your block
-        comment, then just use ") )" or any other "escape" character, like this:
-        ((x)_).
-    ))
+        comment, then just use "* )" or any other "escape" character, like this:
+        (* x *;).
+    *)
 
 
 Strings
