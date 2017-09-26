@@ -314,18 +314,9 @@ is a concise way to express the following:
 
     {
         someStruct: [
-            {   key1: thing1
-                key2: false
-                key3: 3
-            }
-            {   key1: thing2
-                key2: false
-                key3: 13
-            }
-            {   key1: thing3
-                key2: true
-                key3: 37
-            }
+            {   key1:thing1 key2:false key3:3  }
+            {   key1:thing2 key2:false key3:13 }
+            {   key1:thing3 key2:true  key3:37 }
         ]
     }
 
@@ -345,39 +336,31 @@ would yield the same result as this LSON:
 
     {
         collection: [
-            {
-                value: -1.5
-                isPositive: false
-            }
-            {
-                value: 0
-            }
-            {
-                value: 2.4
-                isPositive: true
-            }
+            { value: -1.5, isPositive: false }
+            { value: 0 }
+            { value: 2.4, isPositive: true }
         ]
     }
 
-As a side note, this is _not_ the most efficient way to express tabular data. That would be more
-like this:
+As a side note, this is _not_ necessarily the best or most efficient way to express tabular data.
+That would be more like this:
 
     {
-        fields: [ key1 key2 key3 ]
+        fields: [ first_name last_name ID ]
         rows: [
-            [ thing1 false  3 ]
-            [ thing2 false 13 ]
-            [ thing3  true 37 ]
+            [ Ariel   Astro    48844757 ]
+            [ Blue    Blastar  23cc418e ]
+            [ Castor  Cantrod  b12b4f89 ]
         ]
     }
 
-or just this (where row 0 is special):
+or just this (where row 0 is special and holds the column names):
 
     [
-        [ key1 key2 key3 ]
-        [ thing1 false  3 ]
-        [ thing2 false 13 ]
-        [ thing3  true 37 ]
+        [ first_name  last_name  ID       ]
+        [ Ariel       Astro      48844757 ]
+        [ Blue        Blastar    23cc418e ]
+        [ Castor      Cantrod    b12b4f89 ]
     ]
 
 
