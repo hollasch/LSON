@@ -42,32 +42,32 @@ Example LSON
 ------------
 Following are some example LSON snippets to illustrate various 
 ```
-(Comments are delimited by parentheses, or by star parentheses.)
+// Comments are C-style: double slash to end of line, or enclosed with `/*` and `*/`.
 
-(* This is an example using star parentheses. They must be separated by whitespace. *)
+/* This is an example using slash-star delimeters. */
 
 {
     glossary: {
-        title: 'example glossary' (There are six legal string-delimeter pairs.)
+        title: 'example glossary'  // There are six legal string-delimeter pairs.
         "Gloss Div": {
             title: S
             "Gloss List": {
                 "Gloss Entry": {
-                    (Strings may be unquoted as long as they contain no whitespace.)
+                    /* Strings may be unquoted as long as they contain no whitespace. */
                     ID: SGML
 
                     SortAs:  SGML
                     Acronym: SGML
                     "Gloss Term": "Standard Generalized Markup Language"
 
-                    (Unquoted strings may contain whitespace if escaped.)
+                    // Unquoted strings may contain whitespace if escaped.
                     Abbrev: ISO\ 8879:1986
 
                     "Gloss Def": {
                         para: "A meta-markup language, used to create markup languages "
                             + "such as DocBook."
 
-                        (Note that commas and semicolons are considered whitespace.)
+                        // Note that commas and semicolons are considered whitespace.
                         "Gloss SeeAlso": [ GML, XML ];
                         "Gloss See": markup;
                     }
@@ -79,13 +79,13 @@ Following are some example LSON snippets to illustrate various
 ```
 
 ```
-(An Example Menu Description)
+// An Example Menu Description
 {
     menu: {
         id:    file;
         value: file;
         popup: {
-            menuitem <value, onclick>: [       (Structured objects)
+            menuitem <value, onclick>: [       // Structured objects
                 < New,   CreateNewDoc() >
                 < Open,  OpenDoc()      >
                 < Close, CloseDoc()     >
@@ -99,15 +99,15 @@ Following are some example LSON snippets to illustrate various
 {
     widget: {
         debug: on
-        "debug:Level"=  1.0      (The literal string value "1.0")
-        "debug:Weight": Infinity (Converts to floating-point +infinity if understood, else string)
-        "debug:Prefix": null     (Converts to null value if understood, otherwise string)
-        "debug:Mask":   0xffe0   (Converts to hex number value if understood, else string)
+        "debug:Level"=  1.0      // The literal string value "1.0"
+        "debug:Weight": Infinity // Converts to floating-point +infinity if understood, else string
+        "debug:Prefix": null     // Converts to null value if understood, otherwise string
+        "debug:Mask":   0xffe0   // Converts to hex number value if understood, else string
 
         window: {
             title:  "Sample Konfabulator Widget"
             name:   main_window
-            width:  500  (Converts to number value if understood)
+            width:  500  // Converts to number value if understood
             height: 500
         }
         image: {
@@ -170,17 +170,10 @@ semicolons to be whitespace:
 
 Comments
 --------
-    (Anything in parentheses is a comment. Take that, JSON.)
+    // Single line comments run from double forward slashes to end of line.
 
-    (You can escape a closing parentheses (like this\), if you really must.)
-
-        before the closer (new lines count as whitespace). This means that
-        including (*non-whitespace*) parentheses is fine as well (since these
-        lack the required whitespace). This is probably the best form for block
-        comments. If you must have multiple closing parentheses in your block
-        comment, then just use "* )" or any other "escape" character, like this:
-        (* x *;).
-    *)
+    /*  Slash-star comments: this is probably the best form for block
+        comments. */
 
 
 Strings
@@ -207,7 +200,7 @@ Strings may contain the following escape sequences:
 | `\t`       | horizontal tab                                     |
 | `\u####`   | Unicode character with four hexadecimal digits     |
 | `\U######` | Unicode character with six hexadecimal digits      |
-| `\<any>`   | Yields that character unchanged, such as \' or \\  |
+| `\<any>`   | Yields that character unchanged, such as `\'` or `\\`  |
 
 ### String Concatenation
 In order to support human-readable long strings, the `+` operator may be used to construct
