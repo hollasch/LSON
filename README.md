@@ -15,26 +15,30 @@ LSON: Lucid Serialized Object Notation
 7. [Arrays]
 8. [Dictionaries]
 9. [Structures]
-10. [Conclusion]
 
 
 Introduction
 ------------
-
 LSON is a concise data representation that has the simplicity and expressiveness of JSON, but
 differs in two primary areas:
 
-  1. It's intended to be concise and friendly to humans as well as computers,
+  1. It’s intended to be concise and friendly to humans as well as computers,
   2. It does not aim to mirror JavaScript.
 
-Any legal JSON content can be interpreted as legal LSON.
+LSON is a superset of JSON: Any legal JSON is legal LSON.
+
+LSON expresses data using five primitives: words, strings, arrays, dictionaries, and
+structures. It has no inherently special values like `true`, `false`, `null`, or numbers, and
+instead uses generic _words_ to express values that may have additional meaning and semantics to
+encoders beyond their string value.
 
 
 ### Key Differences from JSON
 1. LSON supports comments.
 2. Commas (and semicolons) are treated as whitespace. Put them anywhere you want, or nowhere.
-3. String quoting is optional when unnecessary.
-4. Special values are handled seamlessly (_e.g._ NaN, infinity, undefined, 0xfffe, #ff8800).
+3. String quoting is optional for words (strings without whitespace).
+4. All possible special (word) values are handled seamlessly (_e.g._ `NaN`, `infinity`, `undefined`,
+   `maybe`, `0xfffe`, `#ff8800`).
 5. LSON supports templated objects (structures).
 
 
@@ -354,15 +358,6 @@ or just this (where row 0 is special and holds the column names):
         [ Blue        Blastar    23cc418e ]
         [ Castor      Cantrod    b12b4f89 ]
     ]
-
-
-Conclusion
-----------
-Wrapping up, LSON expresses data using five primitives: word, strings, arrays, dictionaries, and
-structures. It has no inherently special values like `true`, `false`, `null`, or numbers, and
-instead uses generic _words_ to express values that may have additional semantics and meaning to
-encoders beyond their string representation. Finally, LSON supports comments as a valuable tool for
-annotating source files.
 
 
 
