@@ -134,8 +134,9 @@ Following are some example LSON snippets to illustrate various
 
 Whitespace
 ----------
-In addition to the standard Unicode whitespace characters, LSON also considers commans and
-semicolons to be whitespace:
+LSON whitespace includes all
+[standard Unicode whitespace characters](https://en.wikipedia.org/wiki/Whitespace_character#Unicode),
+as well as commas and semicolons:
 
 | Unicode | Escape | Description
 |:-------:|:------:|:-----------
