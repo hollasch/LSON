@@ -188,7 +188,6 @@ Strings are delimited with any of the following character pairs:
 |  «string»  |  U+00ab U+00bb (_{Left,Right}-Pointing Double Angle Quotation Mark_) |
 |  ‘string’  |  U+2018 U+2019 (_{Left,Right} Single Quotation Mark_)                |
 |  “string”  |  U+201c U+201d (_{Left,Right} Double Quotation Mark_)                |
-|  ‹string›  |  U+2039 U+203a (_Single {Left,Right}-Pointing Angle Quotation Mark_) |
 
 ### Escape Sequences
 Strings may contain the following escape sequences:
