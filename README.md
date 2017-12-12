@@ -15,6 +15,7 @@ LSON: Lucid Serialized Object Notation
 7. [Arrays]
 8. [Dictionaries]
 9. [Structures]
+10. [Grammar]
 
 
 Introduction
@@ -283,7 +284,6 @@ Arrays encode ordered lists of items. They have the following properties:
    as dictionaries.
 
 
-
 Dictionaries
 ------------
 Dictionaries (referred to as _objects_ in JSON) are sets of key-value pairs. Keys are string values,
@@ -360,6 +360,58 @@ or just this (where row 0 is special and holds the column names):
     ]
 
 
+Grammar
+-------
+```
+lson-file ::= <value>
+
+line-terminator ::= U+000a | U+000b | U+000c | U+000d | U+0085 | U+2028 | U+2029
+
+comment-line-remainder ::= "//" <any character not line-terminator>* <line-terminator>
+comment-block ::= "/*" <any character sequence not containing "*/"> "*/"
+
+whitespace-item ::= <comment-line-remainder> | <comment-block> | <line-terminator>
+    | U+0009 | U+0020 | U+00a0 | U+1680 | U+2000 | U+2001 | U+2002 | U+2003 | U+2004 | U+2005
+    | U+2006 | U+2007 | U+2008 | U+2009 | U+200a | U+2028 | U+2029 | U+202f | U+205f | U+3000
+
+whitespace ::= <whitespace-item>+
+
+value ::= <word> | <string> | <dictionary> | <array> | <structure>
+
+string-character ::= <non whitespace character>
+    | "\0" | "\n" | "\r" | "\t" | "\u" <hex4> | "\U" <hex6> | "\" <character>
+
+hex4 ::= <hex> <hex> <hex> <hex>
+hex6 ::= <hex> <hex> <hex> <hex> <hex> <hex>
+
+hex ::= "0" | "1" | "2" | "3" | "4" | "5" | "6" | "7" | "8" | "9"
+      | "a" | "b" | "c" | "d" | "e" | "f"
+      | "A" | "B" | "C" | "D" | "E" | "F"
+
+word ::= <string-character>+
+
+string ::= <string-begin-quote> <any <string-character> not matching begin quote>*
+    <string-end-quote> <concatenated-string>*
+
+string-begin-quote ::= U+2022 | "'" | "«" | "‘" | "“"
+string-end-quote   ::= U+2022 | "'" | "»" | "’" | "”"
+
+concatenated-string ::= "+" ( <word> | <string> )
+
+dictionary ::= "{" <dictionary-body> "}"
+
+dictionary-body ::= <dictionary-item>*
+dictionary-item ::= <key> ":" <value> <terminator>?
+key ::= <word> | <string>
+
+array ::= "[" <array-item>* "]"
+array-item ::= <value> <terminator>?
+
+structure ::= <key> "<" ( <key> <terminator>? )+ ">" ":" "[" <structure-item>* "]"
+structure-item ::= "<" <array-item>* ">" <terminator>?
+```
+
+
 
 [Introduction]:                     #introduction
 [Key Differences from JSON]:        #key-differences-from-json
@@ -376,3 +428,4 @@ or just this (where row 0 is special and holds the column names):
 [Dictionaries]:                     #dictionaries
 [Structures]:                       #structures
 [Conclusion]:                       #conclusion
+[Grammar]:                          #grammar
