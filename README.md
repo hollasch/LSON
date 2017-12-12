@@ -104,7 +104,7 @@ Following are some example LSON snippets to illustrate various
 {
     widget: {
         debug: on
-        "debug:Level"=  1.0      // The literal string value "1.0"
+        "debug:Level":  1.0      // The literal string value "1.0"
         "debug:Weight": Infinity // Converts to floating-point +infinity if understood, else string
         "debug:Prefix": null     // Converts to null value if understood, otherwise string
         "debug:Mask":   0xffe0   // Converts to hex number value if understood, else string
