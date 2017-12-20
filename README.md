@@ -16,6 +16,7 @@ LSON: Lucid Serialized Object Notation
 8. [Dictionaries]
 9. [Structures]
 10. [Grammar]
+11. [Appendix A: String Little Languages]
 
 
 Introduction
@@ -411,21 +412,38 @@ structure ::= <key> "<" ( <key> <terminator>? )+ ">" ":" "[" <structure-item>* "
 structure-item ::= "<" <array-item>* ">" <terminator>?
 ```
 
+Appendix A: String Little Languages
+-----------------------------------
+This is implied above, but provided here to be more explicit. Words such as `null` and `#ffee05` can
+be thought of as “little languages”. In order for word→value promotion to work, words must be
+recognizable from only their string value, and unambiguous. Again, this process lies entirely within
+the domain of the application; LSON does not stipulate the format of special word values in any way.
+
+In the same manner, any string value can also be a little language, again defined entirely in the
+domain of the application and outside the domain of LSON. For example, a string value parsed by a
+JavaScript application may describe a function definition, such as `"(x,y,z) => { return
+Math.sqrt(x*x + y+y + z*z) }"`. As long as something can be decoded from (and encoded to) a string,
+it's representable in an agnostic way in LSON.
+
+Contrast this to JSON's inclusion of number values, `true`, `false` and `null`, which are actually
+domain-specific values (exceedlingly common, but still domain specific).
 
 
-[Introduction]:                     #introduction
-[Key Differences from JSON]:        #key-differences-from-json
-[Special Values]:                   #special-values
-[Example LSON]:                     #example-lson
-[Whitespace]:                       #whitespace
-[Comments]:                         #comments
-[Strings]:                          #strings
-[Escape Sequences]:                 #escape-sequences
-[String Concatenation]:             #string-concatenation
-[Words]:                            #words
-[Word Concatenation]:               #word-concatenation
-[Arrays]:                           #arrays
-[Dictionaries]:                     #dictionaries
-[Structures]:                       #structures
-[Conclusion]:                       #conclusion
-[Grammar]:                          #grammar
+
+[Introduction]:                      #introduction
+[Key Differences from JSON]:         #key-differences-from-json
+[Special Values]:                    #special-values
+[Example LSON]:                      #example-lson
+[Whitespace]:                        #whitespace
+[Comments]:                          #comments
+[Strings]:                           #strings
+[Escape Sequences]:                  #escape-sequences
+[String Concatenation]:              #string-concatenation
+[Words]:                             #words
+[Word Concatenation]:                #word-concatenation
+[Arrays]:                            #arrays
+[Dictionaries]:                      #dictionaries
+[Structures]:                        #structures
+[Conclusion]:                        #conclusion
+[Grammar]:                           #grammar
+[Appendix A: String Little Languages]: #appendix-a-string-little-languages
