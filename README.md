@@ -187,13 +187,14 @@ Strings
 -------
 Strings are delimited with any of the following character pairs:
 
-|  Quotes    | Character Codes                                                      |
-|:----------:|:---------------------------------------------------------------------|
-|  "string"  |  U+0022 U+0022 (_Quotation Mark_)                                    |
-|  'string'  |  U+0027 U+0027 (_Apostrophe_)                                        |
-|  «string»  |  U+00ab U+00bb (_{Left,Right}-Pointing Double Angle Quotation Mark_) |
-|  ‘string’  |  U+2018 U+2019 (_{Left,Right} Single Quotation Mark_)                |
-|  “string”  |  U+201c U+201d (_{Left,Right} Double Quotation Mark_)                |
+|  Quotes    | Character Codes | Description                                       |
+|:----------:|:---------------:|:--------------------------------------------------|
+|  "string"  |     U+0022      | Quotation Mark                                    |
+|  'string'  |     U+0027      | Apostrophe                                        |
+| \`string\` |     U+0060      | Grave Accent (Backtick)
+|  «string»  | U+00ab, U+00bb  | {Left,Right}-Pointing Double Angle Quotation Mark |
+|  ‘string’  | U+2018, U+2019  | {Left,Right} Single Quotation Mark                |
+|  “string”  | U+201c, U+201d  | {Left,Right} Double Quotation Mark                |
 
 ### Escape Sequences
 Strings may contain the following escape sequences:
@@ -430,20 +431,20 @@ domain-specific values (exceedlingly common, but still domain specific).
 
 
 
-[Introduction]:                      #introduction
-[Key Differences from JSON]:         #key-differences-from-json
-[Special Values]:                    #special-values
-[Example LSON]:                      #example-lson
-[Whitespace]:                        #whitespace
-[Comments]:                          #comments
-[Strings]:                           #strings
-[Escape Sequences]:                  #escape-sequences
-[String Concatenation]:              #string-concatenation
-[Words]:                             #words
-[Word Concatenation]:                #word-concatenation
-[Arrays]:                            #arrays
-[Dictionaries]:                      #dictionaries
-[Structures]:                        #structures
-[Conclusion]:                        #conclusion
-[Grammar]:                           #grammar
 [Appendix A: String Little Languages]: #appendix-a-string-little-languages
+[Arrays]:                              #arrays
+[Comments]:                            #comments
+[Conclusion]:                          #conclusion
+[Dictionaries]:                        #dictionaries
+[Escape Sequences]:                    #escape-sequences
+[Example LSON]:                        #example-lson
+[Grammar]:                             #grammar
+[Introduction]:                        #introduction
+[Key Differences from JSON]:           #key-differences-from-json
+[Special Values]:                      #special-values
+[String Concatenation]:                #string-concatenation
+[Strings]:                             #strings
+[Structures]:                          #structures
+[Whitespace]:                          #whitespace
+[Word Concatenation]:                  #word-concatenation
+[Words]:                               #words
