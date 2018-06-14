@@ -206,11 +206,13 @@ Strings may contain the following escape sequences:
 
 | Sequence   | Description                                            |
 |:-----------|:-------------------------------------------------------|
-| `\0`       | Null byte                                              |
-| `\n`       | new line                                               |
-| `\r`       | carriage return                                        |
-| `\t`       | horizontal tab                                         |
-| `\u{#...}` | Unicode character from one or more hexadecimal digits  |
+| `\b`       | Backspace                                              |
+| `\f`       | Form feed                                              |
+| `\n`       | New line                                               |
+| `\r`       | Carriage return                                        |
+| `\t`       | Horizontal tab                                         |
+| `\uXXXX`   | Unicode character from four hexadecimal digits         |
+| `\u{X...}` | Unicode character from one or more hexadecimal digits  |
 | `\<any>`   | Yields that character unchanged, such as `\'` or `\\`  |
 
 ### String Concatenation
@@ -370,11 +372,13 @@ whitespace ::= <whitespace-item>+
 value ::= <word> | <string> | <dictionary> | <array> | <structure>
 
 string-character ::= <non whitespace character>
-    | "\0" | "\n" | "\r" | "\t" | "\u{" <hex>+ "}" | "\" <character>
+    | "\b" | "\f" | "\n" | "\r" | "\t" | "\u" <hex4> | "\u{" <hex>+ "}" | "\" <character>
 
 hex ::= "0" | "1" | "2" | "3" | "4" | "5" | "6" | "7" | "8" | "9"
       | "a" | "b" | "c" | "d" | "e" | "f"
       | "A" | "B" | "C" | "D" | "E" | "F"
+
+<hex4> ::= <hex> <hex> <hex> <hex>
 
 word ::= <string-character>+
 
