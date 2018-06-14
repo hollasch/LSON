@@ -149,36 +149,35 @@ Following are some example LSON snippets to illustrate various aspects.
 
 Whitespace
 -----------
-LSON whitespace includes all
-[standard Unicode whitespace characters](https://en.wikipedia.org/wiki/Whitespace_character#Unicode).
+LSON whitespace includes all [standard Unicode whitespace characters].
 
-| Unicode | Escape | Description
-|:-------:|:------:|:-----------
-| U+0009  |  \t    | Tab
-| U+000a  |  \n    | Newline, or line feed
-| U+000b  | \u000b | Vertical tab
-| U+000c  |  \f    | Form feed
-| U+000d  |  \r    | Carriage return
-| U+0020  | \u0020 | Standard space character
-| U+0085  | \u0085 | Next line
-| U+00a0  | \u00a0 | No-break space
-| U+1680  | \u1680 | Ogham space mark
-| U+2000  | \u2000 | En quad
-| U+2001  | \u2001 | Em quad (mutton quad)
-| U+2002  | \u2002 | En space (nut)
-| U+2003  | \u2003 | Em space (mutton)
-| U+2004  | \u2004 | Three-per-em-space (thick space)
-| U+2005  | \u2005 | Four-per-em-space (mid space)
-| U+2006  | \u2006 | Six-per-em-space
-| U+2007  | \u2007 | Figure space
-| U+2008  | \u2008 | Punctuation space
-| U+2009  | \u2009 | Thin space
-| U+200a  | \u200a | Hair space
-| U+2028  | \u2028 | Line separator
-| U+2029  | \u2029 | Paragraph separator
-| U+202f  | \u202f | Narrow no-break space
-| U+205f  | \u205f | Medium mathematical space
-| U+3000  | \u3000 | Ideographic space
+| Unicode |   Escape   | Description
+|:-------:|:----------:|:-----------
+| U+0009  |    `\t`    | Tab
+| U+000a  |    `\n`    | Newline, or line feed
+| U+000b  |  `\u{0b}`  | Vertical tab
+| U+000c  |    `\f`    | Form feed
+| U+000d  |    `\r`    | Carriage return
+| U+0020  |  `\u{20}`  | Standard space character
+| U+0085  |  `\u{85}`  | Next line
+| U+00a0  |  `\u{a0}`  | No-break space
+| U+1680  | `\u{1680}` | Ogham space mark
+| U+2000  | `\u{2000}` | En quad
+| U+2001  | `\u{2001}` | Em quad (mutton quad)
+| U+2002  | `\u{2002}` | En space (nut)
+| U+2003  | `\u{2003}` | Em space (mutton)
+| U+2004  | `\u{2004}` | Three-per-em-space (thick space)
+| U+2005  | `\u{2005}` | Four-per-em-space (mid space)
+| U+2006  | `\u{2006}` | Six-per-em-space
+| U+2007  | `\u{2007}` | Figure space
+| U+2008  | `\u{2008}` | Punctuation space
+| U+2009  | `\u{2009}` | Thin space
+| U+200a  | `\u{200a}` | Hair space
+| U+2028  | `\u{2028}` | Line separator
+| U+2029  | `\u{2029}` | Paragraph separator
+| U+202f  | `\u{202f}` | Narrow no-break space
+| U+205f  | `\u{205f}` | Medium mathematical space
+| U+3000  | `\u{3000}` | Ideographic space
 
 
 Comments
@@ -205,14 +204,13 @@ Strings are delimited with any of the following character pairs:
 ### Escape Sequences
 Strings may contain the following escape sequences:
 
-| Sequence   | Description                                        |
-|:-----------|:---------------------------------------------------|
-| `\0`       | Null byte                                          |
-| `\n`       | new line                                           |
-| `\r`       | carriage return                                    |
-| `\t`       | horizontal tab                                     |
-| `\u####`   | Unicode character with four hexadecimal digits     |
-| `\U######` | Unicode character with six hexadecimal digits      |
+| Sequence   | Description                                            |
+|:-----------|:-------------------------------------------------------|
+| `\0`       | Null byte                                              |
+| `\n`       | new line                                               |
+| `\r`       | carriage return                                        |
+| `\t`       | horizontal tab                                         |
+| `\u{#...}` | Unicode character from one or more hexadecimal digits  |
 | `\<any>`   | Yields that character unchanged, such as `\'` or `\\`  |
 
 ### String Concatenation
@@ -372,10 +370,7 @@ whitespace ::= <whitespace-item>+
 value ::= <word> | <string> | <dictionary> | <array> | <structure>
 
 string-character ::= <non whitespace character>
-    | "\0" | "\n" | "\r" | "\t" | "\u" <hex4> | "\U" <hex6> | "\" <character>
-
-hex4 ::= <hex> <hex> <hex> <hex>
-hex6 ::= <hex> <hex> <hex> <hex> <hex> <hex>
+    | "\0" | "\n" | "\r" | "\t" | "\u{" <hex>+ "}" | "\" <character>
 
 hex ::= "0" | "1" | "2" | "3" | "4" | "5" | "6" | "7" | "8" | "9"
       | "a" | "b" | "c" | "d" | "e" | "f"
@@ -441,3 +436,5 @@ domain-specific values (exceedlingly common, but still domain specific).
 [Whitespace]:                #whitespace
 [Word Concatenation]:        #word-concatenation
 [Words]:                     #words
+
+[standard Unicode whitespace characters]: https://en.wikipedia.org/wiki/Whitespace_character#Unicode
