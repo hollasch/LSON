@@ -378,7 +378,7 @@ Grammar
     array ::= "[" <array-item>* "]"
     array-item ::= <value> <terminator>
 
-    table ::= "<" <key>{n} ":" table_row(n)* ">"
+    table ::= "<" <key>{n+} ":" table_row(n+)* ">"
     table_row(n) ::= table_row_bare(n) | "[" table_row_bare(n) "]"
     table_row_bare(n) ::= ( <value> <terminator> ){n}
 
