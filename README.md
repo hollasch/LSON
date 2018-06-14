@@ -21,10 +21,11 @@ LSON: Lucid Serialized Object Notation
 Introduction
 -------------
 LSON is a concise data representation that has the simplicity and expressiveness of JSON, but
-differs in two primary areas:
+differs in three primary areas:
 
   1. It’s intended to be concise and friendly to humans as well as computers,
   2. It does not aim to mirror JavaScript.
+  3. It supports domain-specific values in a well-defined and simple manner.
 
 LSON is a superset of JSON: Any legal JSON is legal LSON.
 
@@ -39,7 +40,7 @@ _words_ to express values that may have domain-specific meaning and semantics.
    `maybe`, `0xfffe`, `#ff8800` and so on).
 3. LSON supports tabular data in addition to dictionaries and arrays.
 4. LSON has only five fundamental types: words, strings, arrays, dictionaries, and tables. It does
-   explicitly include reserved special values for boolean, number, or null.
+   not explicitly include reserved special values for boolean, number, or null.
 5. String quoting is optional where unambiguous.
 6. Values are terminated by whitespace, commas or semi-colons.
 
