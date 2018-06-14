@@ -13,7 +13,7 @@ LSON: Lucid Serialized Object Notation
    - [Word Concatenation]
 7. [Arrays]
 8. [Dictionaries]
-9. [Structures]
+9. [Tables]
 10. [Grammar]
 11. [Appendix A: String Little Languages]
 
@@ -28,123 +28,119 @@ differs in two primary areas:
 
 LSON is a superset of JSON: Any legal JSON is legal LSON.
 
-LSON expresses data using five primitives: words, strings, arrays, dictionaries, and
-structures. It has no inherently special values like `true`, `false`, `null`, or numbers, and
-instead uses generic _words_ to express values that may have additional meaning and semantics to
-encoders beyond their string value.
+LSON expresses data using five primitives: words, strings, arrays, dictionaries, and tables. It has
+no inherently special values like `true`, `false`, `null`, or numbers, and instead uses generic
+_words_ to express values that may have domain-specific meaning and semantics.
 
 
 ### Key Differences from JSON
 1. LSON supports comments.
-2. Items are terminated by whitespace, commas or semi-colons.
-3. String quoting is optional for words (strings without whitespace).
-4. All possible special (word) values are handled seamlessly (_e.g._ `NaN`, `infinity`, `undefined`,
+2. Domain-specific values (_words_) are handled implicitly (_e.g._ `NaN`, `infinity`, `undefined`,
    `maybe`, `0xfffe`, `#ff8800` and so on).
-5. LSON supports templated objects (structures).
-6. LSON has only five fundamental types: words, strings, dictionaries, arrays, and structures.
+3. LSON supports tabular data in addition to dictionaries and arrays.
+4. LSON has only five fundamental types: words, strings, arrays, dictionaries, and tables. It does
+   explicitly include reserved special values for boolean, number, or null.
+5. String quoting is optional where unambiguous.
+6. Values are terminated by whitespace, commas or semi-colons.
 
 
 LSON By Example
 ----------------
-Following are some example LSON snippets to illustrate various aspects.
-```
-// Comments are C-style: double slash to end of line, or enclosed with `/*` and `*/`.
-/* This is an example using slash-star delimeters. */
+Following are some example LSON snippets to illustrate various aspects of the notation:
 
-// Items may be terminated with whitespace, commas, semi-colons, or object/array terminators.
+    // Comments are C-style: double slash to end of line, or enclosed with `/*` and `*/`.
+    /* This is an example using slash-star delimeters. */
 
-{
-    glossary: {
-        title: 'example glossary'
-        'Gloss Div': {                // There are six legal string-delimeter pairs.
-            title: S
-            "Gloss List": {
-                `Gloss Entry`: {
-                    /* Strings (words) may be unquoted as long as they contain no whitespace. */
-                    ID: SGML
+    // Items may be terminated with whitespace, commas, semi-colons, or object/array terminators.
 
-                    SortAs:  SGML
-                    Acronym: SGML
-                    «Gloss Term»: "Standard Generalized Markup Language"
+    {
+        glossary: {
+            title: 'example glossary'
+            'Gloss Div': {                // There are six legal string-delimeter pairs.
+                title: S
+                "Gloss List": {
+                    `Gloss Entry`: {
+                        /* Strings (words) may be unquoted as long as they contain no whitespace. */
+                        ID: SGML
 
-                    Abbrev: ISO\ 8879:1986 // Unquoted strings may contain whitespace if escaped.
+                        SortAs:  SGML
+                        Acronym: SGML
+                        «Gloss Term»: "Standard Generalized Markup Language"
 
-                    ‘Gloss Def’: {
-                        para: "A meta-markup language, used to create markup languages "
-                            + "such as DocBook."
+                        Abbrev: ISO\ 8879:1986 // Unquoted strings may contain escaped whitespace.
 
-                        “Gloss SeeAlso”: [ GML, XML, HTML ]
-                        'Gloss See': markup
+                        ‘Gloss Def’: {
+                            para: "A meta-markup language, used to create markup languages "
+                                + "such as DocBook."
+
+                            “Gloss SeeAlso”: [ GML, XML, HTML ]
+                            'Gloss See': markup
+                        }
                     }
                 }
             }
         }
     }
-}
-```
 
-```
-// Example Menu Description
-{
-    menu: {
-        id:    file;
-        value: file;
+Example menu description using tables:
+
+    {
+        id: base01
         popup: {
-            menuitem1: {
-                { value:New;   action:CreateNewDoc }
-                { value:Open;  action:OpenDoc      }
-                { value:Close; action:CloseDoc     }
-            }
+            menus: [
 
-            // Structured Objects
-            menuitem2 <value, action>: [
-                < Copy,  CopySelection >
-                < Cut,   CutSelection  >
-                < Paste, PasteItem     >
+                // Table (2 columns, 3 rows) with optional brackets:
+                File: <
+                    Value  Action
+                    :
+                    New    CreateNewDoc
+                    Open   OpenDoc
+                    Close  CloseDoc
+                >
+
+                // Table (2 columns, 3 rows) without optional brackets:
+                Edit: <value,action: Copy,CopySelection; Cut,CutSelection; Paste,PasteItem>
             ]
-        };
-    }
-}
-```
-
-```
-// An example using word values
-{
-    widget: {
-        debug: "On"              // The literal string value "On"
-        "debug:Level":  1.0      // Converts to floating-point 1.0 if understood, else string
-        "debug:Weight": Infinity // Converts to floating-point +infinity if understood, else string
-        "debug:Prefix": null     // Converts to null value if understood, otherwise string
-        "debug:Mask":   0xffe0   // Converts to hex number value if understood, else string
-
-        window: {
-            title:  'Sample Konfabulator Widget'
-            name:   main_window
-
-            width:  500           // Converts to number value if understood
-            height: 500
-        }
-        image: {
-            src:         Images/Sun.png
-            name:        sun1
-            hOffset:     250
-            vOffset:     250
-            alignment:   center
-            description: null
-        }
-        text: {
-            data:      Click\ Here
-            size:      36
-            style:     bold
-            name:      text1
-            hOffset:   250
-            vOffset:   100
-            alignment: center
-            onMouseUp: "sun1.opacity = (sun1.opacity / 100) * 90;"
         }
     }
-}
-```
+
+An example using word values:
+
+    {
+        widget: {
+            "debug:Enable": "On"     // The literal string value "On"
+            "debug:Level":  1.0      // May convert to floating-point 1.0 if understood, else string
+            "debug:Weight": Infinity // May convert to +infinity if understood, else string
+            "debug:Prefix": null     // May convert to null value if understood, otherwise string
+            "debug:Mask":   0xffe0   // May convert to hex number value if understood, else string
+
+            window: {
+                title:  'Sample Konfabulator Widget'
+                name:   main_window
+
+                width:  500           // Converts to number value if understood
+                height: 500
+            }
+            image: {
+                src:         Images/Sun.png
+                name:        sun1
+                hOffset:     250
+                vOffset:     250
+                alignment:   center
+                description: null
+            }
+            text: {
+                data:      Click\ Here
+                size:      36
+                style:     bold
+                name:      text1
+                hOffset:   250
+                vOffset:   100
+                alignment: center
+                onMouseUp: "sun1.opacity = (sun1.opacity / 100) * 90;"
+            }
+        }
+    }
 
 
 Whitespace
@@ -196,7 +192,7 @@ Strings are delimited with any of the following character pairs:
 |:----------:|:---------------:|:--------------------------------------------------|
 |  "string"  |     U+0022      | Quotation Mark                                    |
 |  'string'  |     U+0027      | Apostrophe                                        |
-| \`string\` |     U+0060      | Grave Accent (Backtick)
+| \`string\` |     U+0060      | Grave Accent (Backtick)                           |
 |  «string»  | U+00ab, U+00bb  | {Left,Right}-Pointing Double Angle Quotation Mark |
 |  ‘string’  | U+2018, U+2019  | {Left,Right} Single Quotation Mark                |
 |  “string”  | U+201c, U+201d  | {Left,Right} Double Quotation Mark                |
@@ -204,16 +200,16 @@ Strings are delimited with any of the following character pairs:
 ### Escape Sequences
 Strings may contain the following escape sequences:
 
-| Sequence   | Description                                            |
-|:-----------|:-------------------------------------------------------|
-| `\b`       | Backspace                                              |
-| `\f`       | Form feed                                              |
-| `\n`       | New line                                               |
-| `\r`       | Carriage return                                        |
-| `\t`       | Horizontal tab                                         |
-| `\uXXXX`   | Unicode character from four hexadecimal digits         |
-| `\u{X...}` | Unicode character from one or more hexadecimal digits  |
-| `\<any>`   | Yields that character unchanged, such as `\'` or `\\`  |
+| Sequence   | Description                                           |
+|:-----------|:------------------------------------------------------|
+| `\b`       | Backspace                                             |
+| `\f`       | Form feed                                             |
+| `\n`       | New line                                              |
+| `\r`       | Carriage return                                       |
+| `\t`       | Horizontal tab                                        |
+| `\uXXXX`   | Unicode character from four hexadecimal digits        |
+| `\u{X...}` | Unicode character from one or more hexadecimal digits |
+| `\<any>`   | Yields that character unchanged, such as `\'` or `\\` |
 
 ### String Concatenation
 In order to support human-readable long strings, the `+` operator may be used to construct
@@ -308,102 +304,90 @@ and hence may be either quoted or unquoted. Dictionaries have the following prop
    terminator.
 
 
-Structures
------------
-A _structure_ is really just a shorthand for expressing dictionaries without repeating key names.
-The following fragment:
+Tables
+-------
+A _table_ expresses data in tabular form, like a CSV file, but where each item can be any legal LSON
+object. The following fragment:
 
-    {
-        someStruct <key1 key2 key3>: [
-            < thing1 false  3 >
-            < thing2 false 13 >
-            < thing3 true  37 >
-        ]
-    }
+    <key1 key2 key3:
+        [ thing1  false   3 ]
+        [ thing2  false  13 ]
+        [ thing3  true   37 ]
+    >
 
-is a concise way to express the following:
+uses brackets to mark table rows, which can aid legibility and debugging with erroneous inputs.
+However, brackets are optional, and the same table could be expressed thus:
 
-    {
-        someStruct: [
-            {   key1:thing1 key2:false key3:3  }
-            {   key1:thing2 key2:false key3:13 }
-            {   key1:thing3 key2:true  key3:37 }
-        ]
-    }
+    <
+        key1    key2   key3
+    :// ------  -----  ----
+        thing1  false     3
+        thing2  false    13
+        thing3  true     37
+    >
 
-As a side note, this is _not_ necessarily the best or most efficient way to store tabular data.
-That would be more like this:
+As with objects and arrays, optional comma and semi-colon terminators may be used to aid
+readability, like so:
 
-    {
-        fields: [ first_name last_name ID ]
-        rows: [
-            [ Ariel   Astro    48844757 ]
-            [ Blue    Blastar  23cc418e ]
-            [ Castor  Cantrod  b12b4f89 ]
-        ]
-    }
-
-or just this (where row 0 is special and holds the column names):
-
-    [
-        [ first_name  last_name  ID       ]
-        [ Ariel       Astro      48844757 ]
-        [ Blue        Blastar    23cc418e ]
-        [ Castor      Cantrod    b12b4f89 ]
-    ]
+    <key1,key2,key3: thing1,false,3; thing2,false,13; thing3,true,37;>
 
 
 Grammar
 --------
-```
-lson-file ::= <value>
+    lson-file ::= <value>
 
-line-terminator ::= U+000a | U+000b | U+000c | U+000d | U+0085 | U+2028 | U+2029
+    line-terminator ::= U+000a | U+000b | U+000c | U+000d | U+0085 | U+2028 | U+2029
 
-comment-line-remainder ::= "//" <any character not line-terminator>* <line-terminator>
-comment-block ::= "/*" <any character sequence not containing "*/"> "*/"
+    comment-line-remainder ::= "//" <any character not line-terminator>* <line-terminator>
+    comment-block ::= "/*" <any character sequence not containing "*/"> "*/"
 
-whitespace-item ::= <comment-line-remainder> | <comment-block> | <line-terminator>
-    | U+0009 | U+0020 | U+00a0 | U+1680 | U+2000 | U+2001 | U+2002 | U+2003 | U+2004 | U+2005
-    | U+2006 | U+2007 | U+2008 | U+2009 | U+200a | U+2028 | U+2029 | U+202f | U+205f | U+3000
+    whitespace-item ::= <comment-line-remainder> | <comment-block> | <line-terminator>
+        | U+0009 | U+0020 | U+00a0 | U+1680 | U+2000 | U+2001 | U+2002 | U+2003 | U+2004 | U+2005
+        | U+2006 | U+2007 | U+2008 | U+2009 | U+200a | U+2028 | U+2029 | U+202f | U+205f | U+3000
 
-whitespace ::= <whitespace-item>+
+    whitespace ::= <whitespace-item>+
 
-value ::= <word> | <string> | <dictionary> | <array> | <structure>
+    value ::= <word> | <string> | <dictionary> | <array> | <table>
 
-string-character ::= <non whitespace character>
-    | "\b" | "\f" | "\n" | "\r" | "\t" | "\u" <hex4> | "\u{" <hex>+ "}" | "\" <character>
+    string-character ::= <non whitespace character>
+        | "\b" | "\f" | "\n" | "\r" | "\t" | "\u" <hex>{4} | "\u{" <hex>+ "}" | "\" <character>
 
-hex ::= "0" | "1" | "2" | "3" | "4" | "5" | "6" | "7" | "8" | "9"
-      | "a" | "b" | "c" | "d" | "e" | "f"
-      | "A" | "B" | "C" | "D" | "E" | "F"
+    hex ::= "0" | "1" | "2" | "3" | "4" | "5" | "6" | "7" | "8" | "9"
+          | "a" | "b" | "c" | "d" | "e" | "f"
+          | "A" | "B" | "C" | "D" | "E" | "F"
 
-<hex4> ::= <hex> <hex> <hex> <hex>
+    word ::= <string-character>+
 
-word ::= <string-character>+
+    string ::= <string-begin-quote> <any <string-character> not matching begin quote>*
+        <string-end-quote> <concatenated-string>*
 
-string ::= <string-begin-quote> <any <string-character> not matching begin quote>*
-    <string-end-quote> <concatenated-string>*
+    string-begin-quote ::= U+0022 | "'" | "«" | "‘" | "“"
+    string-end-quote   ::= U+0022 | "'" | "»" | "’" | "”"
 
-string-begin-quote ::= U+2022 | "'" | "«" | "‘" | "“"
-string-end-quote   ::= U+2022 | "'" | "»" | "’" | "”"
+    concatenated-string ::= "+" ( <word> | <string> )
 
-concatenated-string ::= "+" ( <word> | <string> )
+    terminator ::= "," | ";" | whitespace | empty-before-closing-character
 
-terminator ::= "," | ";" | whitespace | empty-before-closing-character
+    dictionary ::= "{" <dictionary-body> "}"
 
-dictionary ::= "{" <dictionary-body> "}"
+    dictionary-body ::= <dictionary-item>*
+    dictionary-item ::= <key> ":" <value> <terminator>
+    key ::= <word> | <string>
 
-dictionary-body ::= <dictionary-item>*
-dictionary-item ::= <key> ":" <value> <terminator>
-key ::= <word> | <string>
+    array ::= "[" <array-item>* "]"
+    array-item ::= <value> <terminator>
 
-array ::= "[" <array-item>* "]"
-array-item ::= <value> <terminator>
+    table ::= "<" <key>{n} ":" table_row(n)* ">"
+    table_row(n) ::= table_row_bare(n) | "[" table_row_bare(n) "]"
+    table_row_bare(n) ::= ( <value> <terminator> ){n}
 
-structure ::= <key> "<" ( <key> <terminator>? )+ ">" ":" "[" <structure-item>* "]"
-structure-item ::= "<" <array-item>* ">" <terminator>?
-```
+    ____
+
+    <token>?    Denotes zero or one <token>
+    <token>*    Denotes zero or more <token>
+    <token>+    Denotes one or more <token>
+    <token>{n}  Denotes exactly n <token>s
+
 
 Appendix A: String Little Languages
 ------------------------------------
@@ -436,7 +420,7 @@ domain-specific values (exceedlingly common, but still domain specific).
 [Special Values]:            #special-values
 [String Concatenation]:      #string-concatenation
 [Strings]:                   #strings
-[Structures]:                #structures
+[Tables]:                    #tables
 [Whitespace]:                #whitespace
 [Word Concatenation]:        #word-concatenation
 [Words]:                     #words
