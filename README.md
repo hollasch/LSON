@@ -1,48 +1,41 @@
 LSON: Lucid Serialized Object Notation
 ====================================================================================================
 
-1. [Introduction]
-   - [Key Differences from JSON]
-2. [LSON By Example]
-3. [Whitespace]
-4. [Comments]
-5. [Strings]
-   - [Escape Sequences]
-   - [String Concatenation]
-6. [Words]
-   - [Word Concatenation]
-7. [Arrays]
-8. [Dictionaries]
-9. [Tables]
+1.  [Introduction]
+2.  [LSON By Example]
+3.  [Whitespace]
+4.  [Comments]
+5.  [Strings]
+    - [Escape Sequences]
+    - [String Concatenation]
+6.  [Words]
+    - [Word Concatenation]
+7.  [Arrays]
+8.  [Dictionaries]
+9.  [Tables]
 10. [Grammar]
 11. [Appendix A: String Little Languages]
 
 
 Introduction
 -------------
-LSON is a concise data representation that has the simplicity and expressiveness of JSON, but
-differs in three primary areas:
+LSON is a concise data representation that aims for the simplicity and expressiveness of JSON, but
+differs in the following ways:
 
-  1. It’s intended to be concise and friendly to humans as well as computers,
-  2. It does not aim to mirror JavaScript.
-  3. It supports domain-specific values in a well-defined and simple manner.
+  + It's intended to be both concise and readable by humans as well as computers. It supports
+    comments, and string quoting is optional where unambiguous. Values are optionally terminated by
+    commas or semi-colons.
 
-LSON is a superset of JSON: Any legal JSON is legal LSON.
+  + It does not aim to mirror JavaScript, and thus is not a JavaScript subset. At the same time,
+    LSON is a superset of JSON: any legal JSON file is legal LSON.
 
-LSON expresses data using five primitives: words, strings, arrays, dictionaries, and tables. It has
-no inherently special values like `true`, `false`, `null`, or numbers, and instead uses generic
-_words_ to express values that may have domain-specific meaning and semantics.
+  + LSON supports five primitive types: words, strings, arrays, tables, and dictionaries.
 
-
-### Key Differences from JSON
-1. LSON supports comments.
-2. Domain-specific values (_words_) are handled implicitly (_e.g._ `NaN`, `infinity`, `undefined`,
-   `maybe`, `0xfffe`, `#ff8800` and so on).
-3. LSON supports tabular data in addition to dictionaries and arrays.
-4. LSON has only five fundamental types: words, strings, arrays, dictionaries, and tables. It does
-   not explicitly include reserved special values for boolean, number, or null.
-5. String quoting is optional where unambiguous.
-6. Values are terminated by whitespace, commas or semi-colons.
+  + Domain-specific values are supported through a new "word" type. Words are string-valued types
+    that hint at domain-specific significance. Thus, it drops the special treatment for "true",
+    "false", "null" and scientific-notated numbers. Instead, it provides an approach for predictable
+    treatment for domain-specific values such as "#ffe078", "0x1123", "any", "none", "NaN",
+    "2018-07-02", and so forth.
 
 
 LSON By Example
@@ -417,7 +410,6 @@ domain-specific values (exceedlingly common, but still domain specific).
 [LSON By Example]:           #lson-by-example
 [Grammar]:                   #grammar
 [Introduction]:              #introduction
-[Key Differences from JSON]: #key-differences-from-json
 [Special Values]:            #special-values
 [String Concatenation]:      #string-concatenation
 [Strings]:                   #strings
