@@ -83,16 +83,16 @@ Example menu description using tables:
         popup: {
             menus: [
 
-                // Table (2 columns, 3 rows) with optional brackets:
+                // Table (2 columns, 3 rows) with optional brackets and semicolon separators:
                 File: <
-                    Value  Action
+                    [ Value  ; Action       ]
                     :
-                    New    CreateNewDoc
-                    Open   OpenDoc
-                    Close  CloseDoc
+                    [ New    ; CreateNewDoc ]
+                    [ Open   ; OpenDoc      ]
+                    [ Close  ; CloseDoc     ]
                 >
 
-                // Table (2 columns, 3 rows) without optional brackets:
+                // Table (2 columns, 3 rows) without optional brackets, with optiona semi-colons:
                 Edit: <value,action: Copy,CopySelection; Cut,CutSelection; Paste,PasteItem>
             ]
         }
@@ -303,24 +303,32 @@ Tables
 A _table_ expresses data in tabular form, like a CSV file, but where each item can be any legal LSON
 object. The following fragment:
 
-    <key1 key2 key3:
+    <[key1 key2 key3]:
         [ thing1  false   3 ]
         [ thing2  false  13 ]
         [ thing3  true   37 ]
     >
 
-uses brackets to mark table rows, which can aid legibility and debugging with erroneous inputs.
+uses brackets to mark table rows, which can aid legibility and debugging with erroneous inputs. If
+brackets are used to delimit the column names, then they are required around each row of data, and
+must yield a parsing error for a row that does not contain the same number of values as the header
+row.
+
 However, brackets are optional, and the same table could be expressed thus:
 
     <
-        key1    key2   key3
-    :// ------  -----  ----
-        thing1  false     3
-        thing2  false    13
-        thing3  true     37
+        key1   ; key2  ; key3
+    ://--------;-------;------
+        thing1 ; false ;    3
+        thing2 ; false ;   13
+        thing3 ; true  ;   37
     >
 
-As with objects and arrays, optional comma and semi-colon terminators may be used to aid
+While the absence of square brackets means that rows cannot be validated individually for the
+expected number of values, the entire table must still contain a number of values that is a multiple
+of the number of header values.
+
+As with objects and arrays, optional comma, or semi-colon terminators may be used to aid
 readability, like so:
 
     <key1,key2,key3: thing1,false,3; thing2,false,13; thing3,true,37;>
@@ -371,9 +379,13 @@ Grammar
     array ::= "[" <array-item>* "]"
     array-item ::= <value> <terminator>
 
-    table ::= "<" <key>{n+} ":" table_row(n+)* ">"
-    table_row(n) ::= table_row_bare(n) | "[" table_row_bare(n) "]"
+    table ::= bracketed_table | unbracketed_table
+
+    unbracketed_table ::= "<" ( <key> <terminator> ){n+} ":" table_row_bare(n+)* ">"
     table_row_bare(n) ::= ( <value> <terminator> ){n}
+
+    bracketed_table ::= "<" "[" ( <key> <terminator> ){n+} "]" ":" table_row_bracketed(n+) ">"
+    table_row_bracketed(n) ::= "[" table_row_bare(n) "]"
 
     ____
 
