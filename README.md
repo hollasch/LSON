@@ -84,16 +84,16 @@ Example menu description using tables:
             menus: [
 
                 // Table (2 columns, 3 rows) with optional brackets and semicolon separators:
-                File: <
+                File: [#
                     [ Value  ; Action       ]
                     :
                     [ New    ; CreateNewDoc ]
                     [ Open   ; OpenDoc      ]
                     [ Close  ; CloseDoc     ]
-                >
+                #]
 
                 // Table (2 columns, 3 rows) without optional brackets, with optiona semi-colons:
-                Edit: <value,action: Copy,CopySelection; Cut,CutSelection; Paste,PasteItem>
+                Edit: [# value,action: Copy,CopySelection; Cut,CutSelection; Paste,PasteItem #]
             ]
         }
     }
@@ -174,8 +174,10 @@ Comments
 ---------
     // Single line comments run from double forward slashes to end of line.
 
-    /*  Slash-star comments: this is probably the best form for block
-        comments. */
+    /* Slash-star comments:
+    this is probably
+    the best form
+    for block comments. */
 
 
 Strings
@@ -301,28 +303,29 @@ and hence may be either quoted or unquoted. Dictionaries have the following prop
 Tables
 -------
 A _table_ expresses data in tabular form, like a CSV file, but where each item can be any legal LSON
-object. The following fragment:
+object. Tables are delimited with `[#` and `#]` tokens. These sequences may not contain whitespace.
 
-    <[key1 key2 key3]:
-        [ thing1  false   3 ]
-        [ thing2  false  13 ]
-        [ thing3  true   37 ]
-    >
+    [#
+      [key1    key2   key3]:
+      [thing1  false     3]
+      [thing2  false    13]
+      [thing3  true     37]
+    #]
 
-uses brackets to mark table rows, which can aid legibility and debugging with erroneous inputs. If
-brackets are used to delimit the column names, then they are required around each row of data, and
-must yield a parsing error for a row that does not contain the same number of values as the header
-row.
+The fragment above uses brackets to delimit table rows, which can aid legibility and debugging with
+erroneous inputs. If brackets are used to delimit the column names, then they are required around
+each row of data, and must yield a parsing error for a row that does not contain the same number of
+values as the header row.
 
 However, brackets are optional, and the same table could be expressed thus:
 
-    <
+    [#
         key1   ; key2  ; key3
     ://--------;-------;------
         thing1 ; false ;    3
         thing2 ; false ;   13
         thing3 ; true  ;   37
-    >
+    #]
 
 While the absence of square brackets means that rows cannot be validated individually for the
 expected number of values, the entire table must still contain a number of values that is a multiple
@@ -331,7 +334,11 @@ of the number of header values.
 As with objects and arrays, optional comma, or semi-colon terminators may be used to aid
 readability, like so:
 
-    <key1,key2,key3: thing1,false,3; thing2,false,13; thing3,true,37;>
+    [# key1,key2,key3: thing1,false,3; thing2,false,13; thing3,true,37; #]
+
+Potential ambiguous sequences can usually be solved with whitespace, like so:
+
+    [ #ff8cee #Nan# ]   // An array with a CSV color and a special value; NOT a table.
 
 
 Grammar
@@ -368,7 +375,7 @@ Grammar
 
     concatenated-string ::= "+" ( <word> | <string> )
 
-    terminator ::= "," | ";" | whitespace | empty-before-closing-character
+    terminator ::= "," | ";" | whitespace | empty-before-closing-delimiter
 
     dictionary ::= "{" <dictionary-body> "}"
 
@@ -379,12 +386,13 @@ Grammar
     array ::= "[" <array-item>* "]"
     array-item ::= <value> <terminator>
 
-    table ::= bracketed_table | unbracketed_table
+    table ::= "[#" table_body "#]"
+    table_body ::= table_body_unbracketed | table_body_bracketed
 
-    unbracketed_table ::= "<" ( <key> <terminator> ){n+} ":" table_row_bare(n+)* ">"
+    table_body_unbracketed ::= ( <key> <terminator> ){n+} ":" table_row_bare(n+)*
     table_row_bare(n) ::= ( <value> <terminator> ){n}
 
-    bracketed_table ::= "<" "[" ( <key> <terminator> ){n+} "]" ":" table_row_bracketed(n+) ">"
+    table_body_bracketed ::= "[" ( <key> <terminator> ){n+} "]" ":" table_row_bracketed(n+)*
     table_row_bracketed(n) ::= "[" table_row_bare(n) "]"
 
     ____
@@ -393,6 +401,7 @@ Grammar
     <token>*    Denotes zero or more <token>
     <token>+    Denotes one or more <token>
     <token>{n}  Denotes exactly n <token>s
+    <token>{n+} Denotes common n <token>s, where n is one or more
 
 
 Appendix A: String Little Languages
