@@ -13,8 +13,9 @@ LSON: Lucid Serialized Object Notation
 7.  [Arrays]
 8.  [Dictionaries]
 9.  [Tables]
-10. [Grammar]
-11. [Appendix A: String Little Languages]
+10. [Graphs]
+11. [Grammar]
+12. [Appendix A: String Little Languages]
 
 
 Introduction
@@ -24,12 +25,18 @@ differs in the following ways:
 
   + It's intended to be both concise and readable by humans as well as computers. It supports
     comments, and string quoting is optional where unambiguous. Values are optionally terminated by
-    commas or semi-colons.
+    whitespace, end delimiters, commas, or semi-colons.
 
   + It does not aim to mirror JavaScript, and thus is not a JavaScript subset. At the same time,
-    LSON is a superset of JSON: any legal JSON file is legal LSON.
+    LSON is a superset of JSON: _any legal JSON file is legal LSON_.
 
-  + LSON supports five primitive types: words, strings, arrays, tables, and dictionaries.
+  + LSON supports six primitive types:
+    - string
+    - scalar
+    - array
+    - dictionary (a set of identified values)
+    - table
+    - graph
 
   + Domain-specific values are supported through a new "word" type. Words are string-valued types
     that hint at domain-specific significance. Thus, it drops the special treatment for "true",
@@ -135,6 +142,35 @@ An example using word values:
             }
         }
     }
+
+Examples of graph data:
+
+    [<
+        // Unnamed Nodes with 2D Coordinate Data
+        [ [20,30] [10,30] [10,20] [20,20] [20,10] [10,10] ]
+
+        // Edges by Node Index
+        [
+            0 > 1    // Directed edge from 0 to 1
+            1 - 2    // Undirected edge between 1 and 2
+            3 < 2    // Directed edge to 3 from 2
+            3 - 4    // Undirected edge between 3 and 4
+            4 > 5    // Directed edge from 4 to 5
+        ]
+    >]
+
+    [<
+        // Named Nodes With Data
+        { rock:'Rocky' paper:'Origami' scissors:'Stanley' balloon:'Bubbles' }
+
+        // Edges With Data, Referencing Node Names
+        paper > rock:        "paper wraps rock"
+        rock → scissors:     "rock smashes scissors"
+        paper < scissors:    "scissors cut paper"
+        rock ↔ balloon:      "balloon puzzles rock"
+        paper - balloon:     "paper likes balloon"
+        scissors - balloon:  "scissors like balloon"
+    >]
 
 
 Whitespace
@@ -302,14 +338,29 @@ and hence may be either quoted or unquoted. Dictionaries have the following prop
 
 Tables
 -------
-A _table_ expresses data in tabular form, like a CSV file, but where each item can be any legal LSON
-object. Tables are delimited with `[#` and `#]` tokens. These sequences may not contain whitespace.
+Tables (like CSV files) are 2D entities with multiple rows (points) of data, where each dimension
+has an associated label. Tables have the following properties:
+
+  + Tables are delimited with `[#` and `#]` tokens (no whitespace is allowed between delimiter
+    characters).
+
+  + Tables may optionally use `[` and `]` delimiters around field names and row data, as an aid to
+    readability and catching errors.
+
+  + Tables do not allow implicit null data; all row dimensions must be specified. Thus, for a table
+    with *N* columns, there must be *M⋅N* data points in the table, where *M* is the number of table
+    rows.
+
+  + Each cell (dimension) may be any legal LSON value. So you could have cells of arrays, objects,
+    graphs, or even other tables.
+
+The following is an example LSON table:
 
     [#
-      [key1    key2   key3]:
-      [thing1  false     3]
-      [thing2  false    13]
-      [thing3  true     37]
+        [key1    key2   key3]:
+        [thing1  false     3]
+        [thing2  false    13]
+        [thing3  true     37]
     #]
 
 The fragment above uses brackets to delimit table rows, which can aid legibility and debugging with
@@ -338,7 +389,217 @@ readability, like so:
 
 Potential ambiguous sequences can usually be solved with whitespace, like so:
 
-    [ #ff8cee #Nan# ]   // An array with a CSV color and a special value; NOT a table.
+    [ #ff8cee #Nan# ]   // An array with a CSS color and a special value; NOT a table.
+
+
+Graphs
+-------
+LSON supports graph data, where a graph is defined by a set of nodes and a set of edges between
+those nodes. Graphs have the following properties:
+
+  + Graphs are delimited with `[<` and `>]` tokens (no whitespace is allowed between delimiter
+    characters.)
+  + Each node has associated data.
+  + Each edge may or may not have associated data.
+  + Nodes may be unnamed, in which case they are referenced by index.
+  + Nodes may be named, in which case they are referenced by name.
+  + Edges may be directed or undirected.
+  + An edge may leave and arrive at the same node.
+  + There may be many edges between a pair of nodes.
+
+
+### Overall Structure
+Each LSON graph is expressed in the following pattern:
+
+    [<
+        // Node Data
+        // Edge Data
+    >]
+
+
+### Node Data
+Graph nodes may be expressed in a number of ways, depending on
+
+  - whether they are to be referenced by index or by name, and
+  - whether they have associated data.
+
+#### Unnamed Nodes Without Data
+If nodes are to be referenced by index from 0 onward, and have no data, then simply specifying the
+number of nodes is sufficient. Node count must be greater than or equal to zero, and is expressed as
+a positive decimal integer.
+
+    1000
+
+#### Unnamed Nodes With Data
+The following (unnamed) nodes can be referenced by index. Each node has 2D coordinate data.
+
+    [  [3 2] [2 2] [2 1] [1 3] [1 2] [1 1]  ]
+    // ----- ----- ----- ----- ----- -----
+    //   0     1     2     3     4     5
+
+#### Named Nodes Without Data
+To express a set of named nodes without additional data, use an array of strings:
+
+    [ bargaining testing anger shock acceptance depression denial ]
+
+#### Named Nodes With Data
+To express a set of named nodes with additional data per node, use a dictionary. Each entry
+specifies the node data by name. Here, the seven standard colors of the rainbow are given with their
+CSS color values:
+
+
+    {
+        red:    { css:#ff0000  rgb:'rgb(255,0,0)'     }
+        orange: { css:#ffa500  rgb:'rgb(255,165,0)'   }
+        yellow: { css:#ffff00  rgb:'rgb(255,255,0)'   }
+        green:  { css:#008000  rgb:'rgb(0,128,0)'     }
+        blue:   { css:#0000ff  rgb:'rgb(0,0,255)'     }
+        indigo: { css:#4b0082  rgb:'rgb(75,0,130)'    }
+        violet: { css:#ee82ee  rgb:'rgb(238,130,238)' }
+    }
+
+#### Special Case: Nodes With Number Data
+Nodes with only number values are tricky, since these values can be confused with indices when
+specifying edges. Since LSON has no intrinsic number type, an array of number values will be
+interpreted as an array of words, which are simply unquoted strings. Thus, edge references will use
+these values as strings. This may be confusing, as readers may be thinking node indices when edge
+references use numbers.
+
+Here's an example:
+
+    [<
+        [ 100 201 330 404 ]
+        [
+            201 > 100
+            330 > 1      // Illegal: node value "1" not found in node list.
+        ]
+    >]
+
+
+### Edge Data
+Edges are expressed as a set of node pair relationships. A node relationship is either a node index
+or name, followed by a relationship character, followed by the second node index or name.
+
+The following are examples of node edges:
+
+| Edge                 | Interpretation
+|----------------------|------------------------------------------
+| `a - b` <br> `a ↔ b` | An undirected edge between nodes a and b
+| `a > b` <br> `a → b` | A directed edge from node a to node b
+| `a < b` <br> `a ← b` | A directed edge to node a from node b
+
+\* The special Unicode characters above are ↔ [U+2194], → [U+2192], and ← [U+2190].
+
+Because node names may themselves contain relationship characters, ambiguity is possible. In
+general, parsing will consider the first encountered relationship character as a part of the edge
+description, and not part of the node name. If a node name contains any of the above six characters,
+they must either be escaped, or the node name should be quoted. Here are parsing examples for edge
+specifications:
+
+| Edge Spec | Result
+|:----------|:----------------------------------------------------------------
+| `a\-b-c`  | Legal: interpreted as `'a-b' - 'c'`
+| `a-'b-c'` | Legal: interpreted as `'a' - 'b-c'`
+| `a>b`     | Legal: interpreted as `'a' > 'b'`
+| `a-b>c`   | **Illegal**: could be `'a-b' > 'c'` or `'a' - 'b>c'`
+| `a-b-c`   | **Illegal**: could be `'a-b' - 'c'` or `'a' - 'b-c'`
+| `a-b - c` | **Illegal**: interpreted as `'a' - 'b'`, followed by illegal spec `-`
+
+
+#### Edges Without Data
+Edges without data are specified as an array of edges. Here's an example using node indices:
+
+    [ 0→500 1→548 2→23 3→897 ... ]
+
+Another example, this time using named nodes:
+
+    [
+        shock → denial
+        denial → anger
+        anger → bargaining
+        bargaining → depression
+        depression → testing
+        testing → acceptance
+    ]
+
+#### Edges With Data
+Edges with data use a dictionary where each property is a node edge, and the property value is the
+data associated with the edge. This example references named nodes to specify edges colored with CSS
+colors.
+
+    {
+      'upper-left' ← 'upper-right': #888888
+      'mid-left'   - 'upper-left' : #666666
+      'mid-left'   → 'mid-right'  : #444444
+      'mid-right'  - 'lower-right': #222222
+      'lower-left' ← 'lower-right': #000000
+    }
+
+### Some Final Graph Examples
+Indexed nodes without data, edges without data:
+
+    [<
+        1000
+        [ 0→500; 1→548; 2→ 23; 3→897; ... ]
+    >]
+
+Indexed nodes with 2D coordinate data, plus edges without data:
+
+    [<
+        [ [3 2] [2 2] [2 1] [1 3] [1 2] [1 1] ]
+        [ 0-3, 1-4, 2-5, 3-4, 1-2 ]
+    >]
+
+The seven stages of grief:
+
+    [<
+        [ bargaining testing anger shock acceptance depression denial ]
+
+        [   shock → denial
+            denial → anger
+            anger → bargaining
+            bargaining → depression
+            depression → testing
+            testing → acceptance
+        ]
+    >]
+
+Finally, a railroad (parsing) graph for floating point numbers:
+
+    [<
+        [
+          start  wholeDigit    fractionalDigit  exponentCharacter
+          sign   decimalPoint  exponentSign     exponentDigit
+          end
+        ]
+
+        [
+            start → sign
+            start → wholeDigit
+            start → decimalPoint
+
+            wholeDigit → wholeDigit
+            wholeDigit → exponentCharacter
+            wholeDigit → decimalPoint
+            wholeDigit → end
+
+            decimalPoint → fractionalDigit
+            decimalPoint → exponentCharacter
+            decimalPoint → end
+
+            fractionalDigit → fractionalDigit
+            fractionalDigit → exponentCharacter
+            fractionalDigit → end
+
+            exponentCharacter → exponentSign
+            exponentCharacter → exponentDigit
+
+            exponentSign → exponentDigit
+
+            exponentDigit → exponentDigit
+            exponentDigit → end
+        ]
+    >]
 
 
 Grammar
@@ -395,6 +656,22 @@ Grammar
     table_body_bracketed ::= "[" ( <key> <terminator> ){n+} "]" ":" table_row_bracketed(n+)*
     table_row_bracketed(n) ::= "[" table_row_bare(n) "]"
 
+    graph ::= "[<" graph_nodes graph_edges ">]"
+
+    graph_nodes ::= counting_number | array_of_names | dictionary
+    array_of_names = "[" word* "]"
+    array_of_non_names = "[" value* "]"
+
+    graph_edges ::= array_of_edges | dictionary_of_edges
+    array_of_edges ::= "[" edge+ "]"
+    dictionary_of_edges ::= "{" (edge ":" <value> <terminator>)* "}"
+
+    edge ::= node_ref edge_type node_ref
+    node_ref ::= node_index | word
+    node_index ::= (integer greater than zero)
+
+    edge_type ::= '-' | '↔' | '>' | '→' | '<' | '←'
+
     ____
 
     <token>?    Denotes zero or one <token>
@@ -423,20 +700,21 @@ domain-specific values (exceedlingly common, but still domain specific).
 
 
 [Appendix A: String Little Languages]: #appendix-a-string-little-languages
-[Arrays]:                    #arrays
-[Comments]:                  #comments
-[Conclusion]:                #conclusion
-[Dictionaries]:              #dictionaries
-[Escape Sequences]:          #escape-sequences
-[LSON By Example]:           #lson-by-example
-[Grammar]:                   #grammar
-[Introduction]:              #introduction
-[Special Values]:            #special-values
-[String Concatenation]:      #string-concatenation
-[Strings]:                   #strings
-[Tables]:                    #tables
-[Whitespace]:                #whitespace
-[Word Concatenation]:        #word-concatenation
-[Words]:                     #words
+[Arrays]:               #arrays
+[Comments]:             #comments
+[Conclusion]:           #conclusion
+[Dictionaries]:         #dictionaries
+[Escape Sequences]:     #escape-sequences
+[LSON By Example]:      #lson-by-example
+[Grammar]:              #grammar
+[Graphs]:               #graphs
+[Introduction]:         #introduction
+[Special Values]:       #special-values
+[String Concatenation]: #string-concatenation
+[Strings]:              #strings
+[Tables]:               #tables
+[Whitespace]:           #whitespace
+[Word Concatenation]:   #word-concatenation
+[Words]:                #words
 
 [standard Unicode whitespace characters]: https://en.wikipedia.org/wiki/Whitespace_character#Unicode
