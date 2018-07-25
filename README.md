@@ -145,7 +145,7 @@ An example using word values:
 
 Examples of graph data:
 
-    [<
+    [%
         // Unnamed Nodes with 2D Coordinate Data
         [ [20,30] [10,30] [10,20] [20,20] [20,10] [10,10] ]
 
@@ -157,9 +157,9 @@ Examples of graph data:
             3 - 4    // Undirected edge between 3 and 4
             4 > 5    // Directed edge from 4 to 5
         ]
-    >]
+    %]
 
-    [<
+    [%
         // Named Nodes With Data
         { rock:'Rocky' paper:'Origami' scissors:'Stanley' balloon:'Bubbles' }
 
@@ -170,7 +170,7 @@ Examples of graph data:
         rock ↔ balloon:      "balloon puzzles rock"
         paper - balloon:     "paper likes balloon"
         scissors - balloon:  "scissors like balloon"
-    >]
+    %]
 
 
 Whitespace
@@ -397,7 +397,7 @@ Graphs
 LSON supports graph data, where a graph is defined by a set of nodes and a set of edges between
 those nodes. Graphs have the following properties:
 
-  + Graphs are delimited with `[<` and `>]` tokens (no whitespace is allowed between delimiter
+  + Graphs are delimited with `[%` and `%]` tokens (no whitespace is allowed between delimiter
     characters.)
   + Each node has associated data.
   + Each edge may or may not have associated data.
@@ -411,10 +411,10 @@ those nodes. Graphs have the following properties:
 ### Overall Structure
 Each LSON graph is expressed in the following pattern:
 
-    [<
+    [%
         // Node Data
         // Edge Data
-    >]
+    %]
 
 
 ### Node Data
@@ -467,13 +467,13 @@ references use numbers.
 
 Here's an example:
 
-    [<
+    [%
         [ 100 201 330 404 ]
         [
             201 > 100
             330 > 1      // Illegal: node value "1" not found in node list.
         ]
-    >]
+    %]
 
 
 ### Edge Data
@@ -538,21 +538,21 @@ colors.
 ### Some Final Graph Examples
 Indexed nodes without data, edges without data:
 
-    [<
+    [%
         1000
         [ 0→500; 1→548; 2→ 23; 3→897; ... ]
-    >]
+    %]
 
 Indexed nodes with 2D coordinate data, plus edges without data:
 
-    [<
+    [%
         [ [3 2] [2 2] [2 1] [1 3] [1 2] [1 1] ]
         [ 0-3, 1-4, 2-5, 3-4, 1-2 ]
-    >]
+    %]
 
 The seven stages of grief:
 
-    [<
+    [%
         [ bargaining testing anger shock acceptance depression denial ]
 
         [   shock → denial
@@ -562,11 +562,11 @@ The seven stages of grief:
             depression → testing
             testing → acceptance
         ]
-    >]
+    %]
 
 Finally, a railroad (parsing) graph for floating point numbers:
 
-    [<
+    [%
         [
           start  wholeDigit    fractionalDigit  exponentCharacter
           sign   decimalPoint  exponentSign     exponentDigit
@@ -599,7 +599,7 @@ Finally, a railroad (parsing) graph for floating point numbers:
             exponentDigit → exponentDigit
             exponentDigit → end
         ]
-    >]
+    %]
 
 
 Grammar
@@ -656,7 +656,7 @@ Grammar
     table_body_bracketed ::= "[" ( <key> <terminator> ){n+} "]" ":" table_row_bracketed(n+)*
     table_row_bracketed(n) ::= "[" table_row_bare(n) "]"
 
-    graph ::= "[<" graph_nodes graph_edges ">]"
+    graph ::= "[%" graph_nodes graph_edges "%]"
 
     graph_nodes ::= counting_number | array_of_names | dictionary
     array_of_names = "[" word* "]"
