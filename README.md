@@ -638,7 +638,7 @@ Grammar
 
     unquoted-string ::= <string-character>+ <concatenated-string>*
 
-    id ::= quoted-string | unquoted-string
+    id ::= string | unquoted-string
 
     terminator ::= "," | ";" | whitespace | empty-before-closing-delimiter
 
