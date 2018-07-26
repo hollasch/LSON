@@ -617,7 +617,7 @@ Grammar
 
     whitespace ::= <whitespace-item>+
 
-    value ::= <word> | <string> | <dictionary> | <array> | <table>
+    value ::= <word> | <string> | <array> | <dictionary> | <table> | <graph>
 
     string-character ::= <non whitespace character>
         | "\b" | "\f" | "\n" | "\r" | "\t" | "\u" <hex>{4} | "\u{" <hex>+ "}" | "\" <character>
@@ -647,30 +647,30 @@ Grammar
     array ::= "[" <array-item>* "]"
     array-item ::= <value> <terminator>
 
-    table ::= "[#" table_body "#]"
-    table_body ::= table_body_unbracketed | table_body_bracketed
+    table ::= "[#" table-body "#]"
+    table-body ::= table-body-unbracketed | table-body-bracketed
 
-    table_body_unbracketed ::= ( <key> <terminator> ){n+} ":" table_row_bare(n+)*
-    table_row_bare(n) ::= ( <value> <terminator> ){n}
+    table-body-unbracketed ::= ( <key> <terminator> ){n+} ":" table-row-bare(n+)*
+    table-row-bare(n) ::= ( <value> <terminator> ){n}
 
-    table_body_bracketed ::= "[" ( <key> <terminator> ){n+} "]" ":" table_row_bracketed(n+)*
-    table_row_bracketed(n) ::= "[" table_row_bare(n) "]"
+    table-body-bracketed ::= "[" ( <key> <terminator> ){n+} "]" ":" table-row-bracketed(n+)*
+    table-row-bracketed(n) ::= "[" table-row-bare(n) "]"
 
-    graph ::= "[%" graph_nodes graph_edges "%]"
+    graph ::= "[%" graph-nodes graph-edges "%]"
 
-    graph_nodes ::= counting_number | array_of_names | dictionary
-    array_of_names = "[" word* "]"
-    array_of_non_names = "[" value* "]"
+    graph-nodes ::= counting-number | array-of-names | dictionary
+    array-of-names = "[" word* "]"
+    array-of-non-names = "[" value* "]"
 
-    graph_edges ::= array_of_edges | dictionary_of_edges
-    array_of_edges ::= "[" edge+ "]"
-    dictionary_of_edges ::= "{" (edge ":" <value> <terminator>)* "}"
+    graph-edges ::= array-of-edges | dictionary-of-edges
+    array-of-edges ::= "[" edge+ "]"
+    dictionary-of-edges ::= "{" (edge ":" <value> <terminator>)* "}"
 
-    edge ::= node_ref edge_type node_ref
-    node_ref ::= node_index | word
-    node_index ::= (integer greater than zero)
+    edge ::= node-ref edge-type node-ref
+    node-ref ::= node-index | word
+    node-index ::= (integer greater than zero)
 
-    edge_type ::= '-' | '↔' | '>' | '→' | '<' | '←'
+    edge-type ::= '-' | '↔' | '>' | '→' | '<' | '←'
 
     ____
 
