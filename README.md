@@ -636,39 +636,40 @@ Grammar
 
     concatenated-string ::= "+" ( <word> | <string> )
 
+    unquoted-string ::= <string-character>+ <concatenated-string>*
+
+    id ::= quoted-string | unquoted-string
+
     terminator ::= "," | ";" | whitespace | empty-before-closing-delimiter
 
     dictionary ::= "{" <dictionary-body> "}"
 
     dictionary-body ::= <dictionary-item>*
-    dictionary-item ::= <key> ":" <value> <terminator>
-    key ::= <word> | <string>
+    dictionary-item ::= <id> ":" <value> <terminator>
 
     array ::= "[" <array-item>* "]"
     array-item ::= <value> <terminator>
 
-    table ::= "[#" table-body "#]"
-    table-body ::= table-body-unbracketed | table-body-bracketed
+    table ::= "[#" <table-body> "#]"
+    table-body ::= <table-body-unbracketed> | <table-body-bracketed>
 
-    table-body-unbracketed ::= ( <key> <terminator> ){n+} ":" table-row-bare(n+)*
+    table-body-unbracketed ::= ( <id> <terminator> ){n+} ":" <table-row-bare>(n+)*
     table-row-bare(n) ::= ( <value> <terminator> ){n}
 
-    table-body-bracketed ::= "[" ( <key> <terminator> ){n+} "]" ":" table-row-bracketed(n+)*
-    table-row-bracketed(n) ::= "[" table-row-bare(n) "]"
+    table-body-bracketed ::= "[" ( <id> <terminator> ){n+} "]" ":" <table-row-bracketed>(n+)*
+    table-row-bracketed(n) ::= "[" <table-row-bare>(n) "]"
 
-    graph ::= "[%" graph-nodes graph-edges "%]"
+    graph ::= "[%" <graph-nodes> <graph-edges> "%]"
 
-    graph-nodes ::= counting-number | array-of-names | dictionary
-    array-of-names = "[" word* "]"
-    array-of-non-names = "[" value* "]"
+    graph-nodes ::= <counting-number> | <array> | <edge-dictionary>
 
-    graph-edges ::= array-of-edges | dictionary-of-edges
-    array-of-edges ::= "[" edge+ "]"
-    dictionary-of-edges ::= "{" (edge ":" <value> <terminator>)* "}"
+    graph-edges ::= <edge-array> | <edge-dictionary>
+    edge-array ::= "[" <edge>+ "]"
+    edge-dictionary ::= "{" (<edge> ":" <value> <terminator>)* "}"
 
-    edge ::= node-ref edge-type node-ref
-    node-ref ::= node-index | word
-    node-index ::= (integer greater than zero)
+    edge ::= <node-ref> <edge-type> <node-ref>
+    node-ref ::= <node-index> | <id>
+    node-index ::= <counting-number>
 
     edge-type ::= '-' | '↔' | '>' | '→' | '<' | '←'
 
