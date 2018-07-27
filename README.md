@@ -335,6 +335,14 @@ and hence may be either quoted or unquoted. Dictionaries have the following prop
 2. Each dictionary pair is terminated with whitespace, a comma, a semi-colon, or the dictionary
    terminator.
 
+LSON dictionaries differ from JSON in that multiple keys may specified with a single value, using an
+array-like syntax:
+
+    {
+        [ red orange yellow ]: true
+        [ green cyan blue violet ]: false
+    }
+
 
 Tables
 -------
@@ -423,6 +431,8 @@ Graph nodes may be expressed in a number of ways, depending on
   - whether they are to be referenced by index or by name, and
   - whether they have associated data.
 
+Unnamed nodes use an array-like container, while named nodes use a dictionary-like container.
+
 #### Unnamed Nodes Without Data
 If nodes are to be referenced by index from 0 onward, and have no data, then simply specifying the
 number of nodes is sufficient. Node count must be greater than or equal to zero, and is expressed as
@@ -437,10 +447,22 @@ The following (unnamed) nodes can be referenced by index. Each node has 2D coord
     // ----- ----- ----- ----- ----- -----
     //   0     1     2     3     4     5
 
-#### Named Nodes Without Data
-To express a set of named nodes without additional data, use an array of strings:
+Note: in the event that nodes are named with number-like values, they must still be referenced by
+their array-like index:
 
-    [ bargaining testing anger shock acceptance depression denial ]
+    [
+      1  // Node 0 has data (1)
+      2  // Node 1 has data (2)
+      3  // Node 2 has data (3)
+      5  // Node 3 has data (5)
+      8  // Node 4 has data (8)
+    ]
+
+#### Named Nodes Without Data
+To express a set of named nodes without additional data, use a dictionary with multi-keyed dummy
+data, like so:
+
+    { [ bargaining testing anger shock acceptance depression denial ]: null }
 
 #### Named Nodes With Data
 To express a set of named nodes with additional data per node, use a dictionary. Each entry
@@ -457,24 +479,6 @@ CSS color values:
         indigo: { css:#4b0082  rgb:'rgb(75,0,130)'    }
         violet: { css:#ee82ee  rgb:'rgb(238,130,238)' }
     }
-
-#### Special Case: Nodes With Number Data
-Nodes with only number values are tricky, since these values can be confused with indices when
-specifying edges. Since LSON has no intrinsic number type, an array of number values will be
-interpreted as an array of words, which are simply unquoted strings. Thus, edge references will use
-these values as strings. This may be confusing, as readers may be thinking node indices when edge
-references use numbers.
-
-Here's an example:
-
-    [%
-        [ 100 201 330 404 ]
-        [
-            201 > 100
-            330 > 1      // Illegal: node value "1" not found in node list.
-        ]
-    %]
-
 
 ### Edge Data
 Edges are expressed as a set of node pair relationships. A node relationship is either a node index
@@ -511,7 +515,7 @@ Edges without data are specified as an array of edges. Here's an example using n
 
     [ 0→500 1→548 2→23 3→897 ... ]
 
-Another example, this time using named nodes:
+Another example, this time using node names:
 
     [
         shock → denial
@@ -553,7 +557,7 @@ Indexed nodes with 2D coordinate data, plus edges without data:
 The seven stages of grief:
 
     [%
-        [ bargaining testing anger shock acceptance depression denial ]
+        { [ bargaining testing anger shock acceptance depression denial ]: null }
 
         [   shock → denial
             denial → anger
@@ -567,11 +571,11 @@ The seven stages of grief:
 Finally, a railroad (parsing) graph for floating point numbers:
 
     [%
-        [
+        {[
           start  wholeDigit    fractionalDigit  exponentCharacter
           sign   decimalPoint  exponentSign     exponentDigit
           end
-        ]
+        ]:null}
 
         [
             start → sign
@@ -645,7 +649,8 @@ Grammar
     dictionary ::= "{" <dictionary-body> "}"
 
     dictionary-body ::= <dictionary-item>*
-    dictionary-item ::= <id> ":" <value> <terminator>
+    dictionary-item ::= <key> ":" <value> <terminator>
+    key ::= <id> | "[" <key>+ "]"
 
     array ::= "[" <array-item>* "]"
     array-item ::= <value> <terminator>
@@ -661,11 +666,12 @@ Grammar
 
     graph ::= "[%" <graph-nodes> <graph-edges> "%]"
 
-    graph-nodes ::= <counting-number> | <array> | <edge-dictionary>
+    graph-nodes ::= <counting-number> | <array> | <dictionary>
 
     graph-edges ::= <edge-array> | <edge-dictionary>
     edge-array ::= "[" <edge>+ "]"
-    edge-dictionary ::= "{" (<edge> ":" <value> <terminator>)* "}"
+    edge-dictionary ::= "{" (<edge-key> ":" <value> <terminator>)* "}"
+    edge-key ::= <edge> | "[" (<edge> <terminator>)+ "]"
 
     edge ::= <node-ref> <edge-type> <node-ref>
     node-ref ::= <node-index> | <id>
