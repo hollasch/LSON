@@ -8,14 +8,15 @@ LSON: Lucid Serialized Object Notation
 5.  [Strings]
     - [Escape Sequences]
     - [String Concatenation]
-6.  [Words]
+6.  [Scalars]
+7.  [Words]
     - [Word Concatenation]
-7.  [Arrays]
-8.  [Dictionaries]
-9.  [Tables]
-10. [Graphs]
-11. [Grammar]
-12. [Appendix A: String Little Languages]
+8.  [Arrays]
+9.  [Dictionaries]
+10.  [Tables]
+11. [Graphs]
+12. [Grammar]
+13. [Appendix A: String Little Languages]
 
 
 Introduction
@@ -38,11 +39,11 @@ differs in the following ways:
     - table
     - graph
 
-  + Domain-specific values are supported through a new "word" type. Words are string-valued types
-    that hint at domain-specific significance. Thus, it drops the special treatment for "true",
-    "false", "null" and scientific-notated numbers. Instead, it provides an approach for predictable
-    treatment for domain-specific values such as "#ffe078", "0x1123", "any", "none", "NaN",
-    "2018-07-02", and so forth.
+  + Domain-specific values are supported through a new "scalar" type. Scalars are string-valued
+    types that hint at domain-specific significance. Thus, it drops the special treatment for
+    strings like "true", "false", "null" and scientific-notated numbers. Instead, it provides an
+    approach for predictable treatment for domain-specific values such as "#ffe078", "0x1123",
+    "any", "none", "NaN", "2018-07-02", and so forth.
 
 
 LSON By Example
@@ -127,17 +128,21 @@ An example using word values:
                 name:        sun1
                 hOffset:     250
                 vOffset:     250
-                alignment:   center
+                alignment:   (position:center) // Scalar type "position", value "center"
                 description: null
+                borderColor: (color:#4f1e77)   // Scalar value "#4f1e77" of type "color"
             }
             text: {
                 data:      Click\ Here
                 size:      36
-                style:     bold
+                style:     (weight:bold)
                 name:      text1
                 hOffset:   250
                 vOffset:   100
-                alignment: center
+                alignment: (position:center)
+
+                // The following is a string value, but a particular use of the file may recognize
+                // and handle such strings as a special case. This is not a formal LSON type.
                 onMouseUp: "sun1.opacity = (sun1.opacity / 100) * 90;"
             }
         }
@@ -255,6 +260,27 @@ concatenations. For example:
     }
 
 
+Scalars
+--------
+Scalar values are distinguished from strings by enclosing parentheses. For example, `(null)` denotes
+the special value `null`. Unlike JSON, any string-representable value is allowed, and interpretation
+is up to the decoding application. Applications that do not handle a particular scalar value
+natively will process that value as a simple string, while preserving the notion that it's a special
+value. The scalar nature of the value is to be preserved if it is written back out to LSON.
+
+### Typed Scalars
+In order to facilitate processing, or to provide precision, or to resolve ambiguity, scalar values
+may also include a specific type (such as `color`, `float32`, `readyState`, or `boolean`). In this
+case, the value is prefixed with a type id, followed by a colon, like so:
+
+    (color:#f863b2)
+    (float32:334.1)
+    (readyState:armed)
+    (boolean:true)
+
+Note that type IDs are case-insensitive.
+
+
 Words
 ------
 Words are simply unquoted strings. For example,
@@ -267,8 +293,10 @@ Words are simply unquoted strings. For example,
         next:     0xff128bc5
     }
 
-This feature is more useful than just as a shorthand for string values: it also provides an
-excellent mechanism for conveying an arbitrary set of domain-specific values.
+A word may be recognized as a scalar value by a domain-specific decoder. If it is not recognized,
+then it is treated as an unquoted string. This feature is more useful than just as a shorthand for
+string values: it also provides a mechanism for conveying an arbitrary set of domain-specific
+values.
 
 JSON defines several special values: `true`, `false`, `null` and numbers. Numbers are a _subset_ of
 legal JavaScript (the “J” in JSON) representations. They lack, for example, numbers of the form
@@ -277,8 +305,8 @@ legal JavaScript (the “J” in JSON) representations. They lack, for example, 
 lacking.
 
 The elegance of JSON has given rise to its overwhelming success as a data interchange format for all
-kinds of situations. It's as useful for Python or C++ as it is for JavaScript. Given this, what to
-do about Python's `None`, CSS's `#23ec98`, C++'s `0xfffe` or Scala's `Any`? The temptation for those
+kinds of purposes. It's as useful for Python or C++ as it is for JavaScript. Given this, what to do
+about Python's `None`, CSS's `#23ec98`, C++'s `0xfffe` or Scala's `Any`? The temptation for those
 who wish to expand JSON formats is to formalize these special values as reserved words, usually
 starting with the introduction of missing JavaScript values.
 
@@ -299,6 +327,19 @@ preserve that form on output.
 
 This provides a simple, stable mechanism for the interchange of data across many different types of
 encoders and decoders, and additionally provides for a way to convey domain-specific data values.
+
+### Word→Scalar Promotion
+A specific application may choose to recognize and handle a select set of scalar types. In such a
+case, it is up to the application to specify the types handled, and the order in which they are
+recognized.
+
+For example, a standard JSON-type parser would handle the following ordered list of scalar types:
+
+  1. null (`null`)
+  2. boolean (`true`, `false`)
+  3. real numbers (`[-]*[<digit>]*[.<digit>*][[eE][+-]?<digit>+]`, or some such syntax)
+
+Other common parsers might add CSS colors, ±infinity, and so forth.
 
 ### Word Concatenation
 The concatenation operator always promotes words to strings, to produce a string-valued result. For
@@ -621,7 +662,7 @@ Grammar
 
     whitespace ::= <whitespace-item>+
 
-    value ::= <word> | <string> | <array> | <dictionary> | <table> | <graph>
+    value ::= <word> | <string> | <scalar> | <array> | <dictionary> | <table> | <graph>
 
     string-character ::= <non whitespace character>
         | "\b" | "\f" | "\n" | "\r" | "\t" | "\u" <hex>{4} | "\u{" <hex>+ "}" | "\" <character>
@@ -632,19 +673,23 @@ Grammar
 
     word ::= <string-character>+
 
-    string ::= <string-begin-quote> <any <string-character> not matching begin quote>*
+    string ::= <unquoted-string> | <quoted-string>
+    quoted-string ::= <string-begin-quote> <any <string-character> not matching begin quote>*
         <string-end-quote> <concatenated-string>*
+    unquoted-string ::= <string-character>+ <concatenated-string>*
 
     string-begin-quote ::= U+0022 | "'" | "«" | "‘" | "“"
     string-end-quote   ::= U+0022 | "'" | "»" | "’" | "”"
 
     concatenated-string ::= "+" ( <word> | <string> )
 
-    unquoted-string ::= <string-character>+ <concatenated-string>*
+    id ::= <string>
 
-    id ::= string | unquoted-string
+    terminator ::= "," | ";" | <whitespace> | empty-before-closing-delimiter
 
-    terminator ::= "," | ";" | whitespace | empty-before-closing-delimiter
+    scalar ::= <untyped-scalar> | <typed-scalar>
+    untyped-scalar ::= "(" <string> ")"
+    typed-scalar ::= "(" <typeID> ":" <string> ")
 
     dictionary ::= "{" <dictionary-body> "}"
 
@@ -691,7 +736,7 @@ Grammar
 Appendix A: String Little Languages
 ------------------------------------
 This is implied above, but provided here to be more explicit. Words such as `null` and `#ffee05` can
-be thought of as “little languages”. In order for word→value promotion to work, words must be
+be thought of as “little languages”. In order for word→scalar promotion to work, words must be
 recognizable from only their string value, and unambiguous. Again, this process lies entirely within
 the domain of the application; LSON does not stipulate the format of special word values in any way.
 
@@ -716,6 +761,7 @@ domain-specific values (exceedlingly common, but still domain specific).
 [Grammar]:              #grammar
 [Graphs]:               #graphs
 [Introduction]:         #introduction
+[Scalars]:              #scalars
 [Special Values]:       #special-values
 [String Concatenation]: #string-concatenation
 [Strings]:              #strings
