@@ -9,14 +9,16 @@ LSON: Lucid Serialized Object Notation
     - [Escape Sequences]
     - [String Concatenation]
 6.  [Scalars]
-7.  [Words]
-    - [Word Concatenation]
+7.  [Bare Words]
+    - [Word→Scalar Promotion]
+    - [Bare Word Concatenation]
 8.  [Arrays]
 9.  [Dictionaries]
-10.  [Tables]
+10. [Tables]
 11. [Graphs]
 12. [Grammar]
 13. [Appendix A: String Little Languages]
+14. [Appendix B: Common Scalar Types]
 
 
 Introduction
@@ -31,19 +33,22 @@ differs in the following ways:
   + It does not aim to mirror JavaScript, and thus is not a JavaScript subset. At the same time,
     LSON is a superset of JSON: _any legal JSON file is legal LSON_.
 
-  + LSON supports six primitive types:
-    - string
-    - scalar
+  + LSON supports two primitive types: strings and optionally-typed scalars. Scalars are
+    string-valued types that hint at domain-specific significance. There are no special values in
+    LSON such as `true`, `false`, `null` or numbers. Instead, LSON provides an approach for
+    predictable treatment for domain-specific values such as `#ffe078`, `0x1123`, `any`, `none`,
+    `NaN`, `2018-07-02`, and so forth.
+
+  + LSON supports four data structures:
     - array
-    - dictionary (a set of identified values)
+    - dictionary (a set of name-value pairs)
     - table
     - graph
 
-  + Domain-specific values are supported through a new "scalar" type. Scalars are string-valued
-    types that hint at domain-specific significance. Thus, it drops the special treatment for
-    strings like "true", "false", "null" and scientific-notated numbers. Instead, it provides an
-    approach for predictable treatment for domain-specific values such as "#ffe078", "0x1123",
-    "any", "none", "NaN", "2018-07-02", and so forth.
+  + Bare words may be treated as scalar values if recognized by decoders. Unrecognized scalars are
+    simply processed via there string values, and any subsequent re-encoding into LSON will
+    preserve their expression as bare words. If bare words are recognized by the decoder, they may
+    be handled via their scalar type.
 
 
 LSON By Example
@@ -69,7 +74,7 @@ Following are some example LSON snippets to illustrate various aspects of the no
                         Acronym: SGML
                         «Gloss Term»: "Standard Generalized Markup Language"
 
-                        Abbrev: ISO\ 8879:1986 // Unquoted strings may contain escaped whitespace.
+                        Abbrev: ISO\ 8879:1986 // Bare (unquoted) words may contain escaped whitespace.
 
                         ‘Gloss Def’: {
                             para: "A meta-markup language, used to create markup languages "
@@ -91,7 +96,7 @@ Example menu description using tables:
         popup: {
             menus: [
 
-                // Table (2 columns, 3 rows) with optional brackets and semicolon separators:
+                // A table (2 columns, 3 rows) with optional brackets and semicolon separators:
                 File: [#
                     [ Value  ; Action       ]
                     :
@@ -100,13 +105,13 @@ Example menu description using tables:
                     [ Close  ; CloseDoc     ]
                 #]
 
-                // Table (2 columns, 3 rows) without optional brackets, with optiona semi-colons:
+                // Table (2 columns, 3 rows) without optional brackets, with optional semi-colons:
                 Edit: [# value,action: Copy,CopySelection; Cut,CutSelection; Paste,PasteItem #]
             ]
         }
     }
 
-An example using word values:
+An example using bare word values:
 
     {
         widget: {
@@ -121,14 +126,14 @@ An example using word values:
                 name:   main_window
 
                 width:  500           // Converts to number value if understood
-                height: 500
+                height: (500)         // Explicit scalar of undeclared type
             }
             image: {
                 src:         Images/Sun.png
                 name:        sun1
                 hOffset:     250
                 vOffset:     250
-                alignment:   (position:center) // Scalar type "position", value "center"
+                alignment:   (position:center) // Scalar of type "position", value "center"
                 description: null
                 borderColor: (color:#4f1e77)   // Scalar value "#4f1e77" of type "color"
             }
@@ -151,7 +156,7 @@ An example using word values:
 Examples of graph data:
 
     [%
-        // Unnamed Nodes with 2D Coordinate Data
+        // Unnamed Nodes (0..5) with 2D Coordinate Data
         [ [20,30] [10,30] [10,20] [20,20] [20,10] [10,10] ]
 
         // Edges by Node Index
@@ -263,10 +268,10 @@ concatenations. For example:
 Scalars
 --------
 Scalar values are distinguished from strings by enclosing parentheses. For example, `(null)` denotes
-the special value `null`. Unlike JSON, any string-representable value is allowed, and interpretation
-is up to the decoding application. Applications that do not handle a particular scalar value
-natively will process that value as a simple string, while preserving the notion that it's a special
-value. The scalar nature of the value is to be preserved if it is written back out to LSON.
+the special value `null`. Any string-representable value is allowed, and interpretation is up to the
+decoding application. Applications that do not handle a particular scalar value natively will
+process that value as a simple string, while preserving the notion that it's a scalar value. The
+scalar nature of the value is to be preserved if it is written back out to LSON.
 
 ### Typed Scalars
 In order to facilitate processing, or to provide precision, or to resolve ambiguity, scalar values
@@ -278,12 +283,30 @@ case, the value is prefixed with a type id, followed by a colon, like so:
     (readyState:armed)
     (boolean:true)
 
-Note that type IDs are case-insensitive.
+Note that type IDs are case-insensitive. Type names must escape colons, or must be quoted. Once the
+first colon is encountered, any subsequent colon is interpreted as part of the value. For example,
+if a scalar has type `width:height` and value `150:400`, it could be expressed in any of the
+following ways:
+
+    (width\:height: 150:400)
+    ("width:height": 150:400)
+    ('150:400')                 // Omitted value, assumed recognizable
+    (150\:400)                  // Omitted value, assumed recognizable
+    (:150:400)                  // Omitted value, assumed recognizable
+
+In general, avoid type names with colons if possible. Values with colons are easy enough to specify
+using the last form above for unspecified types, or just including a type, like so:
+
+    (position:150:400)          // Type 'position', value '150:400'
+
+### Scalar Values with Whitespace
+Scalar values with embedded whitespace should either escape the whitespace or quote the value, as
+whitespace may preceed or follow the value, as in `(position:  center  )`.
 
 
-Words
-------
-Words are simply unquoted strings. For example,
+Bare Words
+-----------
+Bare words are simply unquoted strings. For example,
 
     node: {
         id:       1223-02
@@ -329,19 +352,21 @@ This provides a simple, stable mechanism for the interchange of data across many
 encoders and decoders, and additionally provides for a way to convey domain-specific data values.
 
 ### Word→Scalar Promotion
-A specific application may choose to recognize and handle a select set of scalar types. In such a
-case, it is up to the application to specify the types handled, and the order in which they are
-recognized.
+A specific decoder may support a set of recognizable types. For example, a decoder that understands
+values of type boolean would recognize a bare word of value `true` or `false` as a boolean scalar.
 
-For example, a standard JSON-type parser would handle the following ordered list of scalar types:
+It's up to the application to specify the supported set of scalar types, and the order in which they
+are recognized. For example, a standard JSON-type parser would handle the following ordered list of
+scalar types:
 
   1. null (`null`)
   2. boolean (`true`, `false`)
   3. real numbers (`[-]*[<digit>]*[.<digit>*][[eE][+-]?<digit>+]`, or some such syntax)
 
-Other common parsers might add CSS colors, ±infinity, and so forth.
+Other common parsers might support CSS values, ±infinity, and so forth. See [Scalars.md] for a set
+of common scalar types.
 
-### Word Concatenation
+### Bare Word Concatenation
 The concatenation operator always promotes words to strings, to produce a string-valued result. For
 example, the LSON `red + green + blue` would yield the string value `"redgreenblue"` (not the bare
 word `redgreenblue`).
@@ -688,7 +713,7 @@ Grammar
     terminator ::= "," | ";" | <whitespace> | empty-before-closing-delimiter
 
     scalar ::= <untyped-scalar> | <typed-scalar>
-    untyped-scalar ::= "(" <string> ")"
+    untyped-scalar ::= "(" <string> ")" | "(" ":" <string> ")"
     typed-scalar ::= "(" <typeID> ":" <string> ")
 
     dictionary ::= "{" <dictionary-body> "}"
@@ -749,25 +774,33 @@ it's representable in an agnostic way in LSON.
 Contrast this to JSON's inclusion of number values, `true`, `false` and `null`, which are actually
 domain-specific values (exceedlingly common, but still domain specific).
 
+Appendix B: Common Scalar Types
+--------------------------------
+For a set of common scalar types, see [Scalars.md].
+
+
 
 
 [Appendix A: String Little Languages]: #appendix-a-string-little-languages
-[Arrays]:               #arrays
-[Comments]:             #comments
-[Conclusion]:           #conclusion
-[Dictionaries]:         #dictionaries
-[Escape Sequences]:     #escape-sequences
-[LSON By Example]:      #lson-by-example
-[Grammar]:              #grammar
-[Graphs]:               #graphs
-[Introduction]:         #introduction
-[Scalars]:              #scalars
-[Special Values]:       #special-values
-[String Concatenation]: #string-concatenation
-[Strings]:              #strings
-[Tables]:               #tables
-[Whitespace]:           #whitespace
-[Word Concatenation]:   #word-concatenation
-[Words]:                #words
+[Appendix B: Common Scalar Types]: ./Scalars.md
+[Arrays]:                   #arrays
+[Comments]:                 #comments
+[Conclusion]:               #conclusion
+[Dictionaries]:             #dictionaries
+[Escape Sequences]:         #escape-sequences
+[LSON By Example]:          #lson-by-example
+[Grammar]:                  #grammar
+[Graphs]:                   #graphs
+[Introduction]:             #introduction
+[Scalars]:                  #scalars
+[Scalars.md]:               ./Scalars.md
+[Special Values]:           #special-values
+[String Concatenation]:     #string-concatenation
+[Strings]:                  #strings
+[Tables]:                   #tables
+[Whitespace]:               #whitespace
+[Bare Word Concatenation]:  #word-concatenation
+[Bare Words]:               #bare-words
+[Word→Scalar Promotion]:    #wordscalar-promotion
 
 [standard Unicode whitespace characters]: https://en.wikipedia.org/wiki/Whitespace_character#Unicode
