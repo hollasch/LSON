@@ -1,7 +1,7 @@
 LSON: Lucid Serialized Object Notation
 ====================================================================================================
 
-1.  [Introduction]
+1.  [Overview]
 2.  [LSON By Example]
 3.  [Whitespace]
 4.  [Comments]
@@ -19,36 +19,33 @@ LSON: Lucid Serialized Object Notation
 13. [Appendix A: String Little Languages]
 
 
-Introduction
--------------
-LSON is a concise data representation that aims for the simplicity and expressiveness of JSON, but
-differs in the following ways:
+Overview
+---------
+LSON is a data representation that aims for the simplicity and expressiveness of JSON, but differs
+in the following ways:
 
   + It's intended to be both concise and readable by humans as well as computers. It supports
-    comments, and string quoting is optional where unambiguous. Values are optionally terminated by
-    whitespace, end delimiters, commas, or semi-colons.
+    comments. Items are optionally terminated by whitespace, end delimiters, commas, or semi-colons.
 
   + It does not aim to mirror JavaScript, and thus is not a JavaScript subset. At the same time,
     LSON is a superset of JSON: _any legal JSON file is legal LSON_.
 
-  + LSON supports six primitive types:
-    - string
-    - scalar
+  + LSON supports arbitrary _elements_: data values with optional type. Strings are the single
+    element type that LSON supports natively. This provides a way to provide support for
+    domain-specific values, like `true`, `null`, `infinity`, `2018-07-02`, `#6b17ec`, `0x1138`, and
+    so forth.
+
+  + LSON supports four data structures:
     - array
     - dictionary (a set of identified values)
     - table
     - graph
 
-  + Domain-specific values are supported through a new "scalar" type. Scalars are string-valued
-    types that hint at domain-specific significance. Thus, it drops the special treatment for
-    strings like "true", "false", "null" and scientific-notated numbers. Instead, it provides an
-    approach for predictable treatment for domain-specific values such as "#ffe078", "0x1123",
-    "any", "none", "NaN", "2018-07-02", and so forth.
-
 
 LSON By Example
 ----------------
-Following are some example LSON snippets to illustrate various aspects of the notation:
+Following are some example LSON snippets to illustrate various aspects of the notation, before we
+dive deeper:
 
     // Comments are C-style: double slash to end of line, or enclosed with `/*` and `*/`.
     /* This is an example using slash-star delimeters. */
@@ -62,14 +59,12 @@ Following are some example LSON snippets to illustrate various aspects of the no
                 title: S
                 "Gloss List": {
                     `Gloss Entry`: {
-                        /* Strings (words) may be unquoted as long as they contain no whitespace. */
-                        ID: SGML
-
+                        ID:      x112-223
                         SortAs:  SGML
                         Acronym: SGML
                         «Gloss Term»: "Standard Generalized Markup Language"
 
-                        Abbrev: ISO\ 8879:1986 // Unquoted strings may contain escaped whitespace.
+                        Abbrev: ISO\ 8879:1986
 
                         ‘Gloss Def’: {
                             para: "A meta-markup language, used to create markup languages "
@@ -111,23 +106,23 @@ An example using word values:
     {
         widget: {
             "debug:Enable": "On"     // The literal string value "On"
-            "debug:Level":  1.0      // May convert to floating-point 1.0 if understood, else string
-            "debug:Weight": Infinity // May convert to +infinity if understood, else string
-            "debug:Prefix": null     // May convert to null value if understood, otherwise string
-            "debug:Mask":   0xffe0   // May convert to hex number value if understood, else string
+            "debug:Level":  1.0      // Could be float 1.0 if understood, else untyped element
+            "debug:Weight": Infinity // Could be float -Inf if understood, else untyped element
+            "debug:Prefix": null     // Could be null value if understood, else untyped element
+            "debug:Mask":   0xffe0   // Could be int32 if understood, else untyped element
 
             window: {
                 title:  'Sample Konfabulator Widget'
                 name:   main_window
 
-                width:  500           // Converts to number value if understood
-                height: 500
+                width:  (count32:500)
+                height: (count32:500)
             }
             image: {
                 src:         Images/Sun.png
                 name:        sun1
-                hOffset:     250
-                vOffset:     250
+                hOffset:     (int16:250)
+                vOffset:     (int16:250)
                 alignment:   (position:center) // Scalar type "position", value "center"
                 description: null
                 borderColor: (color:#4f1e77)   // Scalar value "#4f1e77" of type "color"
@@ -137,13 +132,13 @@ An example using word values:
                 size:      36
                 style:     (weight:bold)
                 name:      text1
-                hOffset:   250
-                vOffset:   100
+                hOffset:   (int16:250)
+                vOffset:   (int16:100)
                 alignment: (position:center)
 
                 // The following is a string value, but a particular use of the file may recognize
                 // and handle such strings as a special case. This is not a formal LSON type.
-                onMouseUp: "sun1.opacity = (sun1.opacity / 100) * 90;"
+                onMouseUp: (myFuncType: "sun1.opacity = (sun1.opacity / 100) * 90;")
             }
         }
     }
@@ -260,15 +255,15 @@ concatenations. For example:
     }
 
 
-Scalars
---------
-Scalar values are distinguished from strings by enclosing parentheses. For example, `(null)` denotes
+Elements
+---------
+Elements are distinguished from strings by enclosing parentheses. For example, `(null)` denotes
 the special value `null`. Unlike JSON, any string-representable value is allowed, and interpretation
-is up to the decoding application. Applications that do not handle a particular scalar value
+is up to the decoding application. Applications that do not handle a particular element value
 natively will process that value as a simple string, while preserving the notion that it's a special
-value. The scalar nature of the value is to be preserved if it is written back out to LSON.
+value. The value type (or non-type) is to be preserved if it is written back out to LSON.
 
-### Typed Scalars
+### Typed Elements
 In order to facilitate processing, or to provide precision, or to resolve ambiguity, scalar values
 may also include a specific type (such as `color`, `float32`, `readyState`, or `boolean`). In this
 case, the value is prefixed with a type id, followed by a colon, like so:
@@ -281,8 +276,8 @@ case, the value is prefixed with a type id, followed by a colon, like so:
 Note that type IDs are case-insensitive.
 
 
-Words
-------
+Bare Words
+-----------
 Words are simply unquoted strings. For example,
 
     node: {
@@ -293,10 +288,10 @@ Words are simply unquoted strings. For example,
         next:     0xff128bc5
     }
 
-A word may be recognized as a scalar value by a domain-specific decoder. If it is not recognized,
-then it is treated as an unquoted string. This feature is more useful than just as a shorthand for
-string values: it also provides a mechanism for conveying an arbitrary set of domain-specific
-values.
+A word is parsed as an element with unknown type. Its type may be recognized by a domain-specific
+decoder. If it is not recognized, then it is treated as a untyped element. This feature is more
+useful than just as a shorthand for string values: it also provides a mechanism for conveying an
+arbitrary set of domain-specific values.
 
 JSON defines several special values: `true`, `false`, `null` and numbers. Numbers are a _subset_ of
 legal JavaScript (the “J” in JSON) representations. They lack, for example, numbers of the form
@@ -328,12 +323,12 @@ preserve that form on output.
 This provides a simple, stable mechanism for the interchange of data across many different types of
 encoders and decoders, and additionally provides for a way to convey domain-specific data values.
 
-### Word→Scalar Promotion
-A specific application may choose to recognize and handle a select set of scalar types. In such a
+### Word→Element Promotion
+A specific application may choose to recognize and handle a select set of element types. In such a
 case, it is up to the application to specify the types handled, and the order in which they are
 recognized.
 
-For example, a standard JSON-type parser would handle the following ordered list of scalar types:
+For example, a standard JSON-type parser would handle the following ordered list of element types:
 
   1. null (`null`)
   2. boolean (`true`, `false`)
@@ -662,7 +657,7 @@ Grammar
 
     whitespace ::= <whitespace-item>+
 
-    value ::= <word> | <string> | <scalar> | <array> | <dictionary> | <table> | <graph>
+    value ::= <word> | <string> | <element> | <array> | <dictionary> | <table> | <graph>
 
     string-character ::= <non whitespace character>
         | "\b" | "\f" | "\n" | "\r" | "\t" | "\u" <hex>{4} | "\u{" <hex>+ "}" | "\" <character>
@@ -687,9 +682,9 @@ Grammar
 
     terminator ::= "," | ";" | <whitespace> | empty-before-closing-delimiter
 
-    scalar ::= <untyped-scalar> | <typed-scalar>
-    untyped-scalar ::= "(" <string> ")"
-    typed-scalar ::= "(" <typeID> ":" <string> ")
+    element ::= <untyped-element> | <typed-element>
+    untyped-element ::= "(" <string> ")"
+    typed-element ::= "(" <typeID> ":" <string> ")
 
     dictionary ::= "{" <dictionary-body> "}"
 
@@ -736,7 +731,7 @@ Grammar
 Appendix A: String Little Languages
 ------------------------------------
 This is implied above, but provided here to be more explicit. Words such as `null` and `#ffee05` can
-be thought of as “little languages”. In order for word→scalar promotion to work, words must be
+be thought of as “little languages”. In order for word→element promotion to work, words must be
 recognizable from only their string value, and unambiguous. Again, this process lies entirely within
 the domain of the application; LSON does not stipulate the format of special word values in any way.
 
@@ -760,8 +755,8 @@ domain-specific values (exceedlingly common, but still domain specific).
 [LSON By Example]:      #lson-by-example
 [Grammar]:              #grammar
 [Graphs]:               #graphs
-[Introduction]:         #introduction
-[Scalars]:              #scalars
+[Overview]:             #overview
+[Elements]:             #elements
 [Special Values]:       #special-values
 [String Concatenation]: #string-concatenation
 [Strings]:              #strings
