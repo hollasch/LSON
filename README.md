@@ -773,6 +773,7 @@ For a set of common element types, see [ElementTypes.md].
 
 
 [Arrays]:                   #arrays
+[Bare Words]:               #bare-words
 [Bare Word Concatenation]:  #bare-word-concatenation
 [Comments]:                 #comments
 [Conclusion]:               #conclusion
