@@ -8,15 +8,17 @@ LSON: Lucid Serialized Object Notation
 5.  [Strings]
     - [Escape Sequences]
     - [String Concatenation]
-6.  [Scalars]
-7.  [Words]
-    - [Word Concatenation]
+6.  [Elements]
+7.  [Bare Words]
+    - [Word → Element Promotion]
+    - [Bare Word Concatenation]
 8.  [Arrays]
 9.  [Dictionaries]
-10.  [Tables]
+10. [Tables]
 11. [Graphs]
-12. [Grammar]
-13. [Appendix A: String Little Languages]
+12. [Appendix A: Grammar]
+13. [Appendix B: String Little Languages]
+14. [Appendix C: Common Element Types]
 
 
 Overview
@@ -30,14 +32,14 @@ in the following ways:
   + It does not aim to mirror JavaScript, and thus is not a JavaScript subset. At the same time,
     LSON is a superset of JSON: _any legal JSON file is legal LSON_.
 
-  + LSON supports arbitrary _elements_: data values with optional type. Strings are the single
-    element type that LSON supports natively. This provides a way to provide support for
+  + LSON supports arbitrary _elements_: data values with stated or unknown type. Strings are the
+    single element type that LSON supports natively. This provides a way to provide support for
     domain-specific values, like `true`, `null`, `infinity`, `2018-07-02`, `#6b17ec`, `0x1138`, and
     so forth.
 
   + LSON supports four data structures:
     - array
-    - dictionary (a set of identified values)
+    - dictionary (a set of name-value pairs)
     - table
     - graph
 
@@ -64,7 +66,7 @@ dive deeper:
                         Acronym: SGML
                         «Gloss Term»: "Standard Generalized Markup Language"
 
-                        Abbrev: ISO\ 8879:1986
+                        Abbrev: ISO\ 8879:1986     // Whitespace can be escaped.
 
                         ‘Gloss Def’: {
                             para: "A meta-markup language, used to create markup languages "
@@ -86,7 +88,7 @@ Example menu description using tables:
         popup: {
             menus: [
 
-                // Table (2 columns, 3 rows) with optional brackets and semicolon separators:
+                // A table (2 columns, 3 rows) with optional brackets and semicolon separators:
                 File: [#
                     [ Value  ; Action       ]
                     :
@@ -95,13 +97,13 @@ Example menu description using tables:
                     [ Close  ; CloseDoc     ]
                 #]
 
-                // Table (2 columns, 3 rows) without optional brackets, with optiona semi-colons:
+                // Table (2 columns, 3 rows) without optional brackets, with optional semi-colons:
                 Edit: [# value,action: Copy,CopySelection; Cut,CutSelection; Paste,PasteItem #]
             ]
         }
     }
 
-An example using word values:
+An example using bare word values:
 
     {
         widget: {
@@ -123,9 +125,9 @@ An example using word values:
                 name:        sun1
                 hOffset:     (int16:250)
                 vOffset:     (int16:250)
-                alignment:   (position:center) // Scalar type "position", value "center"
+                alignment:   (position:center) // Element type "position", value "center"
                 description: null
-                borderColor: (color:#4f1e77)   // Scalar value "#4f1e77" of type "color"
+                borderColor: (color:#4f1e77)   // Element type "color", value "#4f1e77"
             }
             text: {
                 data:      Click\ Here
@@ -146,7 +148,7 @@ An example using word values:
 Examples of graph data:
 
     [%
-        // Unnamed Nodes with 2D Coordinate Data
+        // Unnamed Nodes (0..5) with 2D Coordinate Data
         [ [20,30] [10,30] [10,20] [20,20] [20,10] [10,10] ]
 
         // Edges by Node Index
@@ -264,7 +266,7 @@ natively will process that value as a simple string, while preserving the notion
 value. The value type (or non-type) is to be preserved if it is written back out to LSON.
 
 ### Typed Elements
-In order to facilitate processing, or to provide precision, or to resolve ambiguity, scalar values
+In order to facilitate processing, or to provide precision, or to resolve ambiguity, element values
 may also include a specific type (such as `color`, `float32`, `readyState`, or `boolean`). In this
 case, the value is prefixed with a type id, followed by a colon, like so:
 
@@ -273,12 +275,30 @@ case, the value is prefixed with a type id, followed by a colon, like so:
     (readyState:armed)
     (boolean:true)
 
-Note that type IDs are case-insensitive.
+Note that type IDs are case-insensitive. Type names must escape colons, or must be quoted. Once the
+first colon is encountered, any subsequent colon is interpreted as part of the value. For example,
+if a element has type `width:height` and value `150:400`, it could be expressed in any of the
+following ways:
+
+    (width\:height: 150:400)
+    ("width:height": 150:400)
+    ('150:400')                 // Omitted value, assumed recognizable
+    (150\:400)                  // Omitted value, assumed recognizable
+    (:150:400)                  // Omitted value, assumed recognizable
+
+In general, avoid type names with colons if possible. Values with colons are easy enough to specify
+using the last form above for unspecified types, or just including a type, like so:
+
+    (position:150:400)          // Type 'position', value '150:400'
+
+### Element Values with Whitespace
+Element values with embedded whitespace should either escape the whitespace or quote the value, as
+whitespace may preceed or follow the value, as in `(position:  center  )`.
 
 
 Bare Words
 -----------
-Words are simply unquoted strings. For example,
+Bare words are simply unquoted strings. For example,
 
     node: {
         id:       1223-02
@@ -323,7 +343,7 @@ preserve that form on output.
 This provides a simple, stable mechanism for the interchange of data across many different types of
 encoders and decoders, and additionally provides for a way to convey domain-specific data values.
 
-### Word→Element Promotion
+### Word → Element Promotion
 A specific application may choose to recognize and handle a select set of element types. In such a
 case, it is up to the application to specify the types handled, and the order in which they are
 recognized.
@@ -334,9 +354,10 @@ For example, a standard JSON-type parser would handle the following ordered list
   2. boolean (`true`, `false`)
   3. real numbers (`[-]*[<digit>]*[.<digit>*][[eE][+-]?<digit>+]`, or some such syntax)
 
-Other common parsers might add CSS colors, ±infinity, and so forth.
+Other common parsers might support CSS values, ±infinity, and so forth. See [Elements.md] for a set
+of common element types.
 
-### Word Concatenation
+### Bare Word Concatenation
 The concatenation operator always promotes words to strings, to produce a string-valued result. For
 example, the LSON `red + green + blue` would yield the string value `"redgreenblue"` (not the bare
 word `redgreenblue`).
@@ -642,8 +663,8 @@ Finally, a railroad (parsing) graph for floating point numbers:
     %]
 
 
-Grammar
---------
+Appendix A: Grammar
+--------------------
     lson-file ::= <value>
 
     line-terminator ::= U+000a | U+000b | U+000c | U+000d | U+0085 | U+2028 | U+2029
@@ -728,7 +749,7 @@ Grammar
     <token>{n+} Denotes common n <token>s, where n is one or more
 
 
-Appendix A: String Little Languages
+Appendix B: String Little Languages
 ------------------------------------
 This is implied above, but provided here to be more explicit. Words such as `null` and `#ffee05` can
 be thought of as “little languages”. In order for word→element promotion to work, words must be
@@ -744,19 +765,23 @@ it's representable in an agnostic way in LSON.
 Contrast this to JSON's inclusion of number values, `true`, `false` and `null`, which are actually
 domain-specific values (exceedlingly common, but still domain specific).
 
+Appendix C: Common Element Types
+---------------------------------
+For a set of common element types, see [ElementTypes.md].
 
 
-[Appendix A: String Little Languages]: #appendix-a-string-little-languages
+
+
 [Arrays]:               #arrays
 [Comments]:             #comments
 [Conclusion]:           #conclusion
 [Dictionaries]:         #dictionaries
 [Escape Sequences]:     #escape-sequences
 [LSON By Example]:      #lson-by-example
-[Grammar]:              #grammar
 [Graphs]:               #graphs
 [Overview]:             #overview
 [Elements]:             #elements
+[ElementTypes.md]:      ./ElementTypes.md
 [Special Values]:       #special-values
 [String Concatenation]: #string-concatenation
 [Strings]:              #strings
@@ -764,5 +789,9 @@ domain-specific values (exceedlingly common, but still domain specific).
 [Whitespace]:           #whitespace
 [Word Concatenation]:   #word-concatenation
 [Words]:                #words
+[Word → Element Promotion]: #word--element-promotion
+[Appendix A: Grammar]:                 #grammar
+[Appendix B: String Little Languages]: #appendix-b-string-little-languages
+[Appendix C: Common Element Types]:    #appendix-c-common-element-types
 
 [standard Unicode whitespace characters]: https://en.wikipedia.org/wiki/Whitespace_character#Unicode
