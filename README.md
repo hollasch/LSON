@@ -772,23 +772,24 @@ For a set of common element types, see [ElementTypes.md].
 
 
 
-[Arrays]:               #arrays
-[Comments]:             #comments
-[Conclusion]:           #conclusion
-[Dictionaries]:         #dictionaries
-[Escape Sequences]:     #escape-sequences
-[LSON By Example]:      #lson-by-example
-[Graphs]:               #graphs
-[Overview]:             #overview
-[Elements]:             #elements
-[ElementTypes.md]:      ./ElementTypes.md
-[Special Values]:       #special-values
-[String Concatenation]: #string-concatenation
-[Strings]:              #strings
-[Tables]:               #tables
-[Whitespace]:           #whitespace
-[Word Concatenation]:   #word-concatenation
-[Words]:                #words
+[Arrays]:                   #arrays
+[Bare Word Concatenation]:  #bare-word-concatenation
+[Comments]:                 #comments
+[Conclusion]:               #conclusion
+[Dictionaries]:             #dictionaries
+[Escape Sequences]:         #escape-sequences
+[LSON By Example]:          #lson-by-example
+[Graphs]:                   #graphs
+[Overview]:                 #overview
+[Elements]:                 #elements
+[ElementTypes.md]:          ./ElementTypes.md
+[Special Values]:           #special-values
+[String Concatenation]:     #string-concatenation
+[Strings]:                  #strings
+[Tables]:                   #tables
+[Whitespace]:               #whitespace
+[Word Concatenation]:       #word-concatenation
+[Words]:                    #words
 [Word → Element Promotion]: #word--element-promotion
 [Appendix A: Grammar]:                 #grammar
 [Appendix B: String Little Languages]: #appendix-b-string-little-languages
