@@ -9,7 +9,7 @@ LSON: Lucid Serialized Object Notation
     - [Element Types]
 6.  [Bare Values]
     - [Word → Element Promotion]
-    - [Bare Word Concatenation]
+    - [Bare Value Concatenation]
 7.  [Strings]
     - [Escape Sequences]
     - [String Concatenation]
@@ -17,6 +17,18 @@ LSON: Lucid Serialized Object Notation
 9.  [Dictionaries]
 10. [Tables]
 11. [Graphs]
+    - [General Graph Structure]
+    - [Graph Nodes]
+      + [Unnamed Graph Nodes Without Data]
+      + [Unnamed Graph Nodes With Data]
+      + [Named Graph Nodes Without Data]
+      + [Named Graph Nodes With Data]
+    - [Graph Edges]
+      + [Graph Edges Without Data]
+      + [Graph Edges With Data]
+      + [Directed Graph Edges Via Adjacency Matrix]
+      + [Undirected Graph Edges Via Adjacency Matrix]
+    - [Graph Examples]
 12. [Appendix A: Grammar]
 13. [Appendix B: String Little Languages]
 14. [Appendix C: Common Element Types]
@@ -246,7 +258,7 @@ For example, a standard JSON-type parser would handle the following ordered list
 Other common parsers might support CSS values, ±infinity, and so forth. See [Elements.md] for a set
 of common element types.
 
-### Bare Word Concatenation
+### Bare Value Concatenation
 The concatenation operator always promotes words to strings, to produce a string-valued result. For
 example, the LSON `red + green + blue` would yield the string value `"redgreenblue"` (not the bare
 word `redgreenblue`).
@@ -403,7 +415,7 @@ those nodes. Graphs have the following properties:
   + There may be many edges between a pair of nodes.
 
 
-### Overall Structure
+### General Graph Structure
 Each LSON graph is expressed in the following pattern:
 
     [%
@@ -412,7 +424,7 @@ Each LSON graph is expressed in the following pattern:
     %]
 
 
-### Node Data
+### Graph Nodes
 Graph nodes may be expressed in a number of ways, depending on
 
   - whether they are to be referenced by index or by name, and
@@ -420,14 +432,14 @@ Graph nodes may be expressed in a number of ways, depending on
 
 Unnamed nodes use an array-like container, while named nodes use a dictionary-like container.
 
-#### Unnamed Nodes Without Data
+#### Unnamed Graph Nodes Without Data
 If nodes are to be referenced by index from 0 onward, and have no data, then simply specifying the
 number of nodes is sufficient. Node count must be greater than or equal to zero, and is expressed as
 a positive decimal integer.
 
     1000
 
-#### Unnamed Nodes With Data
+#### Unnamed Graph Nodes With Data
 The following (unnamed) nodes can be referenced by index. Each node has 2D coordinate data.
 
     [  [3 2] [2 2] [2 1] [1 3] [1 2] [1 1]  ]
@@ -445,13 +457,13 @@ their array-like index:
       8  // Node 4 has data (8)
     ]
 
-#### Named Nodes Without Data
+#### Named Graph Nodes Without Data
 To express a set of named nodes without additional data, use a dictionary with multi-keyed dummy
 data, like so:
 
     { [ bargaining testing anger shock acceptance depression denial ]: null }
 
-#### Named Nodes With Data
+#### Named Graph Nodes With Data
 To express a set of named nodes with additional data per node, use a dictionary. Each entry
 specifies the node data by name. Here, the seven standard colors of the rainbow are given with their
 CSS color values:
@@ -467,7 +479,7 @@ CSS color values:
         violet: { css:#ee82ee  rgb:'rgb(238,130,238)' }
     }
 
-### Edge Data
+### Graph Edges
 Edges are expressed as a set of node pair relationships. A node relationship is either a node index
 or name, followed by a relationship character, followed by the second node index or name.
 
@@ -497,7 +509,7 @@ specifications:
 | `a-b - c` | **Illegal**: interpreted as `'a' - 'b'`, followed by illegal spec `-`
 
 
-#### Edges Without Data
+#### Graph Edges Without Data
 Edges without data are specified as an array of edges. Here's an example using node indices:
 
     [ 0→500 1→548 2→23 3→897 ... ]
@@ -513,7 +525,7 @@ Another example, this time using node names:
         testing → acceptance
     ]
 
-#### Edges With Data
+#### Graph Edges With Data
 Edges with data use a dictionary where each property is a node edge, and the property value is the
 data associated with the edge. This example references named nodes to specify edges colored with CSS
 colors.
@@ -526,12 +538,52 @@ colors.
       'lower-left' ← 'lower-right': #000000
     }
 
-### Some Final Graph Examples
+#### Directed Graph Edges Via Adjacency Matrix
+Directed graph edges may be expressed via adjacency matrix. In a directed adjacency matrix, each
+edge is found in a square **N**×**N** matrix, where **N** is the number of nodes in the graph. In
+this form, nodes are referenced by index (not by name), and the edge from node **A** to node **B**
+is found in the **A**th row, **B**th column, with that entry containing the data for that edge.
+
+Graphs using adjacency matrices must have indexable nodes. Thus, named nodes are not supported in
+conjunction with adjacency matrices.
+
+Here's an example of an adjacency matrix for a directed graph of three nodes:
+
+    [%
+        [ scout  dig  sleep ]
+        [
+            [ .67  .12  .21 ]    // Probability of scout→scout, scout→dig, scout→sleep
+            [ .74  .21  .05 ]    // Probability of   dig→scout,   dig→dig,   dig→sleep
+            [ .23  .29  .48 ]    // Probability of sleep→scout, sleep→dig, sleep→sleep
+        ]
+    %]
+
+#### Undirected Graph Edges Via Adjacency Matrix
+Adjacency matrixes with undirected edges require only an upper triangular matrix, where each entry
+describes an edge between one index and an equal or greater index. Thus, the *i*th row has **N**-*i*
+entries.
+
+Graphs using adjacency matrices must have indexable nodes. Thus, named nodes are not supported in
+conjunction with adjacency matrices.
+
+Here's an example of an undirected adjacency matrix:
+
+    [%
+        3                           // Three nodes without data: 0, 1, 2
+        [
+            [ 23.1  445.  0.12 ]    // 0-0  0-1  0-2
+                  [ 1.72  34.7 ]    //      1-1  1-2
+                        [ 7.56 ]    //           2-2
+        ]
+    %]
+
+
+### Graph Examples
 Indexed nodes without data, edges without data:
 
     [%
         1000
-        [ 0→500; 1→548; 2→ 23; 3→897; ... ]
+        [ 0→500; 1→548; 2→23; 3→897; ... ]
     %]
 
 Indexed nodes with 2D coordinate data, plus edges without data:
@@ -541,7 +593,7 @@ Indexed nodes with 2D coordinate data, plus edges without data:
         [ 0-3, 1-4, 2-5, 3-4, 1-2 ]
     %]
 
-The seven stages of grief:
+The seven stages of grief: named nodes without data, edges without data:
 
     [%
         { [ bargaining testing anger shock acceptance depression denial ]: null }
@@ -558,12 +610,14 @@ The seven stages of grief:
 Finally, a railroad (parsing) graph for floating point numbers:
 
     [%
+        // Named nodes without data
         {[
           start  wholeDigit    fractionalDigit  exponentCharacter
           sign   decimalPoint  exponentSign     exponentDigit
           end
         ]:null}
 
+        // Edges without data
         [
             start → sign
             start → wholeDigit
@@ -644,6 +698,7 @@ Appendix A: Grammar
     key ::= <id> | "[" <key>+ "]"
 
     array ::= "[" <array-item>* "]"
+    array(n) ::= "[" <array-item>{n} "]"
     array-item ::= <value> <terminator>
 
     table ::= "[#" <table-body> "#]"
@@ -655,14 +710,24 @@ Appendix A: Grammar
     table-body-bracketed ::= "[" ( <id> <terminator> ){n+} "]" ":" <table-row-bracketed>(n+)*
     table-row-bracketed(n) ::= "[" <table-row-bare>(n) "]"
 
-    graph ::= "[%" <graph-nodes> <graph-edges> "%]"
+    graph ::= explicit-graph | adjacency-graph
+    explicit-graph ::= "[%" <graph-nodes> <explicit-graph-edges> "%]"
+    adjacency-graph ::= "[%" <indexed-nodes>(n) <adjacency-matrix>(n) "%]"
 
-    graph-nodes ::= <counting-number> | <array> | <dictionary>
+    "[%" <graph-nodes> <graph-edges> "%]"
 
-    graph-edges ::= <edge-array> | <edge-dictionary>
+    graph-nodes ::= <indexed-nodes> | <named-nodes>
+    indexed-nodes ::= <counting-number> | <array>(n)
+    named-nodes :: = <dictionary>
+
+    explicit-graph-edges ::= <edge-array> | <edge-dictionary>
     edge-array ::= "[" <edge>+ "]"
     edge-dictionary ::= "{" (<edge-key> ":" <value> <terminator>)* "}"
     edge-key ::= <edge> | "[" (<edge> <terminator>)+ "]"
+
+    adjacency-matrix ::= <directed-adjacency-matrix> | <undirected-adjacency-matrix>
+    directed-adjacency-matrix ::= "[" <array>(n){n} "]"
+    undirected-adjacency-matrix ::= "[" <array>(n) <array>(n-1) .. <array>(1) "]"
 
     edge ::= <node-ref> <edge-type> <node-ref>
     node-ref ::= <node-index> | <id>
@@ -702,29 +767,41 @@ For a set of common element types, see [ElementTypes.md].
 
 
 
-[Arrays]:                   #arrays
-[Bare Words]:               #bare-words
-[Bare Word Concatenation]:  #bare-word-concatenation
-[Comments]:                 #comments
-[Conclusion]:               #conclusion
-[Dictionaries]:             #dictionaries
-[Escape Sequences]:         #escape-sequences
-[LSON Example]:             #lson-example
-[Graphs]:                   #graphs
-[Overview]:                 #overview
-[Elements]:                 #elements
-[Element Types]:            #element-types
-[ElementTypes.md]:          ./ElementTypes.md
-[Special Values]:           #special-values
-[String Concatenation]:     #string-concatenation
-[Strings]:                  #strings
-[Tables]:                   #tables
-[Whitespace]:               #whitespace
-[Word Concatenation]:       #word-concatenation
-[Words]:                    #words
-[Word → Element Promotion]: #word--element-promotion
-[Appendix A: Grammar]:                 #grammar
-[Appendix B: String Little Languages]: #appendix-b-string-little-languages
-[Appendix C: Common Element Types]:    #appendix-c-common-element-types
+[Appendix A: Grammar]:                         #grammar
+[Appendix B: String Little Languages]:         #appendix-b-string-little-languages
+[Appendix C: Common Element Types]:            #appendix-c-common-element-types
+[Arrays]:                                      #arrays
+[Bare Value Concatenation]:                    #bare-value-concatenation
+[Bare Values]:                                 #bare-values
+[Comments]:                                    #comments
+[Conclusion]:                                  #conclusion
+[Dictionaries]:                                #dictionaries
+[Directed Graph Edges Via Adjacency Matrix]:   #directed-graph-edges-via-adjacency-matrix
+[Element Types]:                               #element-types
+[ElementTypes.md]:                             ./ElementTypes.md
+[Elements]:                                    #elements
+[Escape Sequences]:                            #escape-sequences
+[General Graph Structure]:                     #general-graph-structure
+[Graph Edges With Data]:                       #graph-edges-with-data
+[Graph Edges Without Data]:                    #graph-edges-without-data
+[Graph Edges]:                                 #graph-edges
+[Graph Examples]:                              #graph-examples
+[Graphs]:                                      #graphs
+[LSON Example]:                                #lson-example
+[Named Graph Nodes With Data]:                 #named-graph-nodes-with-data
+[Named Graph Nodes Without Data]:              #named-graph-nodes-without-data
+[Graph Nodes]:                                 #graph-nodes
+[Overview]:                                    #overview
+[Special Values]:                              #special-values
+[String Concatenation]:                        #string-concatenation
+[Strings]:                                     #strings
+[Tables]:                                      #tables
+[Undirected Graph Edges Via Adjacency Matrix]: #undirected-graph-edges-via-adjacency-matrix
+[Unnamed Graph Nodes With Data]:               #unnamed-graph-nodes-with-data
+[Unnamed Graph Nodes Without Data]:            #unnamed-graph-nodes-without-data
+[Whitespace]:                                  #whitespace
+[Word Concatenation]:                          word-concatenation
+[Word → Element Promotion]:                    #word--element-promotion
+[Words]:                                       #words
 
 [standard Unicode whitespace characters]: https://en.wikipedia.org/wiki/Whitespace_character#Unicode
