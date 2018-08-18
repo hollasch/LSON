@@ -5,13 +5,14 @@ LSON: Lucid Serialized Object Notation
 2.  [LSON Example]
 3.  [Whitespace]
 4.  [Comments]
-5.  [Strings]
-    - [Escape Sequences]
-    - [String Concatenation]
-6.  [Elements]
-7.  [Bare Words]
+5.  [Elements]
+    - [Element Types]
+6.  [Bare Values]
     - [Word → Element Promotion]
     - [Bare Word Concatenation]
+7.  [Strings]
+    - [Escape Sequences]
+    - [String Concatenation]
 8.  [Arrays]
 9.  [Dictionaries]
 10. [Tables]
@@ -137,86 +138,55 @@ Comments
     for block comments. */
 
 
-Strings
---------
-Strings are delimited with any of the following character pairs:
-
-|  Quotes    | Character Codes | Description                                       |
-|:----------:|:---------------:|:--------------------------------------------------|
-|  "string"  |     U+0022      | Quotation Mark                                    |
-|  'string'  |     U+0027      | Apostrophe                                        |
-| \`string\` |     U+0060      | Grave Accent (Backtick)                           |
-|  «string»  | U+00ab, U+00bb  | {Left,Right}-Pointing Double Angle Quotation Mark |
-|  ‘string’  | U+2018, U+2019  | {Left,Right} Single Quotation Mark                |
-|  “string”  | U+201c, U+201d  | {Left,Right} Double Quotation Mark                |
-
-### Escape Sequences
-Strings may contain the following escape sequences:
-
-| Sequence   | Description                                           |
-|:-----------|:------------------------------------------------------|
-| `\b`       | Backspace                                             |
-| `\f`       | Form feed                                             |
-| `\n`       | New line                                              |
-| `\r`       | Carriage return                                       |
-| `\t`       | Horizontal tab                                        |
-| `\uXXXX`   | Unicode character from four hexadecimal digits        |
-| `\u{X...}` | Unicode character from one or more hexadecimal digits |
-| `\<any>`   | Yields that character unchanged, such as `\'` or `\\` |
-
-### String Concatenation
-In order to support human-readable long strings, the `+` operator may be used to construct
-concatenations. For example:
-
-    {
-        strBlock: "Knock knock.\n"
-                + "Who's there?\n"
-                + "Bug in your state machine.\n"
-                + "Who's there?\n"
-    }
-
-
 Elements
 ---------
-Elements are distinguished from strings by enclosing parentheses. For example, `(null)` denotes
-the special value `null`. Unlike JSON, any string-representable value is allowed, and interpretation
-is up to the decoding application. Applications that do not handle a particular element value
-natively will process that value as a simple string, while preserving the notion that it's a special
-value. The value type (or non-type) is to be preserved if it is written back out to LSON.
+An _element_ is the single LSON value type. Unlike JSON, any string-representable value is
+supported, and interpretation is up to the decoding application. Applications that do not handle a
+particular element type natively will process that value by way of its string representation, while
+preserving its (possibly unknown) type. The value type (or non-type) is preserved when re-encoding
+after any transformation or transmission.
 
-### Typed Elements
-In order to facilitate processing, or to provide precision, or to resolve ambiguity, element values
-may also include a specific type (such as `color`, `float32`, `readyState`, or `boolean`). In this
-case, the value is prefixed with a type id, followed by a colon, like so:
+### Element Types
+Elements may include a declared type, using the following syntax:
 
-    (color:#f863b2)
-    (float32:334.1)
-    (readyState:armed)
-    (boolean:true)
+    (type:value)                // Type "type", value "value"
+    ("thing" : "xyzzy")         // Type "thing", value "xyzzy"
+    (color:#f863b2)             // Type "color", value "#f863b2"
+    ( float32 : 334.1 )         // Type "float32", value "334.1"
+    (readyState: armed)         // Type "readyState", value "armed"
+    ( a b c : This is a test )  // Type "a b c", value "This is a test"
 
-Note that type IDs are case-insensitive. Type names must escape colons, or must be quoted. Once the
-first colon is encountered, any subsequent colon is interpreted as part of the value. For example,
-if a element has type `width:height` and value `150:400`, it could be expressed in any of the
-following ways:
+Note that leading and trailing whitespace is ignored, and not considered part of the type or value.
+However, both types and values may themselves _contain_ whitespace. Quoting can be used to preserve
+leading or trailing whitepace in types or values.
+
+Type IDs are case-insensitive, and followed by a colon. (Thus, type names must either be quoted or
+escape any contained colons.) Once the first colon is encountered, any subsequent colon is
+interpreted as part of the value. Types may be omitted. If the type is omitted, the colon itself may
+be present or omitted. The following are equivalent examples of an untyped element, both with value
+`"a:b:c"`:
+
+    ("a:b:c")
+    (:a:b:c)
+
+The first colon after an element open parentheses is treated as terminating the missing type. In
+that situation, all subsequent colons are considered part of the element value. For example, if a
+element has type `width:height` and value `150:400`, it could be expressed in any of the following
+ways:
 
     (width\:height: 150:400)
     ("width:height": 150:400)
-    ('150:400')                 // Omitted value, assumed recognizable
-    (150\:400)                  // Omitted value, assumed recognizable
-    (:150:400)                  // Omitted value, assumed recognizable
+    ('150:400')                 // Omitted type
+    (150\:400)                  // Omitted type
+    (:150:400)                  // Omitted type
 
-In general, avoid type names with colons if possible. Values with colons are easy enough to specify
-using the last form above for unspecified types, or just including a type, like so:
-
-    (position:150:400)          // Type 'position', value '150:400'
-
-### Element Values with Whitespace
-Element values with embedded whitespace should either escape the whitespace or quote the value, as
-whitespace may preceed or follow the value, as in `(position:  center  )`.
+In general, either avoid or quote type names with colons. Untyped values with colons are easy enough
+to specify using the last form above for unspecified types, with a colon immediately following the
+opening parenthesis.
 
 
-Bare Words
------------
+Bare Values
+------------
 Bare words are simply unquoted strings. For example,
 
     node: {
@@ -280,6 +250,47 @@ of common element types.
 The concatenation operator always promotes words to strings, to produce a string-valued result. For
 example, the LSON `red + green + blue` would yield the string value `"redgreenblue"` (not the bare
 word `redgreenblue`).
+
+
+
+
+Strings
+--------
+Strings are delimited with any of the following character pairs:
+
+|  Quotes    | Character Codes | Description                                       |
+|:----------:|:---------------:|:--------------------------------------------------|
+|  "string"  |     U+0022      | Quotation Mark                                    |
+|  'string'  |     U+0027      | Apostrophe                                        |
+| \`string\` |     U+0060      | Grave Accent (Backtick)                           |
+|  «string»  | U+00ab, U+00bb  | {Left,Right}-Pointing Double Angle Quotation Mark |
+|  ‘string’  | U+2018, U+2019  | {Left,Right} Single Quotation Mark                |
+|  “string”  | U+201c, U+201d  | {Left,Right} Double Quotation Mark                |
+
+### Escape Sequences
+Strings may contain the following escape sequences:
+
+| Sequence   | Description                                           |
+|:-----------|:------------------------------------------------------|
+| `\b`       | Backspace                                             |
+| `\f`       | Form feed                                             |
+| `\n`       | New line                                              |
+| `\r`       | Carriage return                                       |
+| `\t`       | Horizontal tab                                        |
+| `\uXXXX`   | Unicode character from four hexadecimal digits        |
+| `\u{X...}` | Unicode character from one or more hexadecimal digits |
+| `\<any>`   | Yields that character unchanged, such as `\'` or `\\` |
+
+### String Concatenation
+In order to support human-readable long strings, the `+` operator may be used to construct
+concatenations. For example:
+
+    {
+        strBlock: "Knock knock.\n"
+                + "Who's there?\n"
+                + "Bug in your state machine.\n"
+                + "Who's there?\n"
+    }
 
 
 Arrays
@@ -702,6 +713,7 @@ For a set of common element types, see [ElementTypes.md].
 [Graphs]:                   #graphs
 [Overview]:                 #overview
 [Elements]:                 #elements
+[Element Types]:            #element-types
 [ElementTypes.md]:          ./ElementTypes.md
 [Special Values]:           #special-values
 [String Concatenation]:     #string-concatenation
