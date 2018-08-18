@@ -2,7 +2,7 @@ LSON: Lucid Serialized Object Notation
 ====================================================================================================
 
 1.  [Overview]
-2.  [LSON By Example]
+2.  [LSON Example]
 3.  [Whitespace]
 4.  [Comments]
 5.  [Strings]
@@ -23,29 +23,30 @@ LSON: Lucid Serialized Object Notation
 
 Overview
 ---------
-LSON is a data representation that aims for the simplicity and expressiveness of JSON, but differs
+LSON is a data representation that aims for simplicity and expressiveness of JSON, but differs
 in the following ways:
 
   + It's intended to be both concise and readable by humans as well as computers. It supports
     comments. Items are optionally terminated by whitespace, end delimiters, commas, or semi-colons.
 
   + It does not aim to mirror JavaScript, and thus is not a JavaScript subset. At the same time,
-    LSON is a superset of JSON: _any legal JSON file is legal LSON_.
+    LSON is a superset of JSON: any legal JSON file is legal LSON.
 
-  + LSON supports arbitrary _elements_: data values with stated or unknown type. Strings are the
-    single element type that LSON supports natively. This provides a way to provide support for
-    domain-specific values, like `true`, `null`, `infinity`, `2018-07-02`, `#6b17ec`, `0x1138`, and
-    so forth.
+  + LSON supports arbitrary _elements_: data values with declared or unknown type. Strings are the
+    single element type that LSON supports natively. Elements provide support for domain-specific
+    values, such as `true`, `null`, `infinity`, `2018-07-02`, `#6b17ec`, `0x1138`,
+    `(x,a,b) => { a <= x && x <= b }` and so forth. LSON encoders and decoders can handle both known
+    and unknown types in a consistent and predictable manner.
 
-  + LSON supports four data structures:
+  + LSON supports four intrinsic data structures:
     - array
     - dictionary (a set of name-value pairs)
     - table
     - graph
 
 
-LSON By Example
-----------------
+LSON Example
+-------------
 Following are some example LSON snippets to illustrate various aspects of the notation, before we
 dive deeper:
 
@@ -55,10 +56,9 @@ dive deeper:
     // Items may be terminated with whitespace, commas, semi-colons, or object/array terminators.
 
     {
-        glossary: {
-            title: 'example glossary'
+        index: {
             'Gloss Div': {                // There are six legal string-delimeter pairs.
-                title: S
+                title: S                  // No need to quote strings that lack whitespace.
                 "Gloss List": {
                     `Gloss Entry`: {
                         ID:      x112-223
@@ -78,101 +78,20 @@ dive deeper:
                     }
                 }
             }
+            EntryCount: (count32:1123)      // Element of some type "count32", value "1123"
+
+            // Table
+            Content: [%
+                Term                ; Pages           ; See Also
+                :
+                "ABC Dry-Clean Pad" ; (30)            ; null             ;
+                "Abstract grids"    ; (46-58, 92-104) ; "Gridded Layout" ;
+                "Abstract ideas"    ; (37-38, 74-77)  ; null             ;
+                "Acceleration"      ; (408-409)       ; Velocity         ;
+                // ...
+            %]
         }
     }
-
-Example menu description using tables:
-
-    {
-        id: base01
-        popup: {
-            menus: [
-
-                // A table (2 columns, 3 rows) with optional brackets and semicolon separators:
-                File: [#
-                    [ Value  ; Action       ]
-                    :
-                    [ New    ; CreateNewDoc ]
-                    [ Open   ; OpenDoc      ]
-                    [ Close  ; CloseDoc     ]
-                #]
-
-                // Table (2 columns, 3 rows) without optional brackets, with optional semi-colons:
-                Edit: [# value,action: Copy,CopySelection; Cut,CutSelection; Paste,PasteItem #]
-            ]
-        }
-    }
-
-An example using bare word values:
-
-    {
-        widget: {
-            "debug:Enable": "On"     // The literal string value "On"
-            "debug:Level":  1.0      // Could be float 1.0 if understood, else untyped element
-            "debug:Weight": Infinity // Could be float -Inf if understood, else untyped element
-            "debug:Prefix": null     // Could be null value if understood, else untyped element
-            "debug:Mask":   0xffe0   // Could be int32 if understood, else untyped element
-
-            window: {
-                title:  'Sample Konfabulator Widget'
-                name:   main_window
-
-                width:  (count32:500)
-                height: (count32:500)
-            }
-            image: {
-                src:         Images/Sun.png
-                name:        sun1
-                hOffset:     (int16:250)
-                vOffset:     (int16:250)
-                alignment:   (position:center) // Element type "position", value "center"
-                description: null
-                borderColor: (color:#4f1e77)   // Element type "color", value "#4f1e77"
-            }
-            text: {
-                data:      Click\ Here
-                size:      36
-                style:     (weight:bold)
-                name:      text1
-                hOffset:   (int16:250)
-                vOffset:   (int16:100)
-                alignment: (position:center)
-
-                // The following is a string value, but a particular use of the file may recognize
-                // and handle such strings as a special case. This is not a formal LSON type.
-                onMouseUp: (myFuncType: "sun1.opacity = (sun1.opacity / 100) * 90;")
-            }
-        }
-    }
-
-Examples of graph data:
-
-    [%
-        // Unnamed Nodes (0..5) with 2D Coordinate Data
-        [ [20,30] [10,30] [10,20] [20,20] [20,10] [10,10] ]
-
-        // Edges by Node Index
-        [
-            0 > 1    // Directed edge from 0 to 1
-            1 - 2    // Undirected edge between 1 and 2
-            3 < 2    // Directed edge to 3 from 2
-            3 - 4    // Undirected edge between 3 and 4
-            4 > 5    // Directed edge from 4 to 5
-        ]
-    %]
-
-    [%
-        // Named Nodes With Data
-        { rock:'Rocky' paper:'Origami' scissors:'Stanley' balloon:'Bubbles' }
-
-        // Edges With Data, Referencing Node Names
-        paper > rock:        "paper wraps rock"
-        rock → scissors:     "rock smashes scissors"
-        paper < scissors:    "scissors cut paper"
-        rock ↔ balloon:      "balloon puzzles rock"
-        paper - balloon:     "paper likes balloon"
-        scissors - balloon:  "scissors like balloon"
-    %]
 
 
 Whitespace
@@ -779,7 +698,7 @@ For a set of common element types, see [ElementTypes.md].
 [Conclusion]:               #conclusion
 [Dictionaries]:             #dictionaries
 [Escape Sequences]:         #escape-sequences
-[LSON By Example]:          #lson-by-example
+[LSON Example]:             #lson-example
 [Graphs]:                   #graphs
 [Overview]:                 #overview
 [Elements]:                 #elements
