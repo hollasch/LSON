@@ -1,0 +1,15 @@
+// Simple dictionary       // Embedded Whitespace
+
+{
+    a: 1
+    b: 2,
+    c: 3;
+    d: "string"
+
+    e\ f: 4
+    "g h": 5
+    i\:j: 6
+    1234567890\ `~!@#$%^&*-_=+|'",;/?.\ ()[]{}<>    /* One big value with embedded symbols */
+    :
+    7
+}
