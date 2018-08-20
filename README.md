@@ -801,7 +801,7 @@ For a set of common element types, see [ElementTypes.md].
 
 
 
-[Appendix A: Grammar]:                         #grammar
+[Appendix A: Grammar]:                         #appendix-a-grammar
 [Appendix B: Common Element Types]:            #appendix-b-common-element-types
 [Arrays]:                                      #arrays
 [Bare Value Concatenation]:                    #bare-value-concatenation
