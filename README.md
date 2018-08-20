@@ -7,6 +7,7 @@ LSON: Lucid Serialized Object Notation
 4.  [Comments]
 5.  [Elements]
     - [Element Types]
+    - [Decoding Elements]
 6.  [Strings]
     - [Escape Sequences]
     - [String Concatenation]
@@ -30,8 +31,7 @@ LSON: Lucid Serialized Object Notation
       + [Undirected Graph Edges Via Adjacency Matrix]
     - [Graph Examples]
 12. [Appendix A: Grammar]
-13. [Appendix B: String Little Languages]
-14. [Appendix C: Common Element Types]
+13. [Appendix B: Common Element Types]
 
 
 Overview
@@ -45,11 +45,14 @@ in the following ways:
   + It does not aim to mirror JavaScript, and thus is not a JavaScript subset. At the same time,
     LSON is a superset of JSON: any legal JSON file is legal LSON.
 
-  + LSON supports arbitrary _elements_: data values with declared or unknown type. Strings are the
-    single element type that LSON supports natively. Elements provide support for domain-specific
-    values, such as `true`, `null`, `infinity`, `2018-07-02`, `#6b17ec`, `0x1138`,
-    `(x,a,b) => { a <= x && x <= b }` and so forth. LSON encoders and decoders can handle both known
-    and unknown types in a consistent and predictable manner.
+  + LSON is focused on data _representation_, not data _usage_. With the single exception of string
+    values, there is no intrinsic support for numbers, boolean, or any other primitive type.
+
+  + LSON supports arbitrary _elements_: domain-specific data values with declared or unknown type.
+    Elements provide support for arbitrary domain-specific values, such as `true`, `null`,
+    `infinity`, `2018-07-02`, `#6b17ec`, `0x1138`, `(x,a,b) => { a <= x && x <= b }` and so forth.
+    LSON encoders and decoders handle both known and unknown types in a consistent and predictable
+    manner.
 
   + LSON supports four intrinsic data structures:
     - array
@@ -175,16 +178,16 @@ leading or trailing whitepace in types or values.
 Type IDs are case-insensitive, and followed by a colon. (Thus, type names must either be quoted or
 escape any contained colons.) Once the first colon is encountered, any subsequent colon is
 interpreted as part of the value. Types may be omitted. If the type is omitted, the colon itself may
-be present or omitted. The following are equivalent examples of an untyped element, both with value
-`"a:b:c"`:
+be present or omitted. The following are equivalent examples of an _untyped_ element, both with
+value `"a:b:c"`:
 
     ("a:b:c")
     (:a:b:c)
 
 The first colon after an element open parentheses is treated as terminating the missing type. In
 that situation, all subsequent colons are considered part of the element value. For example, if a
-element has type `width:height` and value `150:400`, it could be expressed in any of the following
-ways:
+element has (optional) type `width:height` and value `150:400`, it could be expressed in any of the
+following ways:
 
     (width\:height: 150:400)
     ("width:height": 150:400)
@@ -195,6 +198,51 @@ ways:
 In general, either avoid or quote type names with colons. Untyped values with colons are easy enough
 to specify using the last form above for unspecified types, with a colon immediately following the
 opening parenthesis.
+
+### Decoding Elements
+All elements have a string representation of their value. In addition, for elements with declared
+type, decoders may use this information to generate a native value of that type. For example, the
+element `(boolean:true)` always has the string representation "true", and may have a decoder's
+native Boolean-valued `True`. Decoders are thus domain-specific, and may handle a mix of elements of
+both known and unknown types. This approach to typing allows unknown types to be handled
+consistently across encode-decode paths, and across data queries and transforms.
+
+In this manner, a C++ decoder could meaningfully operate on LSON intended for a Python endpoint,
+with values like `False` or `None`.
+
+### Untyped Elements
+Elements may omit type information, as in `(1.23456)` or `(:s/ab/xy/g)`. As for all elements, both
+of these cases have their string representation. However, decoders will typically be able to deduce
+the type of an element, according to a scheme of their choosing. For some element types and
+decoders, this can be fairly trivial:
+
+    (nullptr) → (nullptr:nullptr)     // C++
+    (true) → (bool:true)              // C++
+    (true) → (Boolean:true)           // JavaScript
+    (true) → (Boolean:True)           // Python
+
+A JSON-style decoder might employ a sequence of three recognizers:
+
+1. null
+2. boolean
+3. number
+
+Other common types may have associated type recognizers:
+
+    (-1.234e6) → (Number:-1.234e6)    // JavaScript
+    (-1.234e6) → (double:-1.234e6)    // C++
+    (1..10) → (range:"range(1,10)")   // Python
+    (#a3f4b9) → (color:#a3f4b9)       // CSS color
+    (0x3ff0'0000'0000'0000) ...       // In C++, could be recognized as `uint64_t`
+
+One reasonable approach for decoders is to maintain an ordered list of recognizers that are employed
+in sequence to attempt to recognize a given untyped value. Enumerations such as `true`, `false`,
+`null`, `None` and so forth would be first in the list, with more complicated types (like numbers,
+colors, regular expressions) tried later in the sequence.
+
+Note that values need only be recognized if the decoder intends to perform native operations with
+those values. Decoders that just perform queries, transforms, or transmission need not care about
+underlying implementations.
 
 
 Strings
@@ -251,50 +299,39 @@ concatenations. For example:
 
 Bare Values
 ------------
-Bare values are simply treated as undelimited element values. For example,
+LSON supports four data structures — everything else is considered an element. Elements may or may
+not include a type declaration. In addition, any bare (undelimited) value is considered an untyped
+element, with strings as the only natively-recognized type. Strings are recognized as such due to
+any of the six quotation delimiters.
 
-    node: {
-        id:       1223-02
-        class:    sphere
-        weight:   112.23e-6
-        previous: null
-        next:     0xff128bc5
-    }
+Consider the following bare values:
 
-A word is parsed as an element with unknown type. Its type may be recognized by a domain-specific
-decoder. If it is not recognized, then it is treated as a untyped element. This feature is more
-useful than just as a shorthand for string values: it also provides a mechanism for conveying an
-arbitrary set of domain-specific values.
+| Bare Value    | Recognized As
+|---------------|-------------------------
+| `"true"`      | `(string:true)`
+| `"two words"` | `(string:"two words")`
+|  `true`       | `(:true)`
+|  `1.37`       | `(:1.37)`
+| `plaid`       | `(:plaid)`
+| `red\ blue`   | `(:"red blue")`
+| `(a + b)`     | `(:a + b)`
 
-JSON defines several special values: `true`, `false`, `null` and numbers. Numbers are a _subset_ of
-legal JavaScript (the “J” in JSON) representations. They lack, for example, numbers of the form
-`.12` (JSON requires numbers to have a leading zero). In addition, the IEEE special values `NaN` and
-`Infinity` are unsupported. Other JavaScript values, such as `0x77` and `undefined` are also
-lacking.
+Bare values that contain whitespace must either escape that whitespace (by prefixing with the `\`
+character) or must use parenthesis delimeters.
 
-The elegance of JSON has given rise to its overwhelming success as a data interchange format for all
-kinds of purposes. It's as useful for Python or C++ as it is for JavaScript. Given this, what to do
-about Python's `None`, CSS's `#23ec98`, C++'s `0xfffe` or Scala's `Any`? The temptation for those
-who wish to expand JSON formats is to formalize these special values as reserved words, usually
-starting with the introduction of missing JavaScript values.
+Bare values are one of the key features of LSON. Whereas JSON supports a partial set of values
+(boolean, null, numbers), it lacks other values that would be equally useful in different contexts:
+hexadecimals, CSS colors, native primitive values (`None`, `Any`), and so on. The promotion of bare
+value to untyped element provides a succint way to express arbitrary values in different domains,
+while at the same time allowing for consistent treatment and handling of unrecognized types. Thus,
+LSON establishes a hard boundary between data _representation_ and data _usage_.
 
-LSON takes a different approach. Instead of formalizing additional value types, LSON handles all of
-them as simple bare words. This approach provides implicit support for any and all special value
-types where it makes sense – the encoders and decoders decide. If a decoder does not understand a
-special value (for example, a C++ parser that encounters the word `#ff7e22`), the word is simply
-interpreted as the string value `"#ff7e22"`. A decoder that _does_ understand CSS color values,
-however, _might_ parse this string as a color, with value `rgb(255,126,34)`. Or it might not. It's
-really not the job of the serialization protocol to determine interpretation.
+On re-encoding, _an encoder should preserve original bare values as bare values_. For example, if a
+transforming program decodes the bare literal `cromulent`, then any subsequent encoding should emit
+`cromulent`, not `(cromulent)` or `(:cromulent)`.
 
-On re-serialization, _an encoder must preserve bare words as bare words_. A C++ encoder would
-write the value back out as the bare (unquoted) word value `#ff7e22`, and a CSS encoder would write
-it back out as the bare word value `#ff7e22` as well. If a value is transformed, then it's written
-out as the application deems proper. It's not up to the serialization format to dictate usage. This
-further implies that decoders must note and distinguish between strings and bare words in order to
-preserve that form on output.
-
-This provides a simple, stable mechanism for the interchange of data across many different types of
-encoders and decoders, and additionally provides for a way to convey domain-specific data values.
+In situations where it makes sense, recognizable values such as `true` or `0x113f` should also be
+encoded as bare values, if these types are expected to be recognizable by the next decoder.
 
 ### Word → Element Promotion
 A specific application may choose to recognize and handle a select set of element types. In such a
@@ -757,23 +794,7 @@ Appendix A: Grammar
     <token>{n+} Denotes common n <token>s, where n is one or more
 
 
-Appendix B: String Little Languages
-------------------------------------
-This is implied above, but provided here to be more explicit. Words such as `null` and `#ffee05` can
-be thought of as “little languages”. In order for word→element promotion to work, words must be
-recognizable from only their string value, and unambiguous. Again, this process lies entirely within
-the domain of the application; LSON does not stipulate the format of special word values in any way.
-
-In the same manner, any _string_ value can also be a little language, again defined entirely in the
-domain of the application and outside the domain of LSON. For example, a string value parsed by a
-JavaScript application may describe a function definition, such as `"(x,y,z) => { return
-Math.sqrt(x*x + y+y + z*z) }"`. As long as something can be decoded from (and encoded to) a string,
-it's representable in an agnostic way in LSON.
-
-Contrast this to JSON's inclusion of number values, `true`, `false` and `null`, which are actually
-domain-specific values (exceedlingly common, but still domain specific).
-
-Appendix C: Common Element Types
+Appendix B: Common Element Types
 ---------------------------------
 For a set of common element types, see [ElementTypes.md].
 
@@ -781,13 +802,13 @@ For a set of common element types, see [ElementTypes.md].
 
 
 [Appendix A: Grammar]:                         #grammar
-[Appendix B: String Little Languages]:         #appendix-b-string-little-languages
-[Appendix C: Common Element Types]:            #appendix-c-common-element-types
+[Appendix B: Common Element Types]:            #appendix-b-common-element-types
 [Arrays]:                                      #arrays
 [Bare Value Concatenation]:                    #bare-value-concatenation
 [Bare Values]:                                 #bare-values
 [Comments]:                                    #comments
 [Conclusion]:                                  #conclusion
+[Decoding Elements]:                           #decoding-elements
 [Dictionaries]:                                #dictionaries
 [Directed Graph Edges Via Adjacency Matrix]:   #directed-graph-edges-via-adjacency-matrix
 [Element Types]:                               #element-types
