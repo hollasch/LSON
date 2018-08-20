@@ -1,0 +1,8 @@
+// Typed elements
+
+[
+    (color:blue)
+    ( color : red )                  // Whitespace around type and value should be trimmed.
+    ( pretty\ color : " purple ")    // Embedded whitespace in type & value
+    ( pretty\:color : glitter:red )  // Embedded colons
+]
