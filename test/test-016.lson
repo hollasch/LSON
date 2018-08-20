@@ -1,0 +1,11 @@
+// Bare Values
+
+[
+    alpha, bravo, charlie;
+
+    one\ two\ three       // Embedded Whitespace
+    (one two three)       // Same thing, but none bare
+
+    1234567890\ `~!@#$%^&*-_=+|'":/?.\ ()[]{}<>    /* One big value with embedded symbols
+                                                   ** Not that comma/semi-colon would terminate. */
+]
