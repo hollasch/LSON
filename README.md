@@ -728,8 +728,8 @@ Appendix A: Grammar
         <string-end-quote> <concatenated-string>*
     unquoted-string ::= <string-character>+ <concatenated-string>*
 
-    string-begin-quote ::= U+0022 | "'" | "«" | "‘" | "“"
-    string-end-quote   ::= U+0022 | "'" | "»" | "’" | "”"
+    string-begin-quote ::= "\"" | "'" | "`" | "«" | "‘" | "“"
+    string-end-quote   ::= "\"" | "'" | "`" | "»" | "’" | "”"
 
     concatenated-string ::= "+" ( <word> | <string> )
 
