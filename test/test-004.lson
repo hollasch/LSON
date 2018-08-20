@@ -1,2 +1,3 @@
-/* A block
-   comment */
+// String defined inside an element.
+
+(string:"this is a string in an element")

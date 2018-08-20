@@ -1,0 +1,4 @@
+// Multi-element array with string & terminators
+    [
+        "one","two";"three", "four"; "five"
+    ]

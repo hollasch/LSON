@@ -1,1 +1,2 @@
-{ }
+// Simple array with single string element
+["hey"]

@@ -1,0 +1,3 @@
+// A single string-value
+
+"Hello"             // Element of type string

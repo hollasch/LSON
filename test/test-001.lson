@@ -1,1 +1,13 @@
-// Nothing but a comment.
+// A single string value, with multi-line comment
+
+    /* ---------------------------------------------- */
+
+"string value"
+
+    /* "foo"
+       --
+       this
+       should
+       be          */   /*
+       ignored
+       since it's in a block comment */

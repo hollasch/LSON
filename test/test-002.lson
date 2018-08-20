@@ -1,1 +1,2 @@
-testWord
+// String concatenation test, two parts
+"hello" + " world"

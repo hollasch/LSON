@@ -1,0 +1,2 @@
+// Multi-element array with string & whitespace
+    ["one" "two" "three" "four" "five"]

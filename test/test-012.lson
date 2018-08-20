@@ -1,0 +1,9 @@
+// Multi-element array with variously-quoted strings
+    [
+        "one",
+        'two',
+        `three`;
+        «four»;
+        ‘five’
+        “six”
+    ]
