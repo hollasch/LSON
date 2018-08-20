@@ -1,0 +1,19 @@
+// Array of arrays of strings
+
+[
+    [ "one" ];
+    [
+        ["two"  "three"]
+        ["four" "five" ]
+    ],
+    [
+        [
+            [ "a" "b" ]
+            [ "c" "d" ]
+        ],
+        [
+            [ "e" ; "f" ]
+            [ "g" ; "h" ]
+        ]
+    ];
+]
