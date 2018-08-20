@@ -1,0 +1,8 @@
+// Untyped elements
+
+[
+    (thing)
+    (:thing)
+    ("a thing with whitespace")
+    (:unquoted\ thing\ with\ whitespace)
+]
