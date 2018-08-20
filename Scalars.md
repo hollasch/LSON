@@ -1,7 +1,7 @@
-Common Scalar Types
+Common Element Types
 ====================================================================================================
 
-Since LSON supports arbitray scalar types, it is useful to standardize common types, their
+Since LSON supports arbitray element types, it is useful to standardize these types, their
 associated type IDs, and their grammars. Note that these are only suggestions for common
 interpretations. If you disagree with a particular representation, feel free to define your own.
 
@@ -64,14 +64,14 @@ In addition, counting numbers support hexadecimal notation, as follows:
 
     "0x"[0-9]+
 
-For this scalar type, the ultimate size is unhandled. If an application is unable to support a
-particular count scalar, it must preserve the value's string representation on output.
+For this element type, the ultimate size is unhandled. If an application is unable to support a
+particular count element, it must preserve the value's string representation on output.
 
 Because these values can collide with other numeric types, bare word expressions are sensitive to
-the exact order of scalar recognition, which the application must make clear.
+the exact order of element type recognition, which the application must make clear.
 
 ### CountN
-These scalar types denote the storage size for a particular value, where N denotes the number of
+These element types denote the storage size for a particular value, where N denotes the number of
 bits. For example, `count8` stores unsigned 8-bit values, and `count64` would be unsigned 64-bit
 values. The particular set of supported variants is up to the application. Because a specific size
 is specified, it is undefined how any particular application handles values too large to fit (such
