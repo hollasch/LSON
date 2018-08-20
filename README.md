@@ -7,12 +7,12 @@ LSON: Lucid Serialized Object Notation
 4.  [Comments]
 5.  [Elements]
     - [Element Types]
-6.  [Bare Values]
-    - [Word → Element Promotion]
-    - [Bare Value Concatenation]
-7.  [Strings]
+6.  [Strings]
     - [Escape Sequences]
     - [String Concatenation]
+7.  [Bare Values]
+    - [Word → Element Promotion]
+    - [Bare Value Concatenation]
 8.  [Arrays]
 9.  [Dictionaries]
 10. [Tables]
@@ -197,9 +197,61 @@ to specify using the last form above for unspecified types, with a colon immedia
 opening parenthesis.
 
 
+Strings
+--------
+Strings are the only natively-supported element type. In element syntax, a string is expressed thus:
+
+    (string:"This is a string.")
+
+Since strings are natively supported, string quotes are sufficient to recognize the element type
+(string) and value (the quoted content). Thus, the following are all equivalent:
+
+    (string:"This is a string.")    // Fully-qualified element of type "string"
+    (string: This is a string)      // Value quotes optional when inside parentheses
+    "This is a string"              // Value recognized as type "string"
+
+In addition to standard double quotes, strings may be quoted with any of five additional quote
+delimiter pairs. This provides a clean way to avoid the necessity of escaping delimiters in complex
+strings.
+
+|  Quotes    | Character Codes | Description                                       |
+|:----------:|:---------------:|:--------------------------------------------------|
+|  "string"  |     U+0022      | Quotation Mark                                    |
+|  'string'  |     U+0027      | Apostrophe                                        |
+| \`string\` |     U+0060      | Grave Accent (Backtick)                           |
+|  «string»  | U+00ab, U+00bb  | {Left,Right}-Pointing Double Angle Quotation Mark |
+|  ‘string’  | U+2018, U+2019  | {Left,Right} Single Quotation Mark                |
+|  “string”  | U+201c, U+201d  | {Left,Right} Double Quotation Mark                |
+
+### Escape Sequences
+Strings may contain the following escape sequences:
+
+| Sequence   | Description                                           |
+|:-----------|:------------------------------------------------------|
+| `\b`       | Backspace                                             |
+| `\f`       | Form feed                                             |
+| `\n`       | New line                                              |
+| `\r`       | Carriage return                                       |
+| `\t`       | Horizontal tab                                        |
+| `\uXXXX`   | Unicode character from four hexadecimal digits        |
+| `\u{X...}` | Unicode character from one or more hexadecimal digits |
+| `\<any>`   | Yields that character unchanged, such as `\'` or `\\` |
+
+### String Concatenation
+In order to support human-readable long strings, the `+` operator may be used to construct
+concatenations. For example:
+
+    {
+        strBlock: "Knock knock.\n"
+                + "Who's there?\n"
+                + "Bug in your state machine.\n"
+                + "Who's there?\n"
+    }
+
+
 Bare Values
 ------------
-Bare words are simply unquoted strings. For example,
+Bare values are simply treated as undelimited element values. For example,
 
     node: {
         id:       1223-02
@@ -264,45 +316,6 @@ example, the LSON `red + green + blue` would yield the string value `"redgreenbl
 word `redgreenblue`).
 
 
-
-
-Strings
---------
-Strings are delimited with any of the following character pairs:
-
-|  Quotes    | Character Codes | Description                                       |
-|:----------:|:---------------:|:--------------------------------------------------|
-|  "string"  |     U+0022      | Quotation Mark                                    |
-|  'string'  |     U+0027      | Apostrophe                                        |
-| \`string\` |     U+0060      | Grave Accent (Backtick)                           |
-|  «string»  | U+00ab, U+00bb  | {Left,Right}-Pointing Double Angle Quotation Mark |
-|  ‘string’  | U+2018, U+2019  | {Left,Right} Single Quotation Mark                |
-|  “string”  | U+201c, U+201d  | {Left,Right} Double Quotation Mark                |
-
-### Escape Sequences
-Strings may contain the following escape sequences:
-
-| Sequence   | Description                                           |
-|:-----------|:------------------------------------------------------|
-| `\b`       | Backspace                                             |
-| `\f`       | Form feed                                             |
-| `\n`       | New line                                              |
-| `\r`       | Carriage return                                       |
-| `\t`       | Horizontal tab                                        |
-| `\uXXXX`   | Unicode character from four hexadecimal digits        |
-| `\u{X...}` | Unicode character from one or more hexadecimal digits |
-| `\<any>`   | Yields that character unchanged, such as `\'` or `\\` |
-
-### String Concatenation
-In order to support human-readable long strings, the `+` operator may be used to construct
-concatenations. For example:
-
-    {
-        strBlock: "Knock knock.\n"
-                + "Who's there?\n"
-                + "Bug in your state machine.\n"
-                + "Who's there?\n"
-    }
 
 
 Arrays
