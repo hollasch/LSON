@@ -21,6 +21,7 @@ LSON: Lucid Serialized Object Notation
 8.  [Arrays]
 9.  [Dictionaries]
 10. [Tables]
+    - [Default Table Values]
 11. [Graphs]
     - [General Graph Structure]
     - [Graph Nodes]
@@ -489,7 +490,8 @@ has an associated label. Tables have the following properties:
   + Tables may optionally use `[` and `]` delimiters around field names and row data, as an aid to
     readability and catching errors.
 
-  + Tables do not allow implicit null data; all row dimensions must be specified. Thus, for a table
+  + Tables do not allow implicit null data; all row dimensions must be specified (except when using
+    [Default Table Values] described below). Thus, for a table
     with _N_ columns,
     there must be *M⋅N* data points in the table,
     where *M* is the number of table rows.
@@ -533,6 +535,18 @@ readability, like so:
 Potential ambiguous sequences can usually be solved with whitespace, like so:
 
     [ #ff8cee #Nan# ]   // An array with a CSS color and a special value; NOT a table.
+
+### Default Table Values
+Tables may define default values for each column. For example,
+
+    [#
+        [ id status=idle ttl=120 ] :
+        [ a173  running  300 ]    // id = a173, status=running, ttl=300
+        [ b2fc  init ]            // id = b2fc, status=init,    ttl=120
+        [ 781d ]                  // id = 781d, status=idle,    ttl=120
+    #]
+
+Currently, default values only apply to trailing columns, and only when using bracketed rows.
 
 
 Graphs
@@ -843,7 +857,8 @@ Appendix A: Grammar
     table-body-unbracketed ::= ( <id> <terminator> ){n+} ":" <table-row-bare>(n+)*
     table-row-bare(n) ::= ( <value> <terminator> ){n}
 
-    table-body-bracketed ::= "[" ( <id> <terminator> ){n+} "]" ":" <table-row-bracketed>(n+)*
+    table-body-bracketed ::= "[" <table-feature>{n+} "]" ":" <table-row-bracketed>(n+)*
+    table-feature ::= <id> <terminator> | <id> "=" <value> <terminator>
     table-row-bracketed(n) ::= "[" <table-row-bare>(n) "]"
 
     graph ::= explicit-graph | adjacency-graph
@@ -890,6 +905,7 @@ Appendix A: Grammar
 [Comments]:                                    #comments
 [Conclusion]:                                  #conclusion
 [Decoding Elements]:                           #decoding-elements
+[Default Table Values]:                        #default-table-values
 [Dictionaries]:                                #dictionaries
 [Directed Graph Edges Via Adjacency Matrix]:   #directed-graph-edges-via-adjacency-matrix
 [Element Types]:                               #element-types

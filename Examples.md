@@ -208,7 +208,6 @@ Example 4
         menu: {
             header: «SVG Viewer»
             items: [#
-                // Note: New default value syntax has yet to be finalized.
                 [ id=null  label="" ]:
 
                 [ Open ]
