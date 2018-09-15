@@ -1,6 +1,10 @@
 Common Element Types
 ====================================================================================================
 
+**This document is currently a working sketch. There's enough here to get an idea of how you might
+use it, but I haven't taken great care to include a good set of useful basic types, nor eliminate
+any holes or contradictions.**
+
 Since LSON supports arbitray element types, it is useful to standardize these types, their
 associated type IDs, and their grammars. Note that these are only suggestions for common
 interpretations. If you disagree with a particular representation, feel free to define your own.
