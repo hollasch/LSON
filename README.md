@@ -5,14 +5,16 @@ LSON: Lucid Serialized Object Notation
 2.  [LSON Example]
 3.  [Whitespace]
 4.  [Comments]
-5.  [Elements]
-    - [Element Types]
-    - [Element Body Blocks]
-    - [Decoding Elements]
-    - [Untyped Elements]
-6.  [Strings]
+5.  [Strings]
     - [Escape Sequences]
     - [String Concatenation]
+6.  [Elements]
+    - [Element Types]
+    - [Element Values]
+    - [Elements of Type String]
+    - [Element Value Blocks]
+    - [Decoding Elements]
+    - [Untyped Elements]
 7.  [Bare Values]
     - [Word → Element Promotion]
     - [Bare Value Concatenation]
@@ -155,16 +157,64 @@ Comments
     for block comments. */
 
 
+Strings
+--------
+Strings are the only natively-supported element type (more on LSON elements later).
+
+In addition to standard double quotes, strings may be quoted with any of five additional quote
+delimiter pairs. This provides a clean way to avoid the necessity of escaping delimiters in most
+complex strings.
+
+|  Quotes    | Character Codes | Description                                       |
+|:----------:|:---------------:|:--------------------------------------------------|
+|  "string"  |     U+0022      | Quotation Mark                                    |
+|  'string'  |     U+0027      | Apostrophe                                        |
+| \`string\` |     U+0060      | Grave Accent (Backtick)                           |
+|  «string»  | U+00ab, U+00bb  | {Left,Right}-Pointing Double Angle Quotation Mark |
+|  ‘string’  | U+2018, U+2019  | {Left,Right} Single Quotation Mark                |
+|  “string”  | U+201c, U+201d  | {Left,Right} Double Quotation Mark                |
+
+### Escape Sequences
+Strings may contain the following escape sequences:
+
+| Sequence   | Description                                           |
+|:-----------|:------------------------------------------------------|
+| `\b`       | Backspace                                             |
+| `\f`       | Form feed                                             |
+| `\n`       | New line                                              |
+| `\r`       | Carriage return                                       |
+| `\t`       | Horizontal tab                                        |
+| `\uXXXX`   | Unicode character from four hexadecimal digits        |
+| `\u{X...}` | Unicode character from one or more hexadecimal digits |
+| `\<any>`   | Yields that character verbatim, such as `\'` or `\\`  |
+
+### String Concatenation
+In order to support human-readable long strings, the `+` operator may be used to construct
+concatenations. For example:
+
+    {
+        strBlock: "Knock knock.\n"
+                + "Who's there?\n"
+                + "Bug in your state machine.\n"
+                + "Who's there?\n"
+    }
+
+
 Elements
 ---------
-An _element_ is the single LSON value type. Unlike JSON, any string-representable value is
-supported, and interpretation is up to the decoding application. Applications that do not handle a
-particular element type natively will process that value by way of its string representation, while
-preserving its (possibly unknown) type. The value type (or non-type) is preserved when re-encoding
-after any transformation or transmission.
+LSON really has a single value type: the _element_. Unlike JSON, any string-representable value is
+supported and handled consistently, but interpretation is up to the decoding application or context.
+Applications that do not handle a particular element type natively will process that value by way of
+its string representation, while preserving its (possibly unknown) type. The value type (which might
+be "unknown") is preserved when re-encoding after any transformation or transmission.
 
 ### Element Types
-Elements may include a declared type, using the following syntax:
+Elements have two components: type and value. The element type is optional, and defaults to
+"unknown" if not specified. At its most basic, an element has the following syntax:
+
+    ( <type> : <value> )
+
+Elements with a declared type may take several forms. For example:
 
     (type:value)                // Type "type", value "value"
     ("thing" : "xyzzy")         // Type "thing", value "xyzzy"
@@ -186,10 +236,9 @@ value `"a:b:c"`:
     ("a:b:c")
     (:a:b:c)
 
-The first colon after an element open parentheses is treated as terminating the missing type. In
-that situation, all subsequent colons are considered part of the element value. For example, if a
-element has (optional) type `width:height` and value `150:400`, it could be expressed in any of the
-following ways:
+The first colon after an element open parentheses is treated as terminating the element's type. All
+subsequent colons are considered part of the element value. For example, if a element has type
+`width:height` and value `150:400`, it could be expressed in any of the following ways:
 
     (width\:height: 150:400)
     ("width:height": 150:400)
@@ -201,14 +250,40 @@ In general, either avoid or quote type names with colons. Untyped values with co
 to specify using the last form above for unspecified types, with a colon immediately following the
 opening parenthesis.
 
-### Element Body Blocks
-In LSON, an _element_ is bascially an arbitrary foreign syntactic structure. Most uses of LSON
-elements will be for simple values in other domains, as we've seen above. Some elements, however,
-might have quite a complex representation, both in syntax and in length. For example, it should be
-simple to embed a 250-line script inside LSON. In my experience, I've seen JSON inside a script
-inside JSON (not because it's good, but because it's necessary).
+### Element Values
+As shown in examples above, the element value may be either unquoted or quoted in its entirety.
+Quoted element values obey the conventions outlined in [Strings], using any of the six string
+delimiters. Because elements may contain values of foreign syntax, **LSON interprets any contained
+`)` character as the element terminator**. Consider the following (**erroneous**) example:
 
-To this end, elements may also employ block delimiters, which use a unique identifier like so:
+    ( gronkScript: konst force ← "gravity(2.3)"; konst elapsed ← 1.223; )    // ERROR
+
+As soon as the LSON parser encounters `konst`, it parses the element value as an unquoted string. In
+that mode, it will terminate the element value at `2.3`, _not_ at `1.223;`. Elements that might
+contain complex values should therefore either be quoted entirely, or contained in [Element Value
+Blocks] (described below).
+
+### Elements of Type String
+As pointed out earlier, strings are the only element type that LSON recognizes implicitly. Since
+strings are natively supported, string quotes are sufficient to recognize the element type (string)
+and value (the quoted content). Thus, the following are all equivalent:
+
+    (string:"This is a string.")    // Fully-qualified element of type "string"
+    (string: This is a string)      // Value quotes optional when inside parentheses
+    "This is a string"              // Value recognized as type "string"
+
+### Element Value Blocks
+As noted above, an _element_ is bascially an arbitrary foreign syntactic structure. Most uses of
+LSON elements will be for simple values in other domains, as we've seen above. Some elements,
+however, might have quite a complex representation, both in syntax and in length. For example, it
+should be simple to embed a 250-line script inside LSON. In my experience, I've seen JSON inside a
+script inside JSON (not because it's good, but because it's necessary).
+
+To this end, elements may also employ block delimiters, which use a unique identifier.
+Block-delimited elements begin with `((<id>` where `<id>` is an arbitrary string _that appears
+nowhere in the element value_. As soon as the nearest`<id>))` is encountered, the element is closed.
+
+Here's an example of a complex element with block delimiters:
 
     frotz: ((xyzzy python :
         db = MySQLdb.connect("localhost","username","password","dbname")
@@ -223,19 +298,17 @@ To this end, elements may also employ block delimiters, which use a unique ident
         db.close()
     xyzzy))
 
-As you can see, block-delimited elements begin with `((<id>` where `<id>` is an arbitrary string
-_that appears nowhere in the element body_. As soon as `<id>))` is encountered, the element is
-closed. Also note that the closing identifier must have the same case as the opening identifier. For
-example, `GREEN))` does not match `((Green`.
+Note that the closing identifier must have the identical case as the opening identifier. For
+example, `GREEN))` matches `((GREEN`, but not `((Green`.
 
-Consider the following (**erroneous**) LSON fragment:
+Now consider the following (**erroneous**) LSON fragment:
 
     frotz: ((Klaatu blargScript :
         gargle("Hey, I have a ((Klaatu)) inside me!")
     Klaatu))
 
 The element above terminates at `Klaatu))` inside the string, not at the last line (thus yielding a
-syntax error). This strict syntax is actually an advantage, because it leaves the element body free
+syntax error). This strict syntax is actually an advantage, because it leaves the element value free
 to use any arbitrary syntax, and LSON will dutifully accumulate the string representation of that
 element until it encounters the element block terminator.
 
@@ -250,6 +323,18 @@ syntax:
     barada))
 
 Safe and legal.
+
+As a final note, because element values encode a foreign syntax, language constructs such as
+linefeeds, whitespace, and comments are all interpreted **literally** as part of the element value.
+Thus:
+
+    jimjam: ((block someScript:
+        (1.2 / 3 * (25.6))    // I am not an LSON comment.
+    block))
+
+is equivalent to:
+
+    jimjam: (someScript: "\n        (1.2 / 3 * (25.6))    // I am not an LSON comment.\n    ")
 
 
 ### Decoding Elements
@@ -296,58 +381,6 @@ colors, regular expressions) tried later in the sequence.
 Note that values need only be recognized if the decoder intends to perform native operations with
 those values. Decoders that just perform queries, transforms, or transmission need not care about
 underlying implementations.
-
-
-Strings
---------
-Strings are the only natively-supported element type. In element syntax, a string is expressed thus:
-
-    (string:"This is a string.")
-
-Since strings are natively supported, string quotes are sufficient to recognize the element type
-(string) and value (the quoted content). Thus, the following are all equivalent:
-
-    (string:"This is a string.")    // Fully-qualified element of type "string"
-    (string: This is a string)      // Value quotes optional when inside parentheses
-    "This is a string"              // Value recognized as type "string"
-
-In addition to standard double quotes, strings may be quoted with any of five additional quote
-delimiter pairs. This provides a clean way to avoid the necessity of escaping delimiters in complex
-strings.
-
-|  Quotes    | Character Codes | Description                                       |
-|:----------:|:---------------:|:--------------------------------------------------|
-|  "string"  |     U+0022      | Quotation Mark                                    |
-|  'string'  |     U+0027      | Apostrophe                                        |
-| \`string\` |     U+0060      | Grave Accent (Backtick)                           |
-|  «string»  | U+00ab, U+00bb  | {Left,Right}-Pointing Double Angle Quotation Mark |
-|  ‘string’  | U+2018, U+2019  | {Left,Right} Single Quotation Mark                |
-|  “string”  | U+201c, U+201d  | {Left,Right} Double Quotation Mark                |
-
-### Escape Sequences
-Strings may contain the following escape sequences:
-
-| Sequence   | Description                                           |
-|:-----------|:------------------------------------------------------|
-| `\b`       | Backspace                                             |
-| `\f`       | Form feed                                             |
-| `\n`       | New line                                              |
-| `\r`       | Carriage return                                       |
-| `\t`       | Horizontal tab                                        |
-| `\uXXXX`   | Unicode character from four hexadecimal digits        |
-| `\u{X...}` | Unicode character from one or more hexadecimal digits |
-| `\<any>`   | Yields that character unchanged, such as `\'` or `\\` |
-
-### String Concatenation
-In order to support human-readable long strings, the `+` operator may be used to construct
-concatenations. For example:
-
-    {
-        strBlock: "Knock knock.\n"
-                + "Who's there?\n"
-                + "Bug in your state machine.\n"
-                + "Who's there?\n"
-    }
 
 
 Bare Values
@@ -789,8 +822,8 @@ Appendix A: Grammar
     terminator ::= "," | ";" | <whitespace> | empty-before-closing-delimiter
 
     element ::= <untyped-element> | <typed-element>
-    untyped-element ::= "(" <string> ")" | "(("<id> <string> <id>"))"
-    typed-element ::= "(" <typeID> ":" <string> ") | "(("<id> <typeID> ":" <string> <id>"))"
+    untyped-element ::= "(" <string> ")" | "(("<id> <text> <id>"))"
+    typed-element ::= "(" <typeID> ":" <string> ") | "(("<id> <typeID> ":" <text> <id>"))"
 
     dictionary ::= "{" <dictionary-body> "}"
 
@@ -863,9 +896,11 @@ For a set of common element types, see [ElementTypes.md].
 [Dictionaries]:                                #dictionaries
 [Directed Graph Edges Via Adjacency Matrix]:   #directed-graph-edges-via-adjacency-matrix
 [Element Types]:                               #element-types
-[Element Body Blocks]:                         #element-body-blocks
+[Element Values]:                              #element-values
+[Element Value Blocks]:                         #element-value-blocks
 [ElementTypes.md]:                             ./ElementTypes.md
 [Elements]:                                    #elements
+[Elements of Type String]:                     #elements-of-type-string
 [Escape Sequences]:                            #escape-sequences
 [General Graph Structure]:                     #general-graph-structure
 [Graph Edges With Data]:                       #graph-edges-with-data
