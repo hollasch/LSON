@@ -7,7 +7,9 @@ LSON: Lucid Serialized Object Notation
 4.  [Comments]
 5.  [Elements]
     - [Element Types]
+    - [Element Body Blocks]
     - [Decoding Elements]
+    - [Untyped Elements]
 6.  [Strings]
     - [Escape Sequences]
     - [String Concatenation]
@@ -199,13 +201,64 @@ In general, either avoid or quote type names with colons. Untyped values with co
 to specify using the last form above for unspecified types, with a colon immediately following the
 opening parenthesis.
 
+### Element Body Blocks
+In LSON, an _element_ is bascially an arbitrary foreign syntactic structure. Most uses of LSON
+elements will be for simple values in other domains, as we've seen above. Some elements, however,
+might have quite a complex representation, both in syntax and in length. For example, it should be
+simple to embed a 250-line script inside LSON. In my experience, I've seen JSON inside a script
+inside JSON (not because it's good, but because it's necessary).
+
+To this end, elements may also employ block delimiters, which use a unique identifier like so:
+
+    frotz: ((xyzzy python :
+        db = MySQLdb.connect("localhost","username","password","dbname")
+        cursor = db.cursor()
+        sql = "select Column1,Column2 from Table1"
+        cursor.execute(sql)
+        results = cursor.fetchall()
+
+        for row in results:
+            print row[0]+row[1]
+
+        db.close()
+    xyzzy))
+
+As you can see, block-delimited elements begin with `((<id>` where `<id>` is an arbitrary string
+_that appears nowhere in the element body_. As soon as `<id>))` is encountered, the element is
+closed. Also note that the closing identifier must have the same case as the opening identifier. For
+example, `GREEN))` does not match `((Green`.
+
+Consider the following (**erroneous**) LSON fragment:
+
+    frotz: ((Klaatu blargScript :
+        gargle("Hey, I have a ((Klaatu)) inside me!")
+    Klaatu))
+
+The element above terminates at `Klaatu))` inside the string, not at the last line (thus yielding a
+syntax error). This strict syntax is actually an advantage, because it leaves the element body free
+to use any arbitrary syntax, and LSON will dutifully accumulate the string representation of that
+element until it encounters the element block terminator.
+
+As another example of the syntactic freedom, here's a fragment that totally diverges from LSON
+syntax:
+
+    frotz: ((barada niktoScript:
+        Look! Unterminated string chars: " ' » )
+        ... wait, there's more ...
+        ] } %> #>
+        Zing!
+    barada))
+
+Safe and legal.
+
+
 ### Decoding Elements
 All elements have a string representation of their value. In addition, for elements with declared
 type, decoders may use this information to generate a native value of that type. For example, the
 element `(boolean:true)` always has the string representation "true", and may have a decoder's
-native Boolean-valued `True`. Decoders are thus domain-specific, and may handle a mix of elements of
+native Boolean value `True`. Decoders are thus domain-specific, and may handle a mix of elements of
 both known and unknown types. This approach to typing allows unknown types to be handled
-consistently across encode-decode paths, and across data queries and transforms.
+consistently across encode-decode transitions, and across data queries and transforms.
 
 In this manner, a C++ decoder could meaningfully operate on LSON intended for a Python endpoint,
 with values like `False` or `None`.
@@ -351,8 +404,6 @@ of common element types.
 The concatenation operator always promotes words to strings, to produce a string-valued result. For
 example, the LSON `red + green + blue` would yield the string value `"redgreenblue"` (not the bare
 word `redgreenblue`).
-
-
 
 
 Arrays
@@ -738,8 +789,8 @@ Appendix A: Grammar
     terminator ::= "," | ";" | <whitespace> | empty-before-closing-delimiter
 
     element ::= <untyped-element> | <typed-element>
-    untyped-element ::= "(" <string> ")"
-    typed-element ::= "(" <typeID> ":" <string> ")
+    untyped-element ::= "(" <string> ")" | "(("<id> <string> <id>"))"
+    typed-element ::= "(" <typeID> ":" <string> ") | "(("<id> <typeID> ":" <string> <id>"))"
 
     dictionary ::= "{" <dictionary-body> "}"
 
@@ -812,6 +863,7 @@ For a set of common element types, see [ElementTypes.md].
 [Dictionaries]:                                #dictionaries
 [Directed Graph Edges Via Adjacency Matrix]:   #directed-graph-edges-via-adjacency-matrix
 [Element Types]:                               #element-types
+[Element Body Blocks]:                         #element-body-blocks
 [ElementTypes.md]:                             ./ElementTypes.md
 [Elements]:                                    #elements
 [Escape Sequences]:                            #escape-sequences
@@ -833,6 +885,7 @@ For a set of common element types, see [ElementTypes.md].
 [Undirected Graph Edges Via Adjacency Matrix]: #undirected-graph-edges-via-adjacency-matrix
 [Unnamed Graph Nodes With Data]:               #unnamed-graph-nodes-with-data
 [Unnamed Graph Nodes Without Data]:            #unnamed-graph-nodes-without-data
+[Untyped Elements]:                            #untyped-elements
 [Whitespace]:                                  #whitespace
 [Word Concatenation]:                          word-concatenation
 [Word → Element Promotion]:                    #word--element-promotion
