@@ -36,6 +36,7 @@ LSON: Lucid Serialized Object Notation
     - [Graph Examples]
 12. [Appendix A: Grammar]
 13. [Appendix B: Common Element Types]
+14. [Appendix C: LSON Examples]
 
 
 Overview
@@ -489,8 +490,9 @@ has an associated label. Tables have the following properties:
     readability and catching errors.
 
   + Tables do not allow implicit null data; all row dimensions must be specified. Thus, for a table
-    with *N* columns, there must be *M⋅N* data points in the table, where *M* is the number of table
-    rows.
+    with _N_ columns,
+    there must be *M⋅N* data points in the table,
+    where *M* is the number of table rows.
 
   + Each cell (dimension) may be any legal LSON value. So you could have cells of arrays, objects,
     graphs, or even other tables.
@@ -878,15 +880,10 @@ Appendix A: Grammar
     <token>{n+} Denotes common n <token>s, where n is one or more
 
 
-Appendix B: Common Element Types
----------------------------------
-For a set of common element types, see [ElementTypes.md].
-
-
-
 
 [Appendix A: Grammar]:                         #appendix-a-grammar
-[Appendix B: Common Element Types]:            #appendix-b-common-element-types
+[Appendix B: Common Element Types]:            ./ElementTypes.md
+[Appendix C: LSON Examples]:                   ./Examples.md
 [Arrays]:                                      #arrays
 [Bare Value Concatenation]:                    #bare-value-concatenation
 [Bare Values]:                                 #bare-values
