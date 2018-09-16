@@ -341,17 +341,12 @@ A graph example from
           {
             "id": "Roger Kint",
             "label": "Roger Kint",
-            "metadata": {
-              "nickname": "Verbal",
-              "actor": "Kevin Spacey"
-            }
+            "metadata": { "nickname": "Verbal", "actor": "Kevin Spacey" }
           },
           {
             "id": "Keyser Söze",
             "label": "Keyser Söze",
-            "metadata": {
-              "actor": "Kevin Spacey"
-            }
+            "metadata": { "actor": "Kevin Spacey" }
           }
         ],
         "edges": [
@@ -372,21 +367,13 @@ A graph example from
       graph: {
         type:  'movie characters'
         label: 'Usual Suspects'
-        graph: [% {
-            'Roger Kint': {
-              label: "Roger Kint"
-              metadata: {
-                nickname: "Verbal"
-                actor:    "Kevin Spacey"
-              }
-            }
-            'Keyser Söze': {
-              label: "Keyser Söze"
-              metadata: {
-                actor: "Kevin Spacey"
-              }
-            }
-          } {
+        graph: [%
+          [# id             label           metadata
+          // -------------  --------------  ------------------------------------------
+          :  'Roger Kint'   "Roger Kint"    { nickname:"Verbal" actor:"Kevin Spacey" }
+             'Keyser Söze'  "Keyser Söze"   { actor: "Kevin Spacey" }
+          #]
+          {
             'Roger Kint' > 'Keyser Söze': (relation:is)
           }
         %]

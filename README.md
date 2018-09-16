@@ -29,9 +29,11 @@ LSON: Lucid Serialized Object Notation
       + [Unnamed Graph Nodes With Data]
       + [Named Graph Nodes Without Data]
       + [Named Graph Nodes With Data]
+      + [Graph Nodes With Tabular Data]
     - [Graph Edges]
       + [Graph Edges Without Data]
       + [Graph Edges With Data]
+      + [Graph Edges With Tabular Data]
       + [Directed Graph Edges Via Adjacency Matrix]
       + [Undirected Graph Edges Via Adjacency Matrix]
     - [Graph Examples]
@@ -437,8 +439,8 @@ of common element types.
 
 ### Bare Value Concatenation
 The concatenation operator always promotes words to strings, to produce a string-valued result. For
-example, the LSON `red + green + blue` would yield the string value `"redgreenblue"` (not the bare
-word `redgreenblue`).
+example, the LSON `0. + 123 + e10` would yield the string value `"0.123e10"` (not the bare
+word `0.123e10`, which might get promoted to a number element).
 
 
 Arrays
@@ -593,13 +595,13 @@ those nodes. Graphs have the following properties:
 
   + Graphs are delimited with `[%` and `%]` tokens (no whitespace is allowed between delimiter
     characters.)
-  + Each node has associated data.
+  + Each node may or may not have associated data.
   + Each edge may or may not have associated data.
   + Nodes may be unnamed, in which case they are referenced by index.
   + Nodes may be named, in which case they are referenced by name.
   + Edges may be directed or undirected.
   + An edge may leave and arrive at the same node.
-  + There may be many edges between a pair of nodes.
+  + There may be many edges between any node pair.
 
 
 ### General Graph Structure
@@ -666,6 +668,25 @@ CSS color values:
         violet: { css:#ee82ee  rgb:'rgb(238,130,238)' }
     }
 
+#### Graph Nodes With Tabular Data
+Node data may be expressed in the form of a table. Node IDs must be the first column of a node
+table (the column name is arbitrary), and all such ID values must be unique (whether referenced or
+not). Here's an example:
+
+    [%
+        [# nodeID, color=(color:black), weight=(number:0):
+            a107c5, ~,      1.00;
+            8c78e5, blue,   1.00;
+            73ba4d, ~,      2.30;
+            2b0ebb, indigo, 0.21;
+        #]
+        [
+            a107c5 → a107c5,
+            a107c5 → 2b0ebb,
+            ...
+        ]
+    %]
+
 ### Graph Edges
 Edges are expressed as a set of node pair relationships. A node relationship is either a node index
 or name, followed by a relationship character, followed by the second node index or name.
@@ -724,6 +745,23 @@ colors.
       'mid-right'  - 'lower-right': #222222
       'lower-left' ← 'lower-right': #000000
     }
+
+#### Graph Edges With Tabular Data
+Graph edges may be expressed using tabular data. As with node tables, the first column of edge
+tables is special, and expected to hold the edge expressions. The name of the first is not
+significant. Here's an example of edge data using a table:
+
+    [%
+        .... // Row data
+        [#
+            [ edge  ; status ; frinkiness    ]:
+            //===== ; ====== ; ==============
+            [ 2 > 0 ; hot    ; zoobnificent  ]
+            [ 2 > 1 ; tepid  ; cromulipitant ]
+            [ 1 > 2 ; molten ; breg          ]
+            ...
+        #]
+    %]
 
 #### Directed Graph Edges Via Adjacency Matrix
 Directed graph edges may be expressed via adjacency matrix. In a directed adjacency matrix, each
@@ -909,14 +947,16 @@ Appendix A: Grammar
 
     "[%" <graph-nodes> <graph-edges> "%]"
 
-    graph-nodes ::= <indexed-nodes> | <named-nodes>
+    graph-nodes ::= <indexed-nodes> | <named-nodes> | <node-table>
     indexed-nodes ::= <counting-number> | <array>(n)
-    named-nodes :: = <dictionary>
+    named-nodes ::= <dictionary>
+    node-table ::= <table>
 
-    explicit-graph-edges ::= <edge-array> | <edge-dictionary>
+    explicit-graph-edges ::= <edge-array> | <edge-dictionary> | <edge-table>
     edge-array ::= "[" <edge>+ "]"
     edge-dictionary ::= "{" (<edge-key> ":" <value> <terminator>)* "}"
     edge-key ::= <edge> | "[" (<edge> <terminator>)+ "]"
+    edge-table ::= <table>
 
     adjacency-matrix ::= <directed-adjacency-matrix> | <undirected-adjacency-matrix>
     directed-adjacency-matrix ::= "[" <array>(n){n} "]"
@@ -959,6 +999,7 @@ Appendix A: Grammar
 [Escape Sequences]:                            #escape-sequences
 [General Graph Structure]:                     #general-graph-structure
 [Graph Edges With Data]:                       #graph-edges-with-data
+[Graph Edges With Tabular Data]:               #graph-edges-with-tabular-data
 [Graph Edges Without Data]:                    #graph-edges-without-data
 [Graph Edges]:                                 #graph-edges
 [Graph Examples]:                              #graph-examples
@@ -967,6 +1008,7 @@ Appendix A: Grammar
 [Named Graph Nodes With Data]:                 #named-graph-nodes-with-data
 [Named Graph Nodes Without Data]:              #named-graph-nodes-without-data
 [Graph Nodes]:                                 #graph-nodes
+[Graph Nodes With Tabular Data]:               #graph-nodes-with-tabular-data
 [Overview]:                                    #overview
 [Special Values]:                              #special-values
 [String Concatenation]:                        #string-concatenation
