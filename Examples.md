@@ -369,7 +369,6 @@ A graph example from
         label: 'Usual Suspects'
         graph: [%
           [# id             label           metadata
-          // -------------  --------------  ------------------------------------------
           :  'Roger Kint'   "Roger Kint"    { nickname:"Verbal" actor:"Kevin Spacey" }
              'Keyser Söze'  "Keyser Söze"   { actor: "Kevin Spacey" }
           #]
