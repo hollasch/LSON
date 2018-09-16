@@ -537,16 +537,53 @@ Potential ambiguous sequences can usually be solved with whitespace, like so:
     [ #ff8cee #Nan# ]   // An array with a CSS color and a special value; NOT a table.
 
 ### Default Table Values
-Tables may define default values for each column. For example,
+Tables may define default values for each column. When using bracketed tables, default values will
+be used to set missing values when fewer values are specified than there are columns. For example:
 
     [#
         [ id status=idle ttl=120 ] :
         [ a173  running  300 ]    // id = a173, status=running, ttl=300
-        [ b2fc  init ]            // id = b2fc, status=init,    ttl=120
-        [ 781d ]                  // id = 781d, status=idle,    ttl=120
+        [ b2fc  init         ]    // id = b2fc, status=init,    ttl=120
+        [ 781d               ]    // id = 781d, status=idle,    ttl=120
     #]
 
-Currently, default values only apply to trailing columns, and only when using bracketed rows.
+In addition, the special character `~` can be used to specify a default value in a table row,
+allowing for sparse table specifications:
+
+    [#
+        id=0000  status=idle  ttl=120 :
+
+        ~     stopped    0     // id = 0000, status=stopped, ttl=0
+        b2fc  init       ~     // id = b2fc, status=init,    ttl=120
+        781d  ~          240   // id = 781d, status=idle,    ttl=240
+        ~     running    ~     // id = 0000, status=running, ttl=120
+    #]
+
+The above two examples use bare values as the default. However, default values can be any value,
+like so:
+
+    [#  id=(count32:0)  lat=(real:0.00)  lon=(real:0.00)  strength=(HCategory:1) : ...
+
+One can use a valueless element to set the default _type_ of table values, while also requiring a
+value of that type, like so:
+
+    [#
+        [ id=(count32:)  lat=(real:)  long=(real:)  strength=(HCat:) ] :
+        //____  ______  _______  _
+        [ 01ca  -12.30   110.41  1 ]  // (count32:01ca), (real:-12.30), (real:110.41), (HCat:1)
+        [ 021s       ~    70.58  3 ]  // ERROR: No default value for 'lat'.
+        [ 9afb ]                      // ERROR: No default value for 'id', 'lat', 'lon'.
+        ...
+
+A standard CSV-type table might default all values to `(null)`:
+
+    [#
+        invoice=(null)  date=(null)  customerid=(null)  amount=(null)  address=(null):
+        ...
+    #]
+
+Since any type can be specified, arrays, dictionaries, tables and graphs can also be used as default
+values.
 
 
 Graphs
@@ -840,6 +877,7 @@ Appendix A: Grammar
     element ::= <untyped-element> | <typed-element>
     untyped-element ::= "(" <string> ")" | "(("<id> <text> <id>"))"
     typed-element ::= "(" <typeID> ":" <string> ") | "(("<id> <typeID> ":" <text> <id>"))"
+    valueless-element ::= "(" <typeID> ":" ")"
 
     dictionary ::= "{" <dictionary-body> "}"
 
@@ -852,14 +890,18 @@ Appendix A: Grammar
     array-item ::= <value> <terminator>
 
     table ::= "[#" <table-body> "#]"
-    table-body ::= <table-body-unbracketed> | <table-body-bracketed>
+    table-body ::= <table-body-bracketed> | <table-body-unbracketed>
 
-    table-body-unbracketed ::= ( <id> <terminator> ){n+} ":" <table-row-bare>(n+)*
-    table-row-bare(n) ::= ( <value> <terminator> ){n}
+    table-body-bracketed ::= "[" <table-feature>* "]" ":" <table-row-bracketed>*
+    table-row-bracketed(n) ::= "[" <table-row-bare>(*) "]"
 
-    table-body-bracketed ::= "[" <table-feature>{n+} "]" ":" <table-row-bracketed>(n+)*
-    table-feature ::= <id> <terminator> | <id> "=" <value> <terminator>
-    table-row-bracketed(n) ::= "[" <table-row-bare>(n) "]"
+    table-feature ::= <id> <terminator>
+                    | <id> "=" <value> <terminator>
+                    | <id> "=" <valueless-element>
+
+    table-body-unbracketed ::= <table-feature>{n+} ":" <table-row-bare>(n+)*
+    table-row-bare(n) ::= (<table-row-feature> <terminator>){n}
+    table-row-feature ::= <value> | "~"
 
     graph ::= explicit-graph | adjacency-graph
     explicit-graph ::= "[%" <graph-nodes> <explicit-graph-edges> "%]"
