@@ -39,7 +39,7 @@ Example 1
 
 ### LSON
     {
-        glossary: {
+        glossary: {                           // Keys (without whitespace) need not be quoted.
             title: "example glossary"
             GlossDiv: {
                 title: S
@@ -49,9 +49,11 @@ Example 1
                         SortAs: SGML
                         GlossTerm: "Standard Generalized Markup Language"
                         Acronym: SGML
-                        Abbrev: ISO\ 8879:1986
+                        Abbrev: ISO\ 8879:1986    // Whitespace outside of quotes can be escaped.
                         GlossDef: {
                             para: "A meta-markup language, used to create markup languages such as DocBook."
+
+                            /* Commas and semi-colons are optional. */
                             GlossSeeAlso: [GML XML]
                         },
                         GlossSee: markup
@@ -88,11 +90,11 @@ Example 2
             id: file
             value: File
             popup: {
-                menuitem: [#
-                    value   onclick :
-                    New     CreateNewDoc()
-                    Open    OpenDoc()
-                    Close   CloseDoc()
+                menuitem: [#                 // A table
+                    value   onclick :        // with columns (features) "value" and "onclick"
+                    New     CreateNewDoc()   // Row 1
+                    Open    OpenDoc()        // Row 2
+                    Close   CloseDoc()       // Row 3
                 #]
             }
         }
@@ -139,17 +141,17 @@ Example 3
         widget: {
             debug: on
             window: {
-                title: "Sample Konfabulator Widget"
-                name: main_window
-                width:  (count:500),
+                title:  "Sample Konfabulator Widget"
+                name:   main_window
+                width:  (count:500),  // Element of some type "count", value "500"
                 height: (count:500)
             },
             image: {
                 src: Images/Sun.png
                 name: sun1
-                hOffset: (int:250)
+                hOffset: (int:250)            // Element of some type "int", value "250)
                 vOffset: (int:250)
-                alignment: (alignment:center)
+                alignment: (alignment:center) // Element of some type "alignment", value "center"
             },
             text: {
                 data: Click Here,
@@ -159,6 +161,12 @@ Example 3
                 hOffset: (int:250),
                 vOffset: (int:100),
                 alignment: (alignment:center),
+
+                /* Elements with block delimiters may contain _anything_, without fear of colliding
+                ** with LSON syntax. Having encountered situations of working with JSON that
+                ** contained script that contained JSON snippets, this would have been a huge help.
+                */
+
                 onMouseUp: ((mouseUp javaScript:
                     sun1.opacity = (sun1.opacity / 100) * 90;
                 mouseUp))
@@ -206,9 +214,9 @@ Example 4
 ### LSON
     {
         menu: {
-            header: «SVG Viewer»
-            items: [# [id=(null) label=""]:
-                [Open]
+            header: «SVG Viewer»                // LSON supports six string delimiters
+            items: [# [id=(null) label=""]:     // A table with default values
+                [Open]                          // Unspecified columns get default values.
                 [OpenNew "Open New"]
                 []
                 [ZoomIn "Zoom In"]
@@ -218,7 +226,7 @@ Example 4
                 [Quality]
                 [Pause]
                 [Mute]
-                []
+                [ ~ "Null" ]                    // '~' indicates default feature value
                 [Find "Find..."]
                 [FindAgain "Find Again"]
                 [Copy]
@@ -297,12 +305,14 @@ A graph example from
         {
           type: car
           label: 'Car Manufacturer Relationships'
-          graph: [% {
+          graph: [% {                // Graph
+              // Nodes
               nissan:   'Nissan'
               infiniti: 'Infiniti'
               toyota:   'Toyota'
               lexus:    'Lexus'
             } {
+              // Edges
               nissan → infiniti: (relation:has_luxury_division)
               toyota → lexus:    (relation:has_luxury_division)
             }
@@ -316,6 +326,7 @@ A graph example from
               nissan: "Nissan"
               toyota: "Toyota"
             } {
+              // In graph edges, `>` is a synonym of `→`.
               nissan > japan: (relation:country_of_origin)
               toyota > japan: (relation:country_of_origin)
             }
@@ -366,18 +377,19 @@ A graph example from
     {
       graph: {
         type:  'movie characters'
-        label: 'Usual Suspects'
+        label: “Usual Suspects”
         graph: [%
+          // A graph with a table of node data.
           [# id             label           metadata
           :  'Roger Kint'   "Roger Kint"    { nickname:"Verbal" actor:"Kevin Spacey" }
              'Keyser Söze'  "Keyser Söze"   { actor: "Kevin Spacey" }
           #]
           {
-            'Roger Kint' > 'Keyser Söze': (relation:is)
+            'Roger Kint' > 'Keyser Söze': (relation:is)  // Element of type "relation", value "is"
           }
         %]
         metadata: {
-          'release year': 1995
+          ‘release year’: 1995
         }
       }
     }
