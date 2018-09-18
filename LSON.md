@@ -71,8 +71,8 @@ in the following ways:
 
 LSON Example
 -------------
-Following are some example LSON snippets to illustrate various aspects of the notation, before we
-dive deeper:
+The following is an LSON snippet to illustrate various aspects of the notation, before we dive
+deeper:
 
     // Comments are C-style: double slash to end of line, or enclosed with `/*` and `*/`.
     /* This is an example using slash-star delimeters. */
@@ -82,7 +82,7 @@ dive deeper:
     {
         index: {
             'Gloss Div': {                // There are six legal string-delimeter pairs.
-                title: S                  // No need to quote strings that lack whitespace.
+                title: "S"                // No need to quote strings that lack whitespace.
                 "Gloss List": {
                     `Gloss Entry`: {
                         ID:      x112-223
@@ -90,14 +90,14 @@ dive deeper:
                         Acronym: SGML
                         «Gloss Term»: "Standard Generalized Markup Language"
 
-                        Abbrev: ISO\ 8879:1986     // Whitespace can be escaped.
+                        Abbrev: (ISO: 8879:1986)  // Element of some type "ISO", value "8879:1986"
 
                         ‘Gloss Def’: {
                             para: "A meta-markup language, used to create markup languages "
                                 + "such as DocBook."
 
-                            “Gloss SeeAlso”: [ GML, XML, HTML ]
-                            'Gloss See': markup
+                            “Gloss SeeAlso”: [ 'GML', 'XML', 'HTML' ]
+                            'Gloss See': "markup"
                         }
                     }
                 }
@@ -177,6 +177,8 @@ complex strings.
 |  «string»  | U+00ab, U+00bb  | {Left,Right}-Pointing Double Angle Quotation Mark |
 |  ‘string’  | U+2018, U+2019  | {Left,Right} Single Quotation Mark                |
 |  “string”  | U+201c, U+201d  | {Left,Right} Double Quotation Mark                |
+
+Though elements are described below, formally a string is an element of type "string".
 
 ### Escape Sequences
 Strings may contain the following escape sequences:
@@ -269,8 +271,8 @@ Blocks] (described below).
 
 ### Elements of Type String
 As pointed out earlier, strings are the only element type that LSON recognizes implicitly. Since
-strings are natively supported, string quotes are sufficient to recognize the element type (string)
-and value (the quoted content). Thus, the following are all equivalent:
+strings are natively supported, string quotes are sufficient to recognize the element type
+("string") and value (the quoted content). Thus, the following are all equivalent:
 
     (string:"This is a string.")    // Fully-qualified element of type "string"
     (string: This is a string)      // Value quotes optional when inside parentheses
@@ -374,7 +376,7 @@ Other common types may have associated type recognizers:
     (-1.234e6) → (Number:-1.234e6)    // JavaScript
     (-1.234e6) → (double:-1.234e6)    // C++
     (1..10) → (range:"range(1,10)")   // Python
-    (#a3f4b9) → (color:#a3f4b9)       // CSS color
+    (#a3f4b9) → (color:0xa3f4b9ff)    // CSS color in C++
     (0x3ff0'0000'0000'0000) ...       // In C++, could be recognized as `uint64_t`
 
 One reasonable approach for decoders is to maintain an ordered list of recognizers that are employed
@@ -439,8 +441,8 @@ of common element types.
 
 ### Bare Value Concatenation
 The concatenation operator always promotes words to strings, to produce a string-valued result. For
-example, the LSON `0. + 123 + e10` would yield the string value `"0.123e10"` (not the bare
-word `0.123e10`, which might get promoted to a number element).
+example, the result of `0. + 123 + e10` would yield (string:0.123e10), not (0.123e10), which might
+get promoted to (number:0.123e10).
 
 
 Arrays

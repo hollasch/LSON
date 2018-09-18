@@ -42,21 +42,21 @@ Example 1
         glossary: {                           // Keys (without whitespace) need not be quoted.
             title: "example glossary"
             GlossDiv: {
-                title: S
+                title: 'S'                    // Six different string quote alternatives.
                 GlossList: {
                     GlossEntry: {
                         ID: SGML
                         SortAs: SGML
-                        GlossTerm: "Standard Generalized Markup Language"
+                        GlossTerm: `Standard Generalized Markup Language`
                         Acronym: SGML
                         Abbrev: ISO\ 8879:1986    // Whitespace outside of quotes can be escaped.
                         GlossDef: {
-                            para: "A meta-markup language, used to create markup languages such as DocBook."
+                            para: “A meta-markup language, used to create markup languages such as DocBook.”
 
                             /* Commas and semi-colons are optional. */
-                            GlossSeeAlso: [GML XML]
+                            GlossSeeAlso: [‘GML’ ‘XML’]
                         },
-                        GlossSee: markup
+                        GlossSee: «markup»
                     }
                 }
             }
@@ -141,23 +141,23 @@ Example 3
         widget: {
             debug: on
             window: {
-                title:  "Sample Konfabulator Widget"
-                name:   main_window
+                title:  'Sample Konfabulator Widget'
+                name:   'main_window'
                 width:  (count:500),  // Element of some type "count", value "500"
                 height: (count:500)
             },
             image: {
-                src: Images/Sun.png
-                name: sun1
+                src: 'Images/Sun.png'
+                name: 'sun1'
                 hOffset: (int:250)            // Element of some type "int", value "250)
                 vOffset: (int:250)
                 alignment: (alignment:center) // Element of some type "alignment", value "center"
             },
             text: {
-                data: Click Here,
+                data: 'Click Here',
                 size: (count:36),
                 style: (fontWeight:bold),
-                name: text1,
+                name: 'text1',
                 hOffset: (int:250),
                 vOffset: (int:100),
                 alignment: (alignment:center),
@@ -188,10 +188,6 @@ Example 4
                 {"id": "Open"},
                 {"id": "OpenNew", "label": "Open New"},
                 null,
-                {"id": "ZoomIn", "label": "Zoom In"},
-                {"id": "ZoomOut", "label": "Zoom Out"},
-                {"id": "OriginalView", "label": "Original View"},
-                null,
                 {"id": "Quality"},
                 {"id": "Pause"},
                 {"id": "Mute"},
@@ -205,6 +201,10 @@ Example 4
                 {"id": "ViewSource", "label": "View Source"},
                 {"id": "SaveAs", "label": "Save As"},
                 null,
+                {"id": "ZoomIn", "label": "Zoom In"},
+                {"id": "ZoomOut", "label": "Zoom Out"},
+                {"id": "OriginalView", "label": "Original View"},
+                null,
                 {"id": "Help"},
                 {"id": "About", "label": "About Adobe CVG Viewer..."}
             ]
@@ -217,27 +217,27 @@ Example 4
             header: «SVG Viewer»                // LSON supports six string delimiters
             items: [# [id=(null) label=""]:     // A table with default values
                 [Open]                          // Unspecified columns get default values.
-                [OpenNew "Open New"]
-                []
-                [ZoomIn "Zoom In"]
-                [ZoomOut "Zoom Out"]
-                [OriginalView "Original View"]
+                [OpenNew  "Open New"]
                 []
                 [Quality]
                 [Pause]
                 [Mute]
-                [ ~ "Null" ]                    // '~' indicates default feature value
-                [Find "Find..."]
-                [FindAgain "Find Again"]
+                [~  "Null"]                     // '~' indicates default feature value
+                [Find  "Find..."]
+                [FindAgain  "Find Again"]
                 [Copy]
-                [CopyAgain "Copy Again"]
-                [CopySVG "Copy SVG"]
-                [ViewSVG "View SVG"]
-                [ViewSource "View Source"]
-                [SaveAs "Save As"]
+                [CopyAgain  "Copy Again"]
+                [CopySVG  "Copy SVG"]
+                [ViewSVG  "View SVG"]
+                [ViewSource  "View Source"]
+                [SaveAs  "Save As"]
+                []
+                [ZoomIn  "Zoom In"]
+                [ZoomOut  "Zoom Out"]
+                [OriginalView  "Original View"]
                 []
                 [Help]
-                [About "About Adobe CVG Viewer..."]
+                [About  "About Adobe CVG Viewer..."]
             #]
         }
     }
@@ -322,9 +322,9 @@ A graph example from
           type: car,
           label: 'Car Manufacturer Countries'
           graph: [% {
-              japan:  "Japan"
-              nissan: "Nissan"
-              toyota: "Toyota"
+              japan:  'Japan'
+              nissan: 'Nissan'
+              toyota: 'Toyota'
             } {
               // In graph edges, `>` is a synonym of `→`.
               nissan > japan: (relation:country_of_origin)
@@ -381,15 +381,15 @@ A graph example from
         graph: [%
           // A graph with a table of node data.
           [# id             label           metadata
-          :  'Roger Kint'   "Roger Kint"    { nickname:"Verbal" actor:"Kevin Spacey" }
-             'Keyser Söze'  "Keyser Söze"   { actor: "Kevin Spacey" }
+          :  'Roger Kint'   'Roger Kint'    { nickname:'Verbal' actor:'Kevin Spacey' }
+             'Keyser Söze'  'Keyser Söze'   { actor: 'Kevin Spacey' }
           #]
           {
             'Roger Kint' > 'Keyser Söze': (relation:is)  // Element of type "relation", value "is"
           }
         %]
         metadata: {
-          ‘release year’: 1995
+          'release year': 1995
         }
       }
     }
