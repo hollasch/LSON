@@ -6,4 +6,18 @@
         «four»;
         ‘five’
         “six”
+
+        "string with \"escaped\" quotes"
+        'string with \'escaped\' quotes'
+        `string with \`escaped\` quotes`
+        “string with \“escaped\” quotes”
+        ‘string with \‘escaped\’ quotes’
+        «string with \«escaped\» quotes»
+
+        "string has GOOD \u0021 unicode escape"
+        "string has GOOD \u{21} unicode escape"
+        "string has GOOD \u{12345678} unicode escape"
+        "string has BAD  \u21 unicode escape"
+        "string has BAD  \u{} unicode escape"
+        "string has BAD  \u{1234567890} unicode escape"
     ]

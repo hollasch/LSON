@@ -39,22 +39,24 @@ Example 1
 
 ### LSON
     {
-        glossary: {
+        glossary: {                           // Keys (without whitespace) need not be quoted.
             title: "example glossary"
             GlossDiv: {
-                title: S
+                title: 'S'                    // Six different string quote alternatives.
                 GlossList: {
                     GlossEntry: {
                         ID: SGML
                         SortAs: SGML
-                        GlossTerm: "Standard Generalized Markup Language"
+                        GlossTerm: `Standard Generalized Markup Language`
                         Acronym: SGML
-                        Abbrev: ISO\ 8879:1986
+                        Abbrev: ISO\ 8879:1986    // Whitespace outside of quotes can be escaped.
                         GlossDef: {
-                            para: "A meta-markup language, used to create markup languages such as DocBook."
-                            GlossSeeAlso: [GML XML]
+                            para: “A meta-markup language, used to create markup languages such as DocBook.”
+
+                            /* Commas and semi-colons are optional. */
+                            GlossSeeAlso: [‘GML’ ‘XML’]
                         },
-                        GlossSee: markup
+                        GlossSee: «markup»
                     }
                 }
             }
@@ -88,11 +90,11 @@ Example 2
             id: file
             value: File
             popup: {
-                menuitem: [#
-                    value   onclick :
-                    New     CreateNewDoc()
-                    Open    OpenDoc()
-                    Close   CloseDoc()
+                menuitem: [#                 // A table
+                    value   onclick :        // with columns (features) "value" and "onclick"
+                    New     CreateNewDoc()   // Row 1
+                    Open    OpenDoc()        // Row 2
+                    Close   CloseDoc()       // Row 3
                 #]
             }
         }
@@ -139,26 +141,32 @@ Example 3
         widget: {
             debug: on
             window: {
-                title: "Sample Konfabulator Widget"
-                name: main_window
-                width:  (count:500),
+                title:  'Sample Konfabulator Widget'
+                name:   'main_window'
+                width:  (count:500),  // Element of some type "count", value "500"
                 height: (count:500)
             },
             image: {
-                src: Images/Sun.png
-                name: sun1
-                hOffset: (int:250)
+                src: 'Images/Sun.png'
+                name: 'sun1'
+                hOffset: (int:250)            // Element of some type "int", value "250)
                 vOffset: (int:250)
-                alignment: (alignment:center)
+                alignment: (alignment:center) // Element of some type "alignment", value "center"
             },
             text: {
-                data: Click Here,
+                data: 'Click Here',
                 size: (count:36),
                 style: (fontWeight:bold),
-                name: text1,
+                name: 'text1',
                 hOffset: (int:250),
                 vOffset: (int:100),
                 alignment: (alignment:center),
+
+                /* Elements with block delimiters may contain _anything_, without fear of colliding
+                ** with LSON syntax. Having encountered situations of working with JSON that
+                ** contained script that contained JSON snippets, this would have been a huge help.
+                */
+
                 onMouseUp: ((mouseUp javaScript:
                     sun1.opacity = (sun1.opacity / 100) * 90;
                 mouseUp))
@@ -180,10 +188,6 @@ Example 4
                 {"id": "Open"},
                 {"id": "OpenNew", "label": "Open New"},
                 null,
-                {"id": "ZoomIn", "label": "Zoom In"},
-                {"id": "ZoomOut", "label": "Zoom Out"},
-                {"id": "OriginalView", "label": "Original View"},
-                null,
                 {"id": "Quality"},
                 {"id": "Pause"},
                 {"id": "Mute"},
@@ -197,6 +201,10 @@ Example 4
                 {"id": "ViewSource", "label": "View Source"},
                 {"id": "SaveAs", "label": "Save As"},
                 null,
+                {"id": "ZoomIn", "label": "Zoom In"},
+                {"id": "ZoomOut", "label": "Zoom Out"},
+                {"id": "OriginalView", "label": "Original View"},
+                null,
                 {"id": "Help"},
                 {"id": "About", "label": "About Adobe CVG Viewer..."}
             ]
@@ -206,30 +214,30 @@ Example 4
 ### LSON
     {
         menu: {
-            header: «SVG Viewer»
-            items: [# [id=(null) label=""]:
-                [Open]
-                [OpenNew "Open New"]
-                []
-                [ZoomIn "Zoom In"]
-                [ZoomOut "Zoom Out"]
-                [OriginalView "Original View"]
+            header: «SVG Viewer»                // LSON supports six string delimiters
+            items: [# [id=(null) label=""]:     // A table with default values
+                [Open]                          // Unspecified columns get default values.
+                [OpenNew  "Open New"]
                 []
                 [Quality]
                 [Pause]
                 [Mute]
-                []
-                [Find "Find..."]
-                [FindAgain "Find Again"]
+                [~  "Null"]                     // '~' indicates default feature value
+                [Find  "Find..."]
+                [FindAgain  "Find Again"]
                 [Copy]
-                [CopyAgain "Copy Again"]
-                [CopySVG "Copy SVG"]
-                [ViewSVG "View SVG"]
-                [ViewSource "View Source"]
-                [SaveAs "Save As"]
+                [CopyAgain  "Copy Again"]
+                [CopySVG  "Copy SVG"]
+                [ViewSVG  "View SVG"]
+                [ViewSource  "View Source"]
+                [SaveAs  "Save As"]
+                []
+                [ZoomIn  "Zoom In"]
+                [ZoomOut  "Zoom Out"]
+                [OriginalView  "Original View"]
                 []
                 [Help]
-                [About "About Adobe CVG Viewer..."]
+                [About  "About Adobe CVG Viewer..."]
             #]
         }
     }
@@ -297,12 +305,14 @@ A graph example from
         {
           type: car
           label: 'Car Manufacturer Relationships'
-          graph: [% {
+          graph: [% {                // Graph
+              // Nodes
               nissan:   'Nissan'
               infiniti: 'Infiniti'
               toyota:   'Toyota'
               lexus:    'Lexus'
             } {
+              // Edges
               nissan → infiniti: (relation:has_luxury_division)
               toyota → lexus:    (relation:has_luxury_division)
             }
@@ -312,10 +322,11 @@ A graph example from
           type: car,
           label: 'Car Manufacturer Countries'
           graph: [% {
-              japan:  "Japan"
-              nissan: "Nissan"
-              toyota: "Toyota"
+              japan:  'Japan'
+              nissan: 'Nissan'
+              toyota: 'Toyota'
             } {
+              // In graph edges, `>` is a synonym of `→`.
               nissan > japan: (relation:country_of_origin)
               toyota > japan: (relation:country_of_origin)
             }
@@ -366,14 +377,15 @@ A graph example from
     {
       graph: {
         type:  'movie characters'
-        label: 'Usual Suspects'
+        label: “Usual Suspects”
         graph: [%
+          // A graph with a table of node data.
           [# id             label           metadata
-          :  'Roger Kint'   "Roger Kint"    { nickname:"Verbal" actor:"Kevin Spacey" }
-             'Keyser Söze'  "Keyser Söze"   { actor: "Kevin Spacey" }
+          :  'Roger Kint'   'Roger Kint'    { nickname:'Verbal' actor:'Kevin Spacey' }
+             'Keyser Söze'  'Keyser Söze'   { actor: 'Kevin Spacey' }
           #]
           {
-            'Roger Kint' > 'Keyser Söze': (relation:is)
+            'Roger Kint' > 'Keyser Söze': (relation:is)  // Element of type "relation", value "is"
           }
         %]
         metadata: {

@@ -8,14 +8,13 @@ About
 ------
 The JSON file format is beautiful in its simplicity and power. With a surprisingly succinct syntax,
 it is able to express data in a huge variety of formats. Yet there are little annoyances of the
-format that inevitably prompt people to wish for a number of small tweaks: the lack of comments,
-mandated string quoting, mandated key quoting, double quotes only, strict syntax for commas,
-limitations in numeric values, and so forth.
+format: the lack of comments, mandated string quoting, mandated key quoting, double quotes only,
+strict syntax for commas, limitations in numeric values, and so forth.
 
-LSON was a personal doodle in my spare time of how I'd like to see the format evolve. In the
-beginning, I made all the standard tweaks. However, in working and re-working it, ideas would arise
-that I found to be quite powerful, and ideas would build on those. In the end, I arrived at a format
-that I believe keeps the ultimate simplicity of the file format, with greater power and
+LSON was a personal doodle in my spare time to see how I'd like to see the format evolve. In the
+beginning, I made all the standard tweaks. However, in working and re-working it, I encountered
+ideas that I found to be quite powerful, and ideas building from those. In the end, I arrived at a
+format that I believe keeps the ultimate simplicity of the file format, with greater power and
 expressiveness.
 
 Here's a list of some of LSON's more interesting features:
@@ -30,11 +29,14 @@ Here's a list of some of LSON's more interesting features:
      values, there is no intrinsic support for numbers, boolean, or any other primitive type.
 
   4. LSON supports arbitrary _elements_: domain-specific data values with declared or unknown type.
-     Elements provide support for domain-specific values such as `true`, `null`, `infinity`,
-     `2018-07-02`, `#6b17ec`, `(x,a,b) => { a <= x && x <= b }`, and so forth. LSON encoders and
-     decoders handle both known and unknown types in a consistent and predictable manner.
+     Elements provide first-class support for domain-specific values such as `true`, `null`,
+     `infinity`, `2018-07-02`, `#6b17ec`, `(x,a,b) => { a <= x && x <= b }`, and so forth. LSON
+     encoders and decoders handle both known and unknown types in a consistent and predictable
+     manner.
 
-  5. LSON includes four basic data structures: array, dictionary, table, and graphs.
+  5. LSON adds two new data structures to JSON's array and dictionary: table and graph.
+
+You can browse [Examples.md] for a quick scan of what LSON looks like.
 
 
 LSON Tools
@@ -48,5 +50,6 @@ In addition, [Connor Hollasch] has written [a Java library] for an early version
 
 
 [a Java library]:     https://github.com/chollasch/LSON4J
+[Examples.md]:        ./Examples.md
 [Connor Hollasch]:    https://github.com/chollasch/
 [LSON Specification]: LSON.md
