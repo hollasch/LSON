@@ -178,21 +178,24 @@ complex strings.
 |  ‘string’  | U+2018, U+2019  | {Left,Right} Single Quotation Mark                |
 |  “string”  | U+201c, U+201d  | {Left,Right} Double Quotation Mark                |
 
-Though elements are described below, formally a string is an element of type "string".
+Strings may contain newlines and linefeeds.
 
 ### Escape Sequences
 Strings may contain the following escape sequences:
 
-| Sequence   | Description                                           |
-|:-----------|:------------------------------------------------------|
-| `\b`       | Backspace                                             |
-| `\f`       | Form feed                                             |
-| `\n`       | New line                                              |
-| `\r`       | Carriage return                                       |
-| `\t`       | Horizontal tab                                        |
-| `\uXXXX`   | Unicode character from four hexadecimal digits        |
-| `\u{X...}` | Unicode character from one or more hexadecimal digits |
-| `\<any>`   | Yields that character verbatim, such as `\'` or `\\`  |
+| Sequence        | Description                                           |
+|:----------------|:------------------------------------------------------|
+| `\b`            | Backspace                                             |
+| `\f`            | Form feed                                             |
+| `\n`            | New line                                              |
+| `\r`            | Carriage return                                       |
+| `\t`            | Horizontal tab                                        |
+| `\uXXXX`        | Unicode character from four hexadecimal digits        |
+| `\uXXany`       | Not a legal Unicode escape; yields `uXXany`           |
+| `\u{X...}`      | Unicode character from 1-8 hexadecimal digits         |
+| `\u{}`          | Not a legal Unicode escape; yields `u{}`              |
+| `\u{123456790}` | Not a legal Unicode escape; yields `u{1234567890}`    |
+| `\<any>`        | Yields that character verbatim, such as `\'` or `\\`  |
 
 ### String Concatenation
 In order to support human-readable long strings, the `+` operator may be used to construct
