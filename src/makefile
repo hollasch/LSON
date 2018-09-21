@@ -17,5 +17,5 @@ $(buildDir):
 lson: $(buildDir)\lson.exe
 
 $(buildDir)\lson.exe: $(buildDir) lson.cpp
-	cl -nologo -O2 -Ox -W4 -GF -GS \
+	cl -nologo -O2 -Ox -W4 -GF -GS -EHsc \
 		-Fe: $(buildDir)\lson.exe -Fo: $(buildDir)\lson.obj lson.cpp
