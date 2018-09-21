@@ -1,3 +1,4 @@
 // Block Elements
 
-((thing foo)) other thing))
+// An array of one block element plus the string "end))".
+[ ((thing foo)) other thing)) end)) ]
