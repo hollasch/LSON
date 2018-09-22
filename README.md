@@ -45,11 +45,11 @@ I am just starting on an LSON parser and command-line utility in C++. Ultimately
 an LSON C++ library, and one or several standalone LSON command-line utilities. You can find this in
 [the `src` directory](src/).
 
-In addition, [Connor Hollasch][] has written [a Java library][] for an early version of LSON.
+In addition, [Connor Hollasch][] has written  a [Java library][] for an early version of LSON.
 
 
 
-[a Java library]:     https://github.com/chollasch/LSON4J
-[Examples.md]:        ./Examples.md
 [Connor Hollasch]:    https://github.com/chollasch/
+[Examples.md]:        ./Examples.md
+[Java library]:       https://github.com/chollasch/LSON4J
 [LSON Specification]: LSON.md

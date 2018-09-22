@@ -120,7 +120,7 @@ deeper:
 
 Whitespace
 -----------
-LSON whitespace includes all [standard Unicode whitespace characters][].
+LSON whitespace includes all standard [Unicode whitespace] characters.
 
 | Unicode |   Escape   | Description
 |:-------:|:----------:|:-----------
@@ -984,8 +984,6 @@ Appendix A: Grammar
 
 
 [Appendix A: Grammar]:                         #appendix-a-grammar
-[Appendix B: Common Element Types]:            ./ElementTypes.md
-[Appendix C: LSON Examples]:                   ./Examples.md
 [Arrays]:                                      #arrays
 [Bare Value Concatenation]:                    #bare-value-concatenation
 [Bare Values]:                                 #bare-values
@@ -996,11 +994,10 @@ Appendix A: Grammar
 [Dictionaries]:                                #dictionaries
 [Directed Graph Edges Via Adjacency Matrix]:   #directed-graph-edges-via-adjacency-matrix
 [Element Types]:                               #element-types
+[Element Value Blocks]:                        #element-value-blocks
 [Element Values]:                              #element-values
-[Element Value Blocks]:                         #element-value-blocks
-[ElementTypes.md]:                             ./ElementTypes.md
-[Elements]:                                    #elements
 [Elements of Type String]:                     #elements-of-type-string
+[Elements]:                                    #elements
 [Escape Sequences]:                            #escape-sequences
 [General Graph Structure]:                     #general-graph-structure
 [Graph Edges With Data]:                       #graph-edges-with-data
@@ -1008,12 +1005,12 @@ Appendix A: Grammar
 [Graph Edges Without Data]:                    #graph-edges-without-data
 [Graph Edges]:                                 #graph-edges
 [Graph Examples]:                              #graph-examples
+[Graph Nodes With Tabular Data]:               #graph-nodes-with-tabular-data
+[Graph Nodes]:                                 #graph-nodes
 [Graphs]:                                      #graphs
 [LSON Example]:                                #lson-example
 [Named Graph Nodes With Data]:                 #named-graph-nodes-with-data
 [Named Graph Nodes Without Data]:              #named-graph-nodes-without-data
-[Graph Nodes]:                                 #graph-nodes
-[Graph Nodes With Tabular Data]:               #graph-nodes-with-tabular-data
 [Overview]:                                    #overview
 [Special Values]:                              #special-values
 [String Concatenation]:                        #string-concatenation
@@ -1028,4 +1025,7 @@ Appendix A: Grammar
 [Word → Element Promotion]:                    #word--element-promotion
 [Words]:                                       #words
 
-[standard Unicode whitespace characters]: https://en.wikipedia.org/wiki/Whitespace_character#Unicode
+[Appendix B: Common Element Types]: ./ElementTypes.md
+[Appendix C: LSON Examples]:        ./Examples.md
+[ElementTypes.md]:                  ./ElementTypes.md
+[Unicode whitespace]:               https://en.wikipedia.org/wiki/Whitespace_character#Unicode
