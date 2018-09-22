@@ -3,9 +3,9 @@ LSON Examples
 
 The following are examples of the [LSON](./README.md) format.
 
-  - Typed Elements: see examples [3], [5], [6]
-  - Tables: see examples [2], [4]
-  - Graphs: see examples [5], [6]
+  - Typed Elements: see examples [3][], [5][], [6][]
+  - Tables: see examples [2][], [4][]
+  - Graphs: see examples [5][], [6][]
 
 <br>
 

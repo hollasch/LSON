@@ -9,20 +9,20 @@ Since LSON supports arbitray element types, it is useful to standardize these ty
 associated type IDs, and their grammars. Note that these are only suggestions for common
 interpretations. If you disagree with a particular representation, feel free to define your own.
 
-- [Null]
-- [Boolean Types]
-  + [Boolean (simple)]
-  + [Boolean (extended)]
-- [Numeric Types]
-  + [Count]
-  + [CountN]
-  + [Int]
-  + [IntN]
-  + [Real]
-  + [RealN]
-  + [Real Extended]
-  + [Number]
-- [Color]
+- [Null][]
+- [Boolean Types][]
+  + [Boolean (simple)][]
+  + [Boolean (extended)][]
+- [Numeric Types][]
+  + [Count][]
+  + [CountN][]
+  + [Int][]
+  + [IntN][]
+  + [Real][]
+  + [RealN][]
+  + [Real Extended][]
+  + [Number][]
+- [Color][]
 
 
 Null

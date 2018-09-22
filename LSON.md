@@ -1,45 +1,45 @@
 LSON: Lucid Serialized Object Notation
 ====================================================================================================
 
-1.  [Overview]
-2.  [LSON Example]
-3.  [Whitespace]
-4.  [Comments]
-5.  [Strings]
-    - [Escape Sequences]
-    - [String Concatenation]
-6.  [Elements]
-    - [Element Types]
-    - [Element Values]
-    - [Elements of Type String]
-    - [Element Value Blocks]
-    - [Decoding Elements]
-    - [Untyped Elements]
-7.  [Bare Values]
-    - [Word → Element Promotion]
-    - [Bare Value Concatenation]
-8.  [Arrays]
-9.  [Dictionaries]
-10. [Tables]
-    - [Default Table Values]
-11. [Graphs]
-    - [General Graph Structure]
-    - [Graph Nodes]
-      + [Unnamed Graph Nodes Without Data]
-      + [Unnamed Graph Nodes With Data]
-      + [Named Graph Nodes Without Data]
-      + [Named Graph Nodes With Data]
-      + [Graph Nodes With Tabular Data]
-    - [Graph Edges]
-      + [Graph Edges Without Data]
-      + [Graph Edges With Data]
-      + [Graph Edges With Tabular Data]
-      + [Directed Graph Edges Via Adjacency Matrix]
-      + [Undirected Graph Edges Via Adjacency Matrix]
-    - [Graph Examples]
-12. [Appendix A: Grammar]
-13. [Appendix B: Common Element Types]
-14. [Appendix C: LSON Examples]
+1.  [Overview][]
+2.  [LSON Example][]
+3.  [Whitespace][]
+4.  [Comments][]
+5.  [Strings][]
+    - [Escape Sequences][]
+    - [String Concatenation][]
+6.  [Elements][]
+    - [Element Types][]
+    - [Element Values][]
+    - [Elements of Type String][]
+    - [Element Value Blocks][]
+    - [Decoding Elements][]
+    - [Untyped Elements][]
+7.  [Bare Values][]
+    - [Word → Element Promotion][]
+    - [Bare Value Concatenation][]
+8.  [Arrays][]
+9.  [Dictionaries][]
+10. [Tables][]
+    - [Default Table Values][]
+11. [Graphs][]
+    - [General Graph Structure][]
+    - [Graph Nodes][]
+      + [Unnamed Graph Nodes Without Data][]
+      + [Unnamed Graph Nodes With Data][]
+      + [Named Graph Nodes Without Data][]
+      + [Named Graph Nodes With Data][]
+      + [Graph Nodes With Tabular Data][]
+    - [Graph Edges][]
+      + [Graph Edges Without Data][]
+      + [Graph Edges With Data][]
+      + [Graph Edges With Tabular Data][]
+      + [Directed Graph Edges Via Adjacency Matrix][]
+      + [Undirected Graph Edges Via Adjacency Matrix][]
+    - [Graph Examples][]
+12. [Appendix A: Grammar][]
+13. [Appendix B: Common Element Types][]
+14. [Appendix C: LSON Examples][]
 
 
 Overview
@@ -120,7 +120,7 @@ deeper:
 
 Whitespace
 -----------
-LSON whitespace includes all [standard Unicode whitespace characters].
+LSON whitespace includes all [standard Unicode whitespace characters][].
 
 | Unicode |   Escape   | Description
 |:-------:|:----------:|:-----------
@@ -261,7 +261,7 @@ opening parenthesis.
 
 ### Element Values
 As shown in examples above, the element value may be either unquoted or quoted in its entirety.
-Quoted element values obey the conventions outlined in [Strings], using any of the six string
+Quoted element values obey the conventions outlined in [Strings][], using any of the six string
 delimiters. Because elements may contain values of foreign syntax, **LSON interprets any contained
 `)` character as the element terminator**. Consider the following (**erroneous**) example:
 
@@ -269,8 +269,8 @@ delimiters. Because elements may contain values of foreign syntax, **LSON interp
 
 As soon as the LSON parser encounters `konst`, it parses the element value as an unquoted string. In
 that mode, it will terminate the element value at `2.3`, _not_ at `1.223;`. Elements that might
-contain complex values should therefore either be quoted entirely, or contained in [Element Value
-Blocks] (described below).
+contain complex values should therefore either be quoted entirely, or contained in
+[Element Value Blocks][] (described below).
 
 ### Elements of Type String
 As pointed out earlier, strings are the only element type that LSON recognizes implicitly. Since
@@ -439,8 +439,8 @@ For example, a standard JSON-type parser would handle the following ordered list
   2. boolean (`true`, `false`)
   3. real numbers (`[-]*[<digit>]*[.<digit>*][[eE][+-]?<digit>+]`, or some such syntax)
 
-Other common parsers might support CSS values, ±infinity, and so forth. See [Elements.md] for a set
-of common element types.
+Other common parsers might support CSS values, ±infinity, and so forth. See [Elements.md][] for a
+set of common element types.
 
 ### Bare Value Concatenation
 The concatenation operator always promotes words to strings, to produce a string-valued result. For
@@ -498,7 +498,7 @@ has an associated label. Tables have the following properties:
     readability and catching errors.
 
   + Tables do not allow implicit null data; all row dimensions must be specified (except when using
-    [Default Table Values] described below). Thus, for a table
+    [Default Table Values][] described below). Thus, for a table
     with _N_ columns,
     there must be *M⋅N* data points in the table,
     where *M* is the number of table rows.
@@ -704,7 +704,7 @@ The following are examples of node edges:
 | `a > b` <br> `a → b` | A directed edge from node a to node b
 | `a < b` <br> `a ← b` | A directed edge to node a from node b
 
-\* The special Unicode characters above are ↔ [U+2194], → [U+2192], and ← [U+2190].
+\* The special Unicode characters above are ↔ \[U+2194], → \[U+2192], and ← \[U+2190].
 
 Because node names may themselves contain relationship characters, ambiguity is possible. In
 general, parsing will consider the first encountered relationship character as a part of the edge

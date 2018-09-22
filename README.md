@@ -2,7 +2,7 @@ LSON: Lucid Serialized Object Notation
 ====================================================================================================
 _“If I had a dime for every developer who thought of creating a better JSON…”_
 
-- [LSON Specification]
+- [LSON Specification][]
 
 About
 ------
@@ -36,7 +36,7 @@ Here's a list of some of LSON's more interesting features:
 
   5. LSON adds two new data structures to JSON's array and dictionary: table and graph.
 
-You can browse [Examples.md] for a quick scan of what LSON looks like.
+You can browse [Examples.md][] for a quick scan of what LSON looks like.
 
 
 LSON Tools
@@ -45,7 +45,7 @@ I am just starting on an LSON parser and command-line utility in C++. Ultimately
 an LSON C++ library, and one or several standalone LSON command-line utilities. You can find this in
 [the `src` directory](src/).
 
-In addition, [Connor Hollasch] has written [a Java library] for an early version of LSON.
+In addition, [Connor Hollasch][] has written [a Java library][] for an early version of LSON.
 
 
 
