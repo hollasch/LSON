@@ -22,6 +22,7 @@ LSON: Lucid Serialized Object Notation
 9.  [Dictionaries][]
 10. [Tables][]
     - [Default Table Values][]
+    - [Dictionary Table Rows][]
 11. [Graphs][]
     - [General Graph Structure][]
     - [Graph Nodes][]
@@ -509,6 +510,9 @@ The following is an example LSON table:
         [thing3  true     37]
     #]
 
+In this example, the table _schema_ consists of three _features_: `key1`, `key2`, and `key3`. The
+third value of the third row (`37`) is considered a _row value_.
+
 The fragment above uses brackets to delimit table rows, which can aid legibility and debugging.
 
 However, brackets are optional, and the same table could be expressed thus:
@@ -533,6 +537,7 @@ Potential ambiguous sequences (brackets and hash characters) can usually be solv
 like so:
 
     [ #ff8cee #Nan# ]   // An array with a CSS color and a special value; NOT a table.
+
 
 ### Default Table Values
 Tables may define default values for each column. When using bracketed tables, default values will
@@ -582,6 +587,38 @@ A standard CSV-type table might default all values to `(null)`:
 
 Since any type can be specified, arrays, dictionaries, tables and graphs can also be used as default
 values.
+
+
+### Dictionary Table Rows
+In addition to unbracketed and bracketed table rows, LSON supports dictionary table rows. In this
+case, a row is delimited with curly braces (`{`, `}`), and the dictionary keys are the formal
+feature names specified in the table schema.
+
+    [#
+        a=true, b=1.0, c="foo", d=none, e=normal, f=100%, g=[[1 0][0 1]]
+        :
+        { b:22.3, d:all }
+        { g:rotate(30), f:50%, c:"bar" }
+        { a:false, e:heavy }
+    #]
+
+The above result is a table with three rows, where each row has all values defined, some explicitly
+and some via default values.
+
+Each row feature may get the default value either by omitting the key entirely, or by explicitly
+using the special value `~`.
+
+Dictionary table rows can have several kinds of errors:
+
+    [#
+        a=(boolean:), b, c="foo", d=none, e=normal, f=100%, g=[[1 0][0 1]]
+
+    :   { b:3.7 }
+                ^ Error: required feature 'a' not defined (it has default type, but not value)
+
+        { a:true, b:4.6, x:red }
+                         ^ Error: unrecognized feature 'x'
+    #]
 
 
 Graphs
@@ -917,33 +954,36 @@ Appendix A: Grammar
 
     dictionary-body ::= <dictionary-item>*
     dictionary-item ::= <key> ":" <value> <terminator>
-    key ::= <id> | "[" <key>+ "]"
+    dictionary-key  ::= <id> | "[" <id>+ <terminator> "]"
 
     array ::= "[" <array-item>* "]"
     array(n) ::= "[" <array-item>{n} "]"
     array-item ::= <value> <terminator>
 
     table ::= "[#" <table-body> "#]"
+    table-body ::= <table-schema> ":" <table-row>*
 
-    table-body ::= <table-feature>* ":" <table-row>*
-
+    table-schema ::= <table-feature>*
     table-feature ::= <id> <terminator>
                     | <id> "=" <value> <terminator>
                     | <id> "=" <valueless-element>
 
-    table-row ::= <table-row-bare(n)> | <table-row-bracketed>
-    table-row-bare(n) ::= (<table-row-value> <terminator>){n}
+    table-row ::= <table-row-bare(numFeatures)> | <table-row-bracketed> | <table-row-dictionary>
+    table-row-bare(numFeatures) ::= (<table-row-value> <terminator>){numFeatures}
     table-row-bracketed ::= "[" <table-row-value>* "]"
     table-row-value ::= <value> | "~"
+    table-row-dictionary ::= "{" <table-row-dictionary-body> "}"
+    table-row-dictionary-body ::= <table-row-dictionary-item>*
+    table-row-dictionary-item ::= <dictionary-key> ":" (<value> | "~") <terminator>
 
     graph ::= explicit-graph | adjacency-graph
     explicit-graph ::= "[%" <graph-nodes> <explicit-graph-edges> "%]"
-    adjacency-graph ::= "[%" <indexed-nodes>(n) <adjacency-matrix>(n) "%]"
+    adjacency-graph ::= "[%" <indexed-nodes>(numNodes) <adjacency-matrix>(numNodes) "%]"
 
     "[%" <graph-nodes> <graph-edges> "%]"
 
     graph-nodes ::= <indexed-nodes> | <named-nodes> | <node-table>
-    indexed-nodes ::= <counting-number> | <array>(n)
+    indexed-nodes ::= <counting-number> | <array>(numNodes)
     named-nodes ::= <dictionary>
     node-table ::= <table>
 
@@ -954,8 +994,8 @@ Appendix A: Grammar
     edge-table ::= <table>
 
     adjacency-matrix ::= <directed-adjacency-matrix> | <undirected-adjacency-matrix>
-    directed-adjacency-matrix ::= "[" <array>(n){n} "]"
-    undirected-adjacency-matrix ::= "[" <array>(n) <array>(n-1) .. <array>(1) "]"
+    directed-adjacency-matrix ::= "[" <array>(numNodes){numNodes} "]"
+    undirected-adjacency-matrix ::= "[" <array>(numNodes) <array>(numNodes-1) .. <array>(1) "]"
 
     edge ::= <node-ref> <edge-type> <node-ref>
     node-ref ::= <node-index> | <id>
@@ -982,6 +1022,7 @@ Appendix A: Grammar
 [Decoding Elements]:                           #decoding-elements
 [Default Table Values]:                        #default-table-values
 [Dictionaries]:                                #dictionaries
+[Dictionary Table Rows]:                       #dictionary-table-rows
 [Directed Graph Edges Via Adjacency Matrix]:   #directed-graph-edges-via-adjacency-matrix
 [Element Types]:                               #element-types
 [Element Value Blocks]:                        #element-value-blocks

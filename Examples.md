@@ -39,19 +39,20 @@ Example 1
 
 ### LSON
     {
-        glossary: {                           // Keys (without whitespace) need not be quoted.
+        glossary: {                     // Keys (without whitespace) need not be quoted.
             title: "example glossary"
             GlossDiv: {
-                title: 'S'                    // Six different string quote alternatives.
+                title: 'S'              // Six different string quote alternatives.
                 GlossList: {
                     GlossEntry: {
                         ID: SGML
                         SortAs: SGML
                         GlossTerm: `Standard Generalized Markup Language`
                         Acronym: SGML
-                        Abbrev: ISO\ 8879:1986    // Whitespace outside of quotes can be escaped.
+                        Abbrev: ISO\ 8879:1986   // Whitespace can be escaped.
                         GlossDef: {
-                            para: “A meta-markup language, used to create markup languages such as DocBook.”
+                            para: “A meta-markup language, ”
+                                + “used to create markup languages such as DocBook.”
 
                             /* Commas and semi-colons are optional. */
                             GlossSeeAlso: [‘GML’ ‘XML’]
@@ -167,9 +168,9 @@ Example 3
                 ** contained script that contained JSON snippets, this would have been a huge help.
                 */
 
-                onMouseUp: ((mouseUp javaScript:
+                onMouseUp: ((xyzzy javaScript:
                     sun1.opacity = (sun1.opacity / 100) * 90;
-                mouseUp))
+                xyzzy))
             }
         }
     }
@@ -211,11 +212,11 @@ Example 4
         }
     }
 
-### LSON
+### LSON 1
     {
         menu: {
             header: «SVG Viewer»                // LSON supports six string delimiters
-            items: [# id=(null) label="" :     // A table with default values
+            items: [# id=(null) label="" :      // A table with default values
                 [Open]                          // Unspecified columns get default values.
                 [OpenNew  "Open New"]
                 []
@@ -238,6 +239,37 @@ Example 4
                 []
                 [Help]
                 [About  "About Adobe CVG Viewer..."]
+            #]
+        }
+    }
+
+### LSON 2
+    {
+        menu: {
+            header: «SVG Viewer»                // LSON supports six string delimiters
+            items: [# id=(null) label="" :      // A table with default values
+                { id:Open }                     // Unspecified columns get default values.
+                { id:OpenNew label:"Open New"}
+                { }
+                { id:Quality }
+                { id:Pause }
+                { id:Mute }
+                { id:~  label:"Null" }          // '~' indicates default feature value
+                { id:Find  label:"Find..." }
+                { id:FindAgain  label:"Find Again" }
+                { id:Copy }
+                { label:"Copy Again" id:CopyAgain }
+                { label:"Copy SVG" id:CopySVG }
+                { label:"View SVG" id:ViewSVG }
+                { label:"View Source" id:ViewSource }
+                { label:"Save As" id:SaveAs }
+                {  }
+                { id:ZoomIn  label:"Zoom In" }
+                { id:ZoomOut  label:"Zoom Out" }
+                { id:OriginalView  label:"Original View" }
+                {  }
+                { id:Help }
+                { id:About  label:"About Adobe CVG Viewer..." }
             #]
         }
     }
