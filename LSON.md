@@ -494,52 +494,43 @@ has an associated label. Tables have the following properties:
   + Tables are delimited with `[#` and `#]` tokens (no whitespace is allowed between delimiter
     characters).
 
-  + Tables may optionally use `[` and `]` delimiters around field names and row data, as an aid to
-    readability and catching errors.
+  + Tables do not allow implicit null data; all row dimensions must be specified (though you can
+    define [Default Table Values][] described below).
 
-  + Tables do not allow implicit null data; all row dimensions must be specified (except when using
-    [Default Table Values][] described below). Thus, for a table
-    with _N_ columns,
-    there must be *M⋅N* data points in the table,
-    where *M* is the number of table rows.
-
-  + Each cell (dimension) may be any legal LSON value. So you could have cells of arrays, objects,
-    graphs, or even other tables.
+  + Each row value (feature) may be any legal LSON value. So you could have cells of arrays,
+    objects, graphs, or even other tables.
 
 The following is an example LSON table:
 
     [#
-        [key1    key2   key3]:
+         key1    key2   key3:
         [thing1  false     3]
         [thing2  false    13]
         [thing3  true     37]
     #]
 
-The fragment above uses brackets to delimit table rows, which can aid legibility and debugging with
-erroneous inputs. If brackets are used to delimit the column names, then they are required around
-each row of data, and must yield a parsing error for a row that does not contain the same number of
-values as the header row.
+The fragment above uses brackets to delimit table rows, which can aid legibility and debugging.
 
 However, brackets are optional, and the same table could be expressed thus:
 
     [#
         key1   ; key2  ; key3
-    ://--------;-------;------
-        thing1 ; false ;    3
+     //--------;-------;------
+      : thing1 ; false ;    3
         thing2 ; false ;   13
         thing3 ; true  ;   37
     #]
 
-While the absence of square brackets means that rows cannot be validated individually for the
-expected number of values, the entire table must still contain a number of values that is a multiple
-of the number of header values.
+In the absence of row brackets, a row must contain a value for each feature. Brackets are optional
+for each row, so one row may use brackets while another may choose to omit them.
 
 As with objects and arrays, optional comma, or semi-colon terminators may be used to aid
 readability, like so:
 
     [# key1,key2,key3: thing1,false,3; thing2,false,13; thing3,true,37; #]
 
-Potential ambiguous sequences can usually be solved with whitespace, like so:
+Potential ambiguous sequences (brackets and hash characters) can usually be solved with whitespace,
+like so:
 
     [ #ff8cee #Nan# ]   // An array with a CSS color and a special value; NOT a table.
 
@@ -548,7 +539,7 @@ Tables may define default values for each column. When using bracketed tables, d
 be used to set missing values when fewer values are specified than there are columns. For example:
 
     [#
-        [ id status=idle ttl=120 ] :
+        id status=idle ttl=120 :
         [ a173  running  300 ]    // id = a173, status=running, ttl=300
         [ b2fc  init         ]    // id = b2fc, status=init,    ttl=120
         [ 781d               ]    // id = 781d, status=idle,    ttl=120
@@ -575,7 +566,7 @@ One can use a valueless element to set the default _type_ of table values, while
 value of that type, like so:
 
     [#
-        [ id=(count32:)  lat=(real:)  long=(real:)  strength=(HCat:) ] :
+        id=(count32:)  lat=(real:)  long=(real:)  strength=(HCat:) :
         //____  ______  _______  _
         [ 01ca  -12.30   110.41  1 ]  // (count32:01ca), (real:-12.30), (real:110.41), (HCat:1)
         [ 021s       ~    70.58  3 ]  // ERROR: No default value for 'lat'.
@@ -759,7 +750,7 @@ significant. Here's an example of edge data using a table:
     [%
         .... // Row data
         [#
-            [ edge  ; status ; frinkiness    ]:
+              edge  ; status ; frinkiness    :
             //===== ; ====== ; ==============
             [ 2 > 0 ; hot    ; zoobnificent  ]
             [ 2 > 1 ; tepid  ; cromulipitant ]
@@ -933,18 +924,17 @@ Appendix A: Grammar
     array-item ::= <value> <terminator>
 
     table ::= "[#" <table-body> "#]"
-    table-body ::= <table-body-bracketed> | <table-body-unbracketed>
 
-    table-body-bracketed ::= "[" <table-feature>* "]" ":" <table-row-bracketed>*
-    table-row-bracketed(n) ::= "[" <table-row-bare>(*) "]"
+    table-body ::= <table-feature>* ":" <table-row>*
 
     table-feature ::= <id> <terminator>
                     | <id> "=" <value> <terminator>
                     | <id> "=" <valueless-element>
 
-    table-body-unbracketed ::= <table-feature>{n+} ":" <table-row-bare>(n+)*
-    table-row-bare(n) ::= (<table-row-feature> <terminator>){n}
-    table-row-feature ::= <value> | "~"
+    table-row ::= <table-row-bare(n)> | <table-row-bracketed>
+    table-row-bare(n) ::= (<table-row-value> <terminator>){n}
+    table-row-bracketed ::= "[" <table-row-value>* "]"
+    table-row-value ::= <value> | "~"
 
     graph ::= explicit-graph | adjacency-graph
     explicit-graph ::= "[%" <graph-nodes> <explicit-graph-edges> "%]"
