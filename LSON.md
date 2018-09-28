@@ -75,48 +75,50 @@ LSON Example
 The following is an LSON snippet to illustrate various aspects of the notation, before we dive
 deeper:
 
-    // Comments are C-style: double slash to end of line, or enclosed with `/*` and `*/`.
-    /* This is an example using slash-star delimeters. */
+```
+// Comments are C-style: double slash to end of line, or enclosed with `/*` and `*/`.
+/* This is an example using slash-star delimeters. */
 
-    // Items may be terminated with whitespace, commas, semi-colons, or object/array terminators.
+// Items may be terminated with whitespace, commas, semi-colons, or object/array terminators.
 
-    {
-        index: {
-            'Gloss Div': {                // There are six legal string-delimeter pairs.
-                title: "S"                // No need to quote strings that lack whitespace.
-                "Gloss List": {
-                    `Gloss Entry`: {
-                        ID:      x112-223
-                        SortAs:  SGML
-                        Acronym: SGML
-                        «Gloss Term»: "Standard Generalized Markup Language"
+{
+    index: {
+        'Gloss Div': {                // There are six legal string-delimeter pairs.
+            title: "S"                // No need to quote strings that lack whitespace.
+            "Gloss List": {
+                `Gloss Entry`: {
+                    ID:      x112-223
+                    SortAs:  SGML
+                    Acronym: SGML
+                    «Gloss Term»: "Standard Generalized Markup Language"
 
-                        Abbrev: (ISO: 8879:1986)  // Element of some type "ISO", value "8879:1986"
+                    Abbrev: (ISO: 8879:1986)  // Element of some type "ISO", value "8879:1986"
 
-                        ‘Gloss Def’: {
-                            para: "A meta-markup language, used to create markup languages "
-                                + "such as DocBook."
+                    ‘Gloss Def’: {
+                        para: "A meta-markup language, used to create markup languages "
+                            + "such as DocBook."
 
-                            “Gloss SeeAlso”: [ 'GML', 'XML', 'HTML' ]
-                            'Gloss See': "markup"
-                        }
+                        “Gloss SeeAlso”: [ 'GML', 'XML', 'HTML' ]
+                        'Gloss See': "markup"
                     }
                 }
             }
-            EntryCount: (count32:1123)      // Element of some type "count32", value "1123"
-
-            // Table
-            Content: [%
-                Term                ; Pages           ; See Also
-                :
-                "ABC Dry-Clean Pad" ; (30)            ; null             ;
-                "Abstract grids"    ; (46-58, 92-104) ; "Gridded Layout" ;
-                "Abstract ideas"    ; (37-38, 74-77)  ; null             ;
-                "Acceleration"      ; (408-409)       ; Velocity         ;
-                // ...
-            %]
         }
+        EntryCount: (count32:1123)      // Element of some type "count32", value "1123"
+
+        // Table
+        Content: [%
+            Term                ; Pages           ; See Also
+            :
+            "ABC Dry-Clean Pad" ; (30)            ; null             ;
+            "Abstract grids"    ; (46-58, 92-104) ; "Gridded Layout" ;
+            "Abstract ideas"    ; (37-38, 74-77)  ; null             ;
+            "Acceleration"      ; (408-409)       ; Velocity         ;
+            // ...
+        %]
     }
+}
+```
 
 
 Whitespace
