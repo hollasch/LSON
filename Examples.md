@@ -215,7 +215,7 @@ Example 4
     {
         menu: {
             header: «SVG Viewer»                // LSON supports six string delimiters
-            items: [# [id=(null) label=""]:     // A table with default values
+            items: [# id=(null) label="" :     // A table with default values
                 [Open]                          // Unspecified columns get default values.
                 [OpenNew  "Open New"]
                 []
