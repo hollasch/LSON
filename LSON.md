@@ -495,11 +495,11 @@ has an associated label. Tables have the following properties:
   + Tables are delimited with `[#` and `#]` tokens (no whitespace is allowed between delimiter
     characters).
 
-  + Tables do not allow implicit null data; all row dimensions must be specified (though you can
-    define [Default Table Values][] described below).
+  + Tables do not support implicit null data (because LSON has no native null type). All row
+    dimensions must be specified (though you can define [Default Table Values][] described below).
 
-  + Each row value (feature) may be any legal LSON value. So you could have cells of arrays,
-    objects, graphs, or even other tables.
+  + Each row feature may be any legal LSON value. So you could have cells of arrays, objects,
+    graphs, or even other tables.
 
 The following is an example LSON table:
 
@@ -520,13 +520,14 @@ However, brackets are optional, and the same table could be expressed thus:
     [#
         key1   ; key2  ; key3
      //--------;-------;------
-      : thing1 ; false ;    3
-        thing2 ; false ;   13
-        thing3 ; true  ;   37
+      : thing1 ; false ;    3      // Schema has 3 features, so first 3 values = first row,
+        thing2 ; false ;   13      // and next three values = second row,
+        thing3 ; true  ;   37      // and so on...
     #]
 
 In the absence of row brackets, a row must contain a value for each feature. Brackets are optional
-for each row, so one row may use brackets while another may choose to omit them.
+for each row, so one row may use brackets while another may choose to omit them. Even when all
+values are supplied for each row, brackets may be useful as they provide a syntax check.
 
 As with objects and arrays, optional comma, or semi-colon terminators may be used to aid
 readability, like so:
@@ -540,17 +541,23 @@ like so:
 
 
 ### Default Table Values
-Tables may define default values for each column. When using bracketed tables, default values will
-be used to set missing values when fewer values are specified than there are columns. For example:
+Tables may optionally define default element types or element values (or both) for each feature.
+Defaults follow an equals sign (`=`) after the feature name, like so:
+
+    [#  id=0 role=scout speed=10 ...
+
+When using bracketed tables, default values can be used to set missing values when fewer values are
+specified than there are columns. For example:
 
     [#
         id status=idle ttl=120 :
-        [ a173  running  300 ]    // id = a173, status=running, ttl=300
-        [ b2fc  init         ]    // id = b2fc, status=init,    ttl=120
-        [ 781d               ]    // id = 781d, status=idle,    ttl=120
+        [ a173  running  300 ]    // id = a173, status=running,        ttl=300
+        [ b2fc  init         ]    // id = b2fc, status=init,           ttl=120 (default)
+        [ 781d               ]    // id = 781d, status=idle (default), ttl=120 (default)
+        [                    ]    // Error: feature 'id' has no default value
     #]
 
-In addition, the special character `~` can be used to specify a default value in a table row,
+In addition, the special character `~` can be used to reference a default value in a table row,
 allowing for sparse table specifications:
 
     [#
@@ -562,53 +569,56 @@ allowing for sparse table specifications:
         ~     running    ~     // id = 0000, status=running, ttl=120
     #]
 
-The above two examples use bare values as the default. However, default values can be any value,
-like so:
+The above examples use bare values as the default. However, defaults can be any element, like so:
 
-    [#  id=(count32:0)  lat=(real:0.00)  lon=(real:0.00)  strength=(HCategory:1) : ...
+    [#  id=(count32:0)  lat=(real:0.00)  lon=(real:0.00)  strength=(HCategory:1) ...
 
-One can use a valueless element to set the default _type_ of table values, while also requiring a
-value of that type, like so:
+Feature defaults can be any legal LSON value, so arrays, dictionaries, tables and graphs can also be
+used as default values:
+
+    [#  id=(count64:0)  xform=[[1 0][1 0]]  up=[0 1 0]  meta={label:"none",color:black} ...
+
+In addition, one can use a valueless element to set the default _element type_ of table features,
+while also requiring an explicit value of that type, like so:
 
     [#
         id=(count32:)  lat=(real:)  long=(real:)  strength=(HCat:) :
-        //____  ______  _______  _
+        /*____  ______  _______  _ */
         [ 01ca  -12.30   110.41  1 ]  // (count32:01ca), (real:-12.30), (real:110.41), (HCat:1)
-        [ 021s       ~    70.58  3 ]  // ERROR: No default value for 'lat'.
-        [ 9afb ]                      // ERROR: No default value for 'id', 'lat', 'lon'.
+        [ 021s       ~    70.58  3 ]  // Error: No default value for 'lat'.
+        [ 9afb                     ]  // Error: No default value for 'id', 'lat', 'lon'.
+        [ 47b1   [1,4]    11.12  2 ]  // Error: Feature 'lat' has elemental data type.
         ...
 
-A standard CSV-type table might default all values to `(null)`:
+Default feature types support only for element row values, not higher-order data structures such as
+arrays, dictionaries, graphs or tables.
+
+A standard CSV-type table might default all values to the element `(null)`:
 
     [#
-        invoice=(null)  date=(null)  customerid=(null)  amount=(null)  address=(null):
+        invoice=(null)  date=(null)  customerid=(null)  amount=(null)  address=(null) :
         ...
     #]
-
-Since any type can be specified, arrays, dictionaries, tables and graphs can also be used as default
-values.
 
 
 ### Dictionary Table Rows
 In addition to unbracketed and bracketed table rows, LSON supports dictionary table rows. In this
 case, a row is delimited with curly braces (`{`, `}`), and the dictionary keys are the formal
-feature names specified in the table schema.
+feature names specified in the table schema. Each row feature may get the default value either by
+omitting the key entirely, or by explicitly using the special value `~`.
 
     [#
         a=true, b=1.0, c="foo", d=none, e=normal, f=100%, g=[[1 0][0 1]]
         :
-        { b:22.3, d:all }
-        { g:rotate(30), f:50%, c:"bar" }
-        { a:false, e:heavy }
+        { b:22.3, d:all }                 // Features a,c,e,f,g defined with default values
+        { g:rotate(30), f:50%, c:"bar" }  // Features a,b,d,e   defined with default values
+        { a:false, e:heavy, b:~, g:~ }    // Features b,c,d,f,g defined with default values
     #]
 
 The above result is a table with three rows, where each row has all values defined, some explicitly
 and some via default values.
 
-Each row feature may get the default value either by omitting the key entirely, or by explicitly
-using the special value `~`.
-
-Dictionary table rows can have several kinds of errors:
+Dictionary table rows can contain several kinds of schema-mismatch errors:
 
     [#
         a=(boolean:), b, c="foo", d=none, e=normal, f=100%, g=[[1 0][0 1]]
