@@ -289,9 +289,9 @@ however, might have quite a complex representation, both in syntax and in length
 should be simple to embed a 250-line script inside LSON. In my experience, I've seen JSON inside a
 script inside JSON (not because it's good, but because it's necessary).
 
-To this end, elements may also employ block delimiters, which use a unique identifier.
-Block-delimited elements begin with `((<id>` where `<id>` is an arbitrary string _that appears
-nowhere in the element value_. As soon as the nearest`<id>))` is encountered, the element is closed.
+To this end, elements may employ block delimiters, using a locally-unique identifier.
+Block-delimited elements begin with `((<id>` where `<id>` is an arbitrary string. As soon as the
+character sequence `<id>))` is encountered, the element is closed.
 
 Here's an example of a complex element with block delimiters:
 
@@ -355,8 +355,9 @@ native Boolean value `True`. Decoders are thus domain-specific, and may handle a
 both known and unknown types. This approach to typing allows unknown types to be handled
 consistently across encode-decode transitions, and across data queries and transforms.
 
-In this manner, a C++ decoder could meaningfully operate on LSON intended for a Python endpoint,
-with values like `False` or `None`.
+In this manner, a C++ decoder could meaningfully and consistently operate on LSON intended for a
+Python endpoint, with values like `False` or `None`.
+
 
 ### Untyped Elements
 Elements may omit type information, as in `(1.23456)` or `(:s/ab/xy/g)`. As for all elements, both
@@ -392,25 +393,32 @@ Note that values need only be recognized if the decoder intends to perform nativ
 those values. Decoders that just perform queries, transforms, or transmission need not care about
 underlying implementations.
 
+By convention, elements that are consumed and unmodified should be preserved exactly across
+decode-encode transitions. For example, the element `(true)` might be interpreted by a Python
+decoder as element of type `Boolean`, value `True`. If it's not modified, however, any subsequent
+encoding should emit the original `(true)` form. That leaves it free for natural consumption by a
+C++ application, for example, while preserving the original meaning (an untyped element with value
+`"true"`).
+
 
 Bare Values
 ------------
-LSON supports four data structures — everything else is considered an element. Elements may or may
-not include a type declaration. In addition, any bare (undelimited) value is considered an untyped
-element, with strings as the only natively-recognized type. Strings are recognized as such due to
-any of the six quotation delimiters.
+A _bare value_ is an element that is not surrounded by parentheses. If the bare value is
+string-quoted, then it is recognized as an element of type string. If the bare value is not quoted,
+it is considered an untyped element.
 
 Consider the following bare values:
 
-| Bare Value    | Recognized As
-|---------------|-------------------------
-| `"true"`      | `(string:true)`
-| `"two words"` | `(string:"two words")`
-|  `true`       | `(:true)`
-|  `1.37`       | `(:1.37)`
-| `plaid`       | `(:plaid)`
-| `red\ blue`   | `(:"red blue")`
-| `(a + b)`     | `(:a + b)`
+    {
+        thing1: "true"       // Element (string:true)
+        thing2: 'two words'  // Element (string:two words)
+        thing3: true         // Element (:true)
+        thing4: 1.37         // Element (:1.37)
+        thing5: plaid        // Element (:plaid)
+        thing6: red\ blue    // Element (:red blue)
+        thing7: (trog)       // Element (:trog)
+        thing8: (a + b)      // Element (:a + b)
+    }
 
 Bare values that contain whitespace must either escape that whitespace (by prefixing with the `\`
 character) or must use parenthesis delimeters.
@@ -456,21 +464,21 @@ Arrays encode ordered lists of items. They have the following properties:
 1. They begin with a left square bracket (`[`, `U+005b`), followed by zero or more values, and
    terminated with a right square bracket (`]`, `U+005d`).
 
-2. Array values may be strings, arrays, or dictionaries.
+2. Array values may be any LSON value (elements, strings, arrays, tables, or whatever).
 
 3. Each array value is terminated with whitespace, a comma, a semi-colon, or the array terminator.
 
 4. Arrays are contiguous. That is, there is no way in LSON to indicate an undefined element. If
-   sparse arrays are desired for a particular encoding, it is recommended that dictionaries be used
-   with numeric key values. Encoders should follow the same convention, encoding sparse arrays as
-   dictionaries. An alternative would be to adopt a special word, such as `undefined` to denote
+   truly sparse arrays are desired for a particular encoding, it is recommended that dictionaries be
+   used with numeric key values. Encoders should follow the same convention, encoding sparse arrays
+   as dictionaries. An alternative would be to adopt a special word, such as `undefined` to denote
    undefined values. Interpreting this would depend on a particular encoder/decoder.
 
 
 Dictionaries
 -------------
-Dictionaries (referred to as _objects_ in JSON) are sets of key-value pairs. Keys are string values,
-and hence may be either quoted or unquoted. Dictionaries have the following properties:
+Dictionaries are sets of key-value pairs. Keys are string values, and hence may be either quoted or
+unquoted. Dictionaries have the following properties:
 
 1. They begin with a left curly bracket (`{`, `U+007b`), followed by zero or more key-value pairs,
    followed by a right curly bracket (`}`, `U+007d`).
@@ -478,8 +486,7 @@ and hence may be either quoted or unquoted. Dictionaries have the following prop
 2. Each dictionary pair is terminated with whitespace, a comma, a semi-colon, or the dictionary
    terminator.
 
-LSON dictionaries differ from JSON in that multiple keys may specified with a single value, using an
-array-like syntax:
+Multiple keys may be specified with a single value, using an array-like syntax:
 
     {
         [ red orange yellow ]: true
