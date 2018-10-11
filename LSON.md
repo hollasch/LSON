@@ -121,7 +121,7 @@ deeper:
 
 Whitespace
 -----------
-LSON whitespace includes all standard [Unicode whitespace] characters.
+LSON whitespace includes all standard [Unicode whitespace][] characters.
 
 | Unicode |   Escape   | Description
 |:-------:|:----------:|:-----------
