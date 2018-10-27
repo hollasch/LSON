@@ -88,33 +88,33 @@ Whitespace
 ====================================================================================================
 LSON whitespace includes all standard [Unicode whitespace][] characters.
 
-| Unicode |   Escape   | Description
-|:-------:|:----------:|:-----------
-| U+0009  |    `\t`    | Tab
-| U+000a  |    `\n`    | Newline, or line feed
-| U+000b  |  `\u{0b}`  | Vertical tab
-| U+000c  |    `\f`    | Form feed
-| U+000d  |    `\r`    | Carriage return
-| U+0020  |  `\u{20}`  | Standard space character
-| U+0085  |  `\u{85}`  | Next line
-| U+00a0  |  `\u{a0}`  | No-break space
-| U+1680  | `\u{1680}` | Ogham space mark
-| U+2000  | `\u{2000}` | En quad
-| U+2001  | `\u{2001}` | Em quad (mutton quad)
-| U+2002  | `\u{2002}` | En space (nut)
-| U+2003  | `\u{2003}` | Em space (mutton)
-| U+2004  | `\u{2004}` | Three-per-em-space (thick space)
-| U+2005  | `\u{2005}` | Four-per-em-space (mid space)
-| U+2006  | `\u{2006}` | Six-per-em-space
-| U+2007  | `\u{2007}` | Figure space
-| U+2008  | `\u{2008}` | Punctuation space
-| U+2009  | `\u{2009}` | Thin space
-| U+200a  | `\u{200a}` | Hair space
-| U+2028  | `\u{2028}` | Line separator
-| U+2029  | `\u{2029}` | Paragraph separator
-| U+202f  | `\u{202f}` | Narrow no-break space
-| U+205f  | `\u{205f}` | Medium mathematical space
-| U+3000  | `\u{3000}` | Ideographic space
+    | Unicode |   Escape   | Description
+    |:-------:|:----------:|:-----------
+    | U+0009  |    `\t`    | Tab
+    | U+000a  |    `\n`    | Newline, or line feed
+    | U+000b  |  `\u{0b}`  | Vertical tab
+    | U+000c  |    `\f`    | Form feed
+    | U+000d  |    `\r`    | Carriage return
+    | U+0020  |  `\u{20}`  | Standard space character
+    | U+0085  |  `\u{85}`  | Next line
+    | U+00a0  |  `\u{a0}`  | No-break space
+    | U+1680  | `\u{1680}` | Ogham space mark
+    | U+2000  | `\u{2000}` | En quad
+    | U+2001  | `\u{2001}` | Em quad (mutton quad)
+    | U+2002  | `\u{2002}` | En space (nut)
+    | U+2003  | `\u{2003}` | Em space (mutton)
+    | U+2004  | `\u{2004}` | Three-per-em-space (thick space)
+    | U+2005  | `\u{2005}` | Four-per-em-space (mid space)
+    | U+2006  | `\u{2006}` | Six-per-em-space
+    | U+2007  | `\u{2007}` | Figure space
+    | U+2008  | `\u{2008}` | Punctuation space
+    | U+2009  | `\u{2009}` | Thin space
+    | U+200a  | `\u{200a}` | Hair space
+    | U+2028  | `\u{2028}` | Line separator
+    | U+2029  | `\u{2029}` | Paragraph separator
+    | U+202f  | `\u{202f}` | Narrow no-break space
+    | U+205f  | `\u{205f}` | Medium mathematical space
+    | U+3000  | `\u{3000}` | Ideographic space
 
 
 
@@ -376,9 +376,9 @@ decoders, this can be fairly trivial:
 
 A JSON-style decoder might employ a sequence of three recognizers:
 
-1. null
-2. boolean
-3. number
+  1. null
+  2. boolean
+  3. number
 
 Other common types may have associated type recognizers:
 
@@ -577,7 +577,7 @@ Tables may optionally define default element types or element values (or both) f
 Defaults follow an equals sign (`=`) after the feature name, like so:
 
     ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ LSON
-    [#  id=0 role=scout speed=10 ...
+    [# id=0 role=scout speed=10 ...
     ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 When using bracketed tables, default values can be used to set missing values when fewer values are
@@ -804,13 +804,12 @@ or name, followed by a relationship character, followed by the second node index
 
 The following are examples of node edges:
 
-| Edge                 | Interpretation
-|----------------------|------------------------------------------
-| `a - b` <br> `a ↔ b` | An undirected edge between nodes a and b
-| `a > b` <br> `a → b` | A directed edge from node a to node b
-| `a < b` <br> `a ← b` | A directed edge to node a from node b
-
-\* The special Unicode characters above are ↔ \[U+2194], → \[U+2192], and ← \[U+2190].
+    | Edge                 | Interpretation
+    |----------------------|------------------------------------------
+    | `a - b` <br> `a ↔ b` | An undirected edge between nodes a and b
+    | `a > b` <br> `a → b` | A directed edge from node a to node b
+    | `a < b` <br> `a ← b` | A directed edge to node a from node b
+    [The special Unicode characters above are ↔ (U+2194), → (U+2192), and ← (U+2190).]
 
 Because node names may themselves contain relationship characters, ambiguity is possible. In
 general, parsing will consider the first encountered relationship character as a part of the edge
@@ -818,14 +817,14 @@ description, and not part of the node name. If a node name contains any of the a
 they must either be escaped, or the node name should be quoted. Here are parsing examples for edge
 specifications:
 
-| Edge Spec | Result
-|:----------|:----------------------------------------------------------------
-| `a\-b-c`  | Legal: interpreted as `'a-b' - 'c'`
-| `a-'b-c'` | Legal: interpreted as `'a' - 'b-c'`
-| `a>b`     | Legal: interpreted as `'a' > 'b'`
-| `a-b>c`   | **Illegal**: could be `'a-b' > 'c'` or `'a' - 'b>c'`
-| `a-b-c`   | **Illegal**: could be `'a-b' - 'c'` or `'a' - 'b-c'`
-| `a-b - c` | **Illegal**: interpreted as `'a' - 'b'`, followed by illegal spec `-`
+    | Edge Spec | Result
+    |:----------|:----------------------------------------------------------------
+    | `a\-b-c`  | Legal: interpreted as `'a-b' ↔ 'c'`
+    | `a-'b-c'` | Legal: interpreted as `'a' ↔ 'b-c'`
+    | `a>b`     | Legal: interpreted as `'a' → 'b'`
+    | `a-b>c`   | **Illegal**: could be `'a-b' → 'c'` or `'a' ↔ 'b>c'`
+    | `a-b-c`   | **Illegal**: could be `'a-b' ↔ 'c'` or `'a' ↔ 'b-c'`
+    | `a-b - c` | **Illegal**: interpreted as `'a' ↔ 'b'`, followed by illegal token `-`
 
 
 ### Graph Edges Without Data
@@ -886,9 +885,10 @@ significant. Here's an example of edge data using a table:
 Directed graph edges may be expressed via adjacency matrix. In a directed adjacency matrix, each
 edge is found in a square **N**×**N** matrix, where **N** is the number of nodes in the graph. In
 this form, nodes are referenced by index (not by name), and the edge from node **A** to node **B**
-is found in the **A**th row, **B**th column, with that entry containing the data for that edge.
+is found in the <b>A</b>th row, <b>B</b>th column, with that entry containing the data for that
+edge.
 
-Graphs using adjacency matrices must have indexable nodes. Thus, named nodes are not supported in
+Graphs using adjacency matrices must have indexable nodes. Named nodes are not supported in
 conjunction with adjacency matrices.
 
 Here's an example of an adjacency matrix for a directed graph of three nodes:
@@ -906,8 +906,8 @@ Here's an example of an adjacency matrix for a directed graph of three nodes:
 
 ### Undirected Graph Edges Via Adjacency Matrix
 Adjacency matrixes with undirected edges require only an upper triangular matrix, where each entry
-describes an edge between one index and an equal or greater index. Thus, the *i*th row has **N**-*i*
-entries.
+describes an edge between one index and an equal or greater index. Thus, the <i>i</i>th row has
+<b>N</b>-<i>i</i> entries.
 
 Graphs using adjacency matrices must have indexable nodes. Thus, named nodes are not supported in
 conjunction with adjacency matrices.
@@ -919,8 +919,8 @@ Here's an example of an undirected adjacency matrix:
         3                           // Three nodes without data: 0, 1, 2
         [
             [ 23.1  445.  0.12 ]    // 0-0  0-1  0-2
-                  [ 1.72  34.7 ]    //      1-1  1-2
-                        [ 7.56 ]    //           2-2
+            [       1.72  34.7 ]    //      1-1  1-2
+            [             7.56 ]    //           2-2
         ]
     %]
     ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -1165,18 +1165,65 @@ ____
 
 
 
-<!-- Markdeep ================================================================================== -->
+<!-- Style ================================================================================== -->
+
+<link href="https://fonts.googleapis.com/css?family=Mukta|Ubuntu|Roboto+Mono" rel="stylesheet">
 
 <style>
+    .md h1, .md h2, .md h3, .md h4, .md h5, .md h6 {
+        border: none;
+        font-family: Mukta,Georgia;
+    }
+    .md h1 {
+        margin-top: 1.25em;
+        font-size: 200%;
+        color: #444;
+        font-variant: small-caps;
+    }
+    .md h2 {
+        font-size: 165%;
+        color: #333;
+        font-variant: small-caps;
+    }
+    .md h3 {
+        font-size: 125%;
+        /* font-style: italic; */
+        font-weight: normal;
+    }
     pre.listing.tilde {
-        background: #f2ffe8;
-        border: solid 2px #cdc;
+        background: #f2f2f8;
+        border: solid 2px #dddddd;
         padding: 1ex;
+    }
+    .md a {
+        font-family: Mukta,Georgia,Palatino,serif;
+    }
+    .md code {
+        font-family: 'Roboto Mono',Menlo,Consolas,Monospace;
+        font-size: 85%;
     }
     .md pre code {
         font-size: 80%;
     }
+    .md {
+        font-family: Mukta,Georgia;
+    }
+    div.longTOC div.tocHeader {
+        display: none;
+    }
+    div.longTOC {
+        padding: 0 4ex;
+        border: solid 2px #eeeeee;
+    }
+    div.longTOC .level2 {
+        margin-left: 3ex;
+    }
+    div.longTOC .level3 {
+        margin-left: 6ex;
+    }
 </style>
+
+<!-- Markdeep =============================================================================== -->
 
 <style class="fallback">body{visibility:hidden;white-space:pre;font-family:monospace}</style>
 <script src="markdeep.min.js"></script>
