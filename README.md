@@ -50,6 +50,6 @@ In addition, [Connor Hollasch][] has written  a [Java library][] for an early ve
 
 
 [Connor Hollasch]:    https://github.com/chollasch/
-[Examples.md]:        ./Examples.md
+[Examples.md]:        https://hollasch.github.io/LSON/examples.md.html
 [Java library]:       https://github.com/chollasch/LSON4J
 [LSON Specification]: https://hollasch.github.io/LSON
