@@ -833,11 +833,11 @@ or name, followed by a relationship character, followed by the second node index
 
 The following are examples of node edges:
 
-| Edge                 | Interpretation
-|----------------------|------------------------------------------
-| `a - b` <br> `a ↔ b` | An undirected edge between nodes a and b
-| `a > b` <br> `a → b` | A directed edge from node a to node b
-| `a < b` <br> `a ← b` | A directed edge to node a from node b
+    | Edge                 | Interpretation
+    |----------------------|------------------------------------------
+    | `a - b` <br> `a ↔ b` | An undirected edge between nodes a and b
+    | `a > b` <br> `a → b` | A directed edge from node a to node b
+    | `a < b` <br> `a ← b` | A directed edge to node a from node b
 
 _The special Unicode characters above are ↔ [U+2194], → [U+2192], and ← [U+2190]._
 
@@ -847,14 +847,14 @@ description, and not part of the node name. If a node name contains any of the a
 they must either be escaped, or the node name should be quoted. Here are parsing examples for edge
 specifications:
 
-| Edge Spec | Result
-|:----------|:----------------------------------------------------------------
-| `a\-b-c`  | Legal: interpreted as `'a-b' - 'c'`
-| `a-'b-c'` | Legal: interpreted as `'a' - 'b-c'`
-| `a>b`     | Legal: interpreted as `'a' > 'b'`
-| `a-b>c`   | **Illegal**: could be `'a-b' > 'c'` or `'a' - 'b>c'`
-| `a-b-c`   | **Illegal**: could be `'a-b' - 'c'` or `'a' - 'b-c'`
-| `a-b - c` | **Illegal**: interpreted as `'a' - 'b'`, followed by illegal token `-`
+    | Edge Spec | Result
+    |:----------|:----------------------------------------------------------------
+    | `a\-b-c`  | Legal: interpreted as `'a-b' - 'c'`
+    | `a-'b-c'` | Legal: interpreted as `'a' - 'b-c'`
+    | `a>b`     | Legal: interpreted as `'a' > 'b'`
+    | `a-b>c`   | **Illegal**: could be `'a-b' > 'c'` or `'a' - 'b>c'`
+    | `a-b-c`   | **Illegal**: could be `'a-b' - 'c'` or `'a' - 'b-c'`
+    | `a-b - c` | **Illegal**: interpreted as `'a' - 'b'`, followed by illegal token `-`
 
 
 ### Graph Edges Without Data
@@ -915,7 +915,7 @@ significant. Here's an example of edge data using a table:
 Directed graph edges may be expressed via adjacency matrix. In a directed adjacency matrix, each
 edge is found in a square **N**×**N** matrix, where **N** is the number of nodes in the graph. In
 this form, nodes are referenced by index (not by name), and the edge from node **A** to node **B**
-is found in the **A**-th row, **B**-th column, with that entry containing the data for that edge.
+is found in the <b>A</b>th row, <b>B</b>th column, with that entry containing the data for that edge.
 
 Graphs using adjacency matrices must have indexable nodes. Named nodes are not supported in
 conjunction with adjacency matrices.
@@ -936,7 +936,7 @@ Here's an example of an adjacency matrix for a directed graph of three nodes:
 ### Undirected Graph Edges Via Adjacency Matrix
 Adjacency matrixes with undirected edges require only an upper triangular matrix, where each entry
 describes an edge between one index and an equal or greater index. Thus, the _i_-th row has
-**N**-_i_ entries.
+<b>N</b>-<i>i</i> entries.
 
 Graphs using adjacency matrices must have indexable nodes. Thus, named nodes are not supported in
 conjunction with adjacency matrices.
