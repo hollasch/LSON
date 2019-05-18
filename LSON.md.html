@@ -163,10 +163,9 @@ which would yield the following string:
     This is a `test`\n of the emergency\n broadcast system. \u26a0
     ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-
 Escape Sequences
 -----------------
-Strings may contain the following escape sequences:
+In non-raw strings, escape sequences are processed as follows:
 
     | Sequence        | Description                                           |
     |:----------------|:------------------------------------------------------|
@@ -196,14 +195,30 @@ concatenations. For example:
     }
     ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
+Strings may include the source line terminators. However, this will capture exactly the actual line
+endings used in the LSON source.
+
+    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ LSON
+    {
+        strBlock: "
+          Knock knock.
+          Who's there?
+          Bug in your state machine.
+          Who's there?
+        "
+    }
+    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+The string defined in the above example includes all whitespace and line endings present between the
+opening and closing `"` characters.
 
 
 Elements
 ====================================================================================================
 LSON really has a single value type: the _element_. Unlike JSON, any string-representable value is
 supported and handled consistently, but interpretation is up to the decoding application or context.
-Applications that do not handle a particular element type natively will process that value by way of
-its string representation, while preserving its (possibly unknown) type. The value type (which might
+Applications that do not handle a particular element type natively will process that value using its
+string representation, while preserving its (possibly unknown) type. The element type (which might
 be "unknown") is preserved when re-encoding after any transformation or transmission.
 
 Element Types
@@ -458,7 +473,7 @@ transforming program decodes the bare literal `cromulent`, then any subsequent e
 `cromulent`, not `(cromulent)` or `(:cromulent)`.
 
 In situations where it makes sense, recognizable values such as `true` or `0x113f` should also be
-encoded as bare values, if these types are expected to be recognizable by the next decoder.
+encoded as bare values, if these types are expected to be recognizable by the a subsequent decoder.
 
 Word → Element Promotion
 -------------------------
@@ -478,8 +493,8 @@ set of common element types.
 Bare Value Concatenation
 -------------------------
 The concatenation operator always promotes words to strings, to produce a string-valued result. For
-example, the result of `0. + 123 + e10` would yield (string:0.123e10), not (0.123e10), which might
-get promoted to (number:0.123e10).
+example, the result of `0. + 123 + e10` would yield `(string:0.123e10)`, not `(0.123e10)`, which
+might get promoted to `(number:0.123e10)`.
 
 
 
@@ -824,7 +839,7 @@ The following are examples of node edges:
 | `a > b` <br> `a → b` | A directed edge from node a to node b
 | `a < b` <br> `a ← b` | A directed edge to node a from node b
 
-\* The special Unicode characters above are ↔ \[U+2194], → \[U+2192], and ← \[U+2190].
+_The special Unicode characters above are ↔ [U+2194], → [U+2192], and ← [U+2190]._
 
 Because node names may themselves contain relationship characters, ambiguity is possible. In
 general, parsing will consider the first encountered relationship character as a part of the edge
@@ -839,7 +854,7 @@ specifications:
 | `a>b`     | Legal: interpreted as `'a' > 'b'`
 | `a-b>c`   | **Illegal**: could be `'a-b' > 'c'` or `'a' - 'b>c'`
 | `a-b-c`   | **Illegal**: could be `'a-b' - 'c'` or `'a' - 'b-c'`
-| `a-b - c` | **Illegal**: interpreted as `'a' - 'b'`, followed by illegal spec `-`
+| `a-b - c` | **Illegal**: interpreted as `'a' - 'b'`, followed by illegal `-`
 
 
 ### Graph Edges Without Data
@@ -900,7 +915,7 @@ significant. Here's an example of edge data using a table:
 Directed graph edges may be expressed via adjacency matrix. In a directed adjacency matrix, each
 edge is found in a square **N**×**N** matrix, where **N** is the number of nodes in the graph. In
 this form, nodes are referenced by index (not by name), and the edge from node **A** to node **B**
-is found in the **A**th row, **B**th column, with that entry containing the data for that edge.
+is found in the **A**-th row, **B**-th column, with that entry containing the data for that edge.
 
 Graphs using adjacency matrices must have indexable nodes. Thus, named nodes are not supported in
 conjunction with adjacency matrices.
@@ -920,8 +935,8 @@ Here's an example of an adjacency matrix for a directed graph of three nodes:
 
 ### Undirected Graph Edges Via Adjacency Matrix
 Adjacency matrixes with undirected edges require only an upper triangular matrix, where each entry
-describes an edge between one index and an equal or greater index. Thus, the *i*th row has **N**-*i*
-entries.
+describes an edge between one index and an equal or greater index. Thus, the _i_-th row has
+**N**-_i_ entries.
 
 Graphs using adjacency matrices must have indexable nodes. Thus, named nodes are not supported in
 conjunction with adjacency matrices.
