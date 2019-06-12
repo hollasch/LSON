@@ -1050,7 +1050,7 @@ whitespace-item ::= <comment-line-remainder> | <comment-block> | <line-terminato
 
 whitespace ::= <whitespace-item>+
 
-value ::= <word> | <string> | <element> | <array> | <dictionary> | <table> | <graph>
+value ::= <word> | <string> | <element> | <array> | <dictionary> | &lt;table> | <graph>
 
 string-character ::= <non whitespace character>
     | "\b" | "\f" | "\n" | "\r" | "\t" | "\u" <hex>{4} | "\u{" <hex>+ "}" | "\" <character>
