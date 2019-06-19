@@ -1219,6 +1219,9 @@ Additional Material
 <link href="https://fonts.googleapis.com/css?family=Mukta|Ubuntu|Roboto+Mono" rel="stylesheet">
 
 <style>
+    body {
+      background: #f4f4f4;
+    }
     .md h1, .md h2, .md h3, .md h4, .md h5, .md h6 {
         border: none;
         font-family: Mukta,Georgia;
@@ -1226,7 +1229,7 @@ Additional Material
     .md h1 {
         margin-top: 1.25em;
         font-size: 200%;
-        color: #444;
+        color: #333;
         font-variant: small-caps;
     }
     .md h2 {
@@ -1239,10 +1242,16 @@ Additional Material
         /* font-style: italic; */
         font-weight: normal;
     }
+    code {
+        background: #e8e4f8;
+    }
     pre.listing.tilde {
-        background: #f2f2f8;
+        background: #ecf8ec;
         border: solid 2px #dddddd;
         padding: 1ex;
+    }
+    pre.listing code {
+        background: #ecf8ec;
     }
     .md a {
         font-family: Mukta,Georgia,Palatino,serif;
