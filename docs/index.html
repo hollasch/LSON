@@ -117,6 +117,19 @@ LSON whitespace includes all standard [Unicode whitespace][] characters.
     | U+3000  | `\u{3000}` | Ideographic space
 
 
+Terminators
+====================================================================================================
+Each item in a sequence must be terminated with whitespace, a closing delimeter of some kind, or
+with a comma (`,`) or semi-colon (`;`). Though not technically whitespace, commas and semi-colons
+serve the same role in separating values.
+
+Since commas and semi-colons are parsed similarly to whitespace, they are not interpreted in any
+syntactically meaningful way. For example, the sequence `a,,,,b,,c` is interpreted as three items
+`a`, `b`, and `c`.
+
+Terminating values with commas or semi-colons is completely optional, and is supported only as an
+aid to readability, at the discretion of the author.
+
 
 Comments
 ====================================================================================================
@@ -507,7 +520,8 @@ Arrays encode ordered lists of items. They have the following properties:
 
 2. Array values may be any LSON value (elements, strings, arrays, tables, or whatever).
 
-3. Each array value is terminated with whitespace, a comma, a semi-colon, or the array terminator.
+3. Each array value is terminated with whitespace, a comma, a semi-colon, or the array closing
+   delimeter.
 
 4. Arrays are contiguous. That is, there is no way in LSON to indicate an undefined element. If
    truly sparse arrays are desired for a particular encoding, it is recommended that dictionaries be
@@ -526,7 +540,7 @@ unquoted. Dictionaries have the following properties:
    followed by a right curly bracket (`}`, `U+007d`).
 
 2. Each dictionary pair is terminated with whitespace, a comma, a semi-colon, or the dictionary
-   terminator.
+   closing delimeter.
 
 Multiple keys may be specified with a single value, using an array-like syntax:
 
@@ -1073,7 +1087,7 @@ concatenated-string ::= "+" ( <word> | <string> )
 
 id ::= <string>
 
-terminator ::= "," | ";" | <whitespace> | empty-before-closing-delimiter
+terminator ::= "," | ";" | <whitespace> | null-before-closing-delimiter
 
 element ::= <untyped-element> | <typed-element>
 untyped-element ::= "(" <string> ")" | "(("<id> <text> <id>"))"
@@ -1084,7 +1098,7 @@ dictionary ::= "{" <dictionary-body> "}"
 
 dictionary-body ::= <dictionary-item>*
 dictionary-item ::= <key> ":" <value> <terminator>
-dictionary-key  ::= <id> | "[" <id>+ <terminator> "]"
+dictionary-key  ::= <id> | "[" <id> (<terminator> <id>)+ "]"
 
 array ::= "[" <array-item>* "]"
 array(n) ::= "[" <array-item>{n} "]"
