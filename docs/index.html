@@ -505,8 +505,8 @@ For example, a standard JSON-type parser would handle the following ordered list
   2. boolean (`true`, `false`)
   3. real numbers (`[-]*[digit]*[.digit*][[eE][+-]?digit+]`, or some such syntax)
 
-Other common parsers might support CSS values, ±infinity, and so forth. See [Elements.md][] for a
-set of common element types.
+Other common parsers might support CSS values, ±infinity, and so forth. See [Element Types][] for
+a set of common element types.
 
 
 ### Bare Value Concatenation
@@ -856,7 +856,7 @@ The following are examples of node edges:
     | `a &gt; b` or `a → b` | A directed edge from node a to node b
     | `a &lt; b` or `a ← b` | A directed edge to node a from node b
 
-_The special Unicode characters above are ↔ [U+2194], → [U+2192], and ← [U+2190]._
+_The special Unicode characters above are ↔ (U+2194), → (U+2192), and ← (U+2190)._
 
 Because node names may themselves contain relationship characters, ambiguity is possible. In
 general, parsing will consider the first encountered relationship character as a part of the edge
@@ -1227,57 +1227,16 @@ ____
 Additional Material
 ====================================================================================================
 - [LSON Examples](./examples.md.html)
+- [Element Types][]
 
 
 
 <!-- Footnotes --------------------------------------------------------------------------------- -->
-[Appendix A: Grammar]:                         #appendix-a-grammar
-[Arrays]:                                      #arrays
-[Bare Value Concatenation]:                    #bare-value-concatenation
-[Bare Values]:                                 #bare-values
-[Comments]:                                    #comments
-[Conclusion]:                                  #conclusion
-[Decoding Elements]:                           #decoding-elements
-[Default Table Values]:                        #default-table-values
-[Dictionaries]:                                #dictionaries
-[Dictionary Table Rows]:                       #dictionary-table-rows
-[Directed Graph Edges Via Adjacency Matrix]:   #directed-graph-edges-via-adjacency-matrix
-[Element Types]:                               #element-types
-[Element Value Blocks]:                        #element-value-blocks
-[Element Values]:                              #element-values
-[Elements of Type String]:                     #elements-of-type-string
-[Elements]:                                    #elements
-[Escape Sequences]:                            #escape-sequences
-[General Graph Structure]:                     #general-graph-structure
-[Graph Edges With Data]:                       #graph-edges-with-data
-[Graph Edges With Tabular Data]:               #graph-edges-with-tabular-data
-[Graph Edges Without Data]:                    #graph-edges-without-data
-[Graph Edges]:                                 #graph-edges
-[Graph Examples]:                              #graph-examples
-[Graph Nodes With Tabular Data]:               #graph-nodes-with-tabular-data
-[Graph Nodes]:                                 #graph-nodes
-[Graphs]:                                      #graphs
-[LSON Example]:                                #lson-example
-[Named Graph Nodes With Data]:                 #named-graph-nodes-with-data
-[Named Graph Nodes Without Data]:              #named-graph-nodes-without-data
-[Overview]:                                    #overview
-[Special Values]:                              #special-values
-[String Concatenation]:                        #string-concatenation
-[Strings]:                                     #strings
-[Tables]:                                      #tables
-[Undirected Graph Edges Via Adjacency Matrix]: #undirected-graph-edges-via-adjacency-matrix
-[Unnamed Graph Nodes With Data]:               #unnamed-graph-nodes-with-data
-[Unnamed Graph Nodes Without Data]:            #unnamed-graph-nodes-without-data
-[Untyped Elements]:                            #untyped-elements
-[Whitespace]:                                  #whitespace
-[Word Concatenation]:                          word-concatenation
-[Word → Element Promotion]:                    #word--element-promotion
-[Words]:                                       #words
-
-[Appendix B: Common Element Types]: ./ElementTypes.md
-[Appendix C: LSON Examples]:        ./examples.md.html
-[ElementTypes.md]:                  ./ElementTypes.md
-[Unicode whitespace]:               https://en.wikipedia.org/wiki/Whitespace_character#Unicode
+[Default Table Values]: #datastructures/tables/defaulttablevalues
+[Element Types]:        ./ElementTypes.md
+[Element Value Blocks]: #datavalues/elements/elementvalueblocks
+[Strings]:              #strings
+[Unicode whitespace]:   https://en.wikipedia.org/wiki/Whitespace_character#Unicode
 
 
 
