@@ -1049,8 +1049,73 @@ Finally, a railroad (parsing) graph for floating point numbers:
 
 
 
+References and Instancing
+====================================================================================================
+
+General Concepts
+----------------------------------------------------------------------------------------------------
+_References_ provide a way to reuse data values, structures or schemas that have been defined
+previously. Reference names are specified on the first definition of an item, and are subsequently
+instanced with the reference operator.
+
+
+Reference Types
+----------------------------------------------------------------------------------------------------
+References are limited to the following specific types:
+
+  - **Values** — All possible data values: strings, bare values, elements, and typed elements
+  - **Structures** — Entire arrays, dictionaries, tables, and graphs
+  - **Schemas** — Table schemas (but not table rows)
+  - **Nodes** — Graph node definitions (but not graph edges)
+
+
+Syntax
+----------------------------------------------------------------------------------------------------
+References are _defined_ with a unique name and the `=` operator:
+
+    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ LSON
+    referenceName = item
+    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+This is used wherever you would naturally specify an LSON item. For example, here's a simple
+dictionary of values:
+
+    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ LSON
+    {
+        color: defaultColor = "indigo"
+        headings: headingList = [ north=0, 45, east=90, 135, south=180, 225, west=270 ]
+        someTable: [# commonSchema = [id, name, amount] ... #]
+        round1: [% characters = [ alice bob carrie edward ] ... %]
+    }
+    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+In this example, the reference names are `defaultColor`, `headingList`, `north`, `east`, `south`,
+`west`, `commonSchema`, and `characters`.
+
+The syntax of a reference _instance_ is
+
+    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ LSON
+    ^referenceName
+    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+So, to specify a second dictionary similar (but the same as) the above example, one could use
+references like so:
+
+    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ LSON
+    {
+        color: ^defaultColor
+        headings: [ ^north, 30, 60, ^east, 120, 150, ^south, 210, 240, ^west, 300, 330 ]
+        someTable: [# ^commonSchema /* Same schema, but different table data */ #]
+        round1: [% ^characters /* Same nodes, different edges */ %]
+    }
+    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+
+
 Appendix A: Grammar
 ====================================================================================================
+
+[_The following grammar does not yet include reference syntax._]
 
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ Text
 lson-file ::= <value>
