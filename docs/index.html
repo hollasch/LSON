@@ -932,8 +932,7 @@ significant. Here's an example of edge data using a table:
 Directed graph edges may be expressed via adjacency matrix. In a directed adjacency matrix, each
 edge is found in a square **N**×**N** matrix, where **N** is the number of nodes in the graph. In
 this form, nodes are referenced by index (not by name), and the edge from node **A** to node **B**
-is found in the <b>A</b>th row, <b>B</b>th column, with that entry containing the data for that
-edge.
+is found in the Ath row, Bth column, with that entry containing the data for that edge.
 
 Graphs using adjacency matrices must have indexable nodes. Named nodes are not supported in
 conjunction with adjacency matrices.
@@ -953,8 +952,8 @@ Here's an example of an adjacency matrix for a directed graph of three nodes:
 
 #### Undirected Graph Edges Via Adjacency Matrix
 Adjacency matrixes with undirected edges require only an upper triangular matrix, where each entry
-describes an edge between one index and an equal or greater index. Thus, the _i_-th row has
-<b>N</b>-<i>i</i> entries.
+describes an edge between one index and an equal or greater index. Thus, the i-th row has
+**N** - _i_ entries.
 
 Graphs using adjacency matrices must have indexable nodes. Thus, named nodes are not supported in
 conjunction with adjacency matrices.
