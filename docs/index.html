@@ -851,11 +851,11 @@ or name, followed by a relationship character, followed by the second node index
 
 The following are examples of node edges:
 
-    | Edge                 | Interpretation
-    |----------------------|------------------------------------------
-    | `a - b` <br> `a ↔ b` | An undirected edge between nodes a and b
-    | `a > b` <br> `a → b` | A directed edge from node a to node b
-    | `a < b` <br> `a ← b` | A directed edge to node a from node b
+    | Edge                    | Interpretation
+    |-------------------------|------------------------------------------
+    | `a - b` <br> `a ↔ b`    | An undirected edge between nodes a and b
+    | `a &gt; b` <br> `a → b` | A directed edge from node a to node b
+    | `a &lt; b` <br> `a ← b` | A directed edge to node a from node b
 
 _The special Unicode characters above are ↔ [U+2194], → [U+2192], and ← [U+2190]._
 
@@ -865,14 +865,14 @@ description, and not part of the node name. If a node name contains any of the a
 they must either be escaped, or the node name should be quoted. Here are parsing examples for edge
 specifications:
 
-    | Edge Spec | Result
-    |:----------|:----------------------------------------------------------------
-    | `a\-b-c`  | Legal: interpreted as `'a-b' - 'c'`
-    | `a-'b-c'` | Legal: interpreted as `'a' - 'b-c'`
-    | `a>b`     | Legal: interpreted as `'a' > 'b'`
-    | `a-b>c`   | **Illegal**: could be `'a-b' > 'c'` or `'a' - 'b>c'`
-    | `a-b-c`   | **Illegal**: could be `'a-b' - 'c'` or `'a' - 'b-c'`
-    | `a-b - c` | **Illegal**: interpreted as `'a' - 'b'`, followed by illegal token `-`
+    | Edge Spec   | Result
+    |:------------|:----------------------------------------------------------------
+    | `a - b - c` | Legal: interpreted as `'a-b' - 'c'`
+    | `a - 'b-c'` | Legal: interpreted as `'a' - 'b-c'`
+    | `a > b`     | Legal: interpreted as `'a' > 'b'`
+    | `a - b > c` | **Illegal**: could be `'a-b' > 'c'` or `'a' - 'b>c'`
+    | `a-b-c`     | **Illegal**: could be `'a-b' - 'c'` or `'a' - 'b-c'`
+    | `a-b - c`   | **Illegal**: interpreted as `'a' - 'b'`, followed by illegal token `-`
 
 #### Graph Edges Without Data
 Edges without data are specified as an array of edges. Here's an example using node indices:
