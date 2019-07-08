@@ -1,4 +1,5 @@
-<meta charset="utf-8">    <!-- Markdeep -->    <!-- vim: set filetype=markdeep : -->
+<meta charset="utf-8">                       <!-- Markdeep: https://casual-effects.com/markdeep/ -->
+                                                               <!-- vim: set filetype=markdeep : -->
 
 
                              **LSON: Lucid Serialized Object Notation**
@@ -84,8 +85,12 @@ deeper:
     ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 
-Whitespace
+
+File Structure
 ====================================================================================================
+
+Whitespace
+----------------------------------------------------------------------------------------------------
 LSON whitespace includes all standard [Unicode whitespace][] characters.
 
     | Unicode |   Escape   | Description
@@ -118,7 +123,7 @@ LSON whitespace includes all standard [Unicode whitespace][] characters.
 
 
 Terminators
-====================================================================================================
+----------------------------------------------------------------------------------------------------
 Each item in a sequence must be terminated with whitespace, a closing delimeter of some kind, or
 with a comma (`,`) or semi-colon (`;`). Though not technically whitespace, commas and semi-colons
 serve the same role in separating values.
@@ -132,7 +137,7 @@ aid to readability, at the discretion of the author.
 
 
 Comments
-====================================================================================================
+----------------------------------------------------------------------------------------------------
     ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ LSON
     // Single line comments run from double forward slashes to end of line.
 
@@ -144,8 +149,11 @@ Comments
 
 
 
-Strings
+Data Values
 ====================================================================================================
+
+Strings
+----------------------------------------------------------------------------------------------------
 Strings are the only natively-supported element type (more on LSON elements later).
 
 In addition to standard double quotes, strings may be quoted with any of five additional quote
@@ -176,8 +184,8 @@ which would yield the following string:
     This is a `test`\n of the emergency\n broadcast system. \u26a0
     ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-Escape Sequences
------------------
+
+### Escape Sequences
 In non-raw strings, escape sequences are processed as follows:
 
     | Sequence        | Description                                           |
@@ -194,8 +202,8 @@ In non-raw strings, escape sequences are processed as follows:
     | `\u{123456790}` | Not a legal Unicode escape; yields `u{1234567890}`    |
     | `\<any>`        | Yields that character verbatim, such as `\'` or `\\`  |
 
-String Concatenation
----------------------
+
+### String Concatenation
 In order to support human-readable long strings, the `+` operator may be used to construct
 concatenations. For example:
 
@@ -227,15 +235,15 @@ opening and closing `"` characters.
 
 
 Elements
-====================================================================================================
+----------------------------------------------------------------------------------------------------
 LSON really has a single value type: the _element_. Unlike JSON, any string-representable value is
 supported and handled consistently, but interpretation is up to the decoding application or context.
 Applications that do not handle a particular element type natively will process that value using its
 string representation, while preserving its (possibly unknown) type. The element type (which might
 be "unknown") is preserved when re-encoding after any transformation or transmission.
 
-Element Types
---------------
+
+### Element Types
 Elements have two components: type and value. The element type is optional, and defaults to
 "unknown" if not specified. At its most basic, an element has the following syntax:
 
@@ -285,8 +293,8 @@ In general, either avoid or quote type names with colons. Untyped values with co
 to specify using the last form above for unspecified types, with a colon immediately following the
 opening parenthesis.
 
-Element Values
----------------
+
+### Element Values
 As shown in examples above, the element value may be either unquoted or quoted in its entirety.
 Quoted element values obey the conventions outlined in [Strings][], using any of the six string
 delimiters. Because elements may contain values of foreign syntax, **LSON interprets any contained
@@ -301,8 +309,8 @@ that mode, it will terminate the element value at `2.3`, _not_ at `1.223;`. Elem
 contain complex values should therefore either be quoted entirely, or contained in
 [Element Value Blocks][] (described below).
 
-Elements of Type String
-------------------------
+
+### Elements of Type String
 As pointed out earlier, strings are the only element type that LSON recognizes implicitly. Since
 strings are natively supported, string quotes are sufficient to recognize the element type
 ("string") and value (the quoted content). Thus, the following are all equivalent:
@@ -313,8 +321,8 @@ strings are natively supported, string quotes are sufficient to recognize the el
     "This is a string"              // Value recognized as type "string"
     ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-Element Value Blocks
----------------------
+
+### Element Value Blocks
 As noted above, an _element_ is bascially an arbitrary foreign syntactic structure. Most uses of
 LSON elements will be for simple values in other domains, as we've seen above. Some elements,
 however, might have quite a complex representation, both in syntax and in length. For example, it
@@ -389,8 +397,7 @@ is equivalent to:
     ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 
-Decoding Elements
-------------------
+### Decoding Elements
 All elements have a string representation of their value. In addition, for elements with declared
 type, decoders may use this information to generate a native value of that type. For example, the
 element `(boolean:true)` always has the string representation "true", and may have a decoder's
@@ -402,8 +409,7 @@ In this manner, a C++ decoder could meaningfully and consistently operate on LSO
 Python endpoint, with values like `False` or `None`.
 
 
-Untyped Elements
------------------
+### Untyped Elements
 Elements may omit type information, as in `(1.23456)` or `(:s/ab/xy/g)`. As for all elements, both
 of these cases have their string representation. However, decoders will typically be able to deduce
 the type of an element, according to a scheme of their choosing. For some element types and
@@ -449,9 +455,8 @@ C++ application, for example, while preserving the original meaning (an untyped 
 `"true"`).
 
 
-
 Bare Values
-====================================================================================================
+----------------------------------------------------------------------------------------------------
 A _bare value_ is an element that is not surrounded by parentheses. If the bare value is
 string-quoted, then it is recognized as an element of type string. If the bare value is not quoted,
 it is considered an untyped element.
@@ -488,8 +493,8 @@ transforming program decodes the bare literal `cromulent`, then any subsequent e
 In situations where it makes sense, recognizable values such as `true` or `0x113f` should also be
 encoded as bare values, if these types are expected to be recognizable by the a subsequent decoder.
 
-Word → Element Promotion
--------------------------
+
+### Word → Element Promotion
 A specific application may choose to recognize and handle a select set of element types. In such a
 case, it is up to the application to specify the types handled, and the order in which they are
 recognized.
@@ -503,16 +508,20 @@ For example, a standard JSON-type parser would handle the following ordered list
 Other common parsers might support CSS values, ±infinity, and so forth. See [Elements.md][] for a
 set of common element types.
 
-Bare Value Concatenation
--------------------------
+
+### Bare Value Concatenation
 The concatenation operator always promotes words to strings, to produce a string-valued result. For
 example, the result of `0. + 123 + e10` would yield `(string:0.123e10)`, not `(0.123e10)`, which
 might get promoted to `(number:0.123e10)`.
 
 
 
-Arrays
+Data Structures
 ====================================================================================================
+
+Arrays
+----------------------------------------------------------------------------------------------------
+
 Arrays encode ordered lists of items. They have the following properties:
 
 1. They begin with a left square bracket (`[`, `U+005b`), followed by zero or more values, and
@@ -530,9 +539,8 @@ Arrays encode ordered lists of items. They have the following properties:
    undefined values. Interpreting this would depend on a particular encoder/decoder.
 
 
-
 Dictionaries
-====================================================================================================
+----------------------------------------------------------------------------------------------------
 Dictionaries are sets of key-value pairs. Keys are string values, and hence may be either quoted or
 unquoted. Dictionaries have the following properties:
 
@@ -552,9 +560,8 @@ Multiple keys may be specified with a single value, using an array-like syntax:
     ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 
-
 Tables
-====================================================================================================
+----------------------------------------------------------------------------------------------------
 Tables (like CSV files) are 2D entities with multiple rows (points) of data, where each dimension
 has an associated label. Tables have the following properties:
 
@@ -613,8 +620,7 @@ like so:
     ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 
-Default Table Values
----------------------
+### Default Table Values
 Tables may optionally define default element types or element values (or both) for each feature.
 Defaults follow a tilde (`~`) after the feature name, like so:
 
@@ -689,8 +695,7 @@ A standard CSV-type table might default all values to the element `(null)`:
     ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 
-Dictionary Table Rows
-----------------------
+### Dictionary Table Rows
 In addition to unbracketed and bracketed table rows, LSON supports dictionary table rows. In this
 case, a row is delimited with curly braces (`{`, `}`), and the dictionary keys are the formal
 feature names specified in the table schema. Each row feature may get the default value either by
@@ -726,9 +731,8 @@ Dictionary table rows can contain several kinds of schema-mismatch errors:
     ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 
-
 Graphs
-====================================================================================================
+----------------------------------------------------------------------------------------------------
 LSON supports graph data, where a graph is defined by a set of nodes and a set of edges between
 those nodes. Graphs have the following properties:
 
@@ -743,8 +747,7 @@ those nodes. Graphs have the following properties:
   + There may be many edges between any node pair.
 
 
-General Graph Structure
-------------------------
+### General Graph Structure
 Each LSON graph is expressed in the following pattern:
 
     ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ LSON
@@ -755,8 +758,7 @@ Each LSON graph is expressed in the following pattern:
     ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 
-Graph Nodes
-------------
+### Graph Nodes
 Graph nodes may be expressed in a number of ways, depending on
 
   - whether they are to be referenced by index or by name, and
@@ -764,7 +766,7 @@ Graph nodes may be expressed in a number of ways, depending on
 
 Unnamed nodes use an array-like container, while named nodes use a dictionary-like container.
 
-### Unnamed Graph Nodes Without Data
+#### Unnamed Graph Nodes Without Data
 If nodes are to be referenced by index from 0 onward, and have no data, then simply specifying the
 number of nodes is sufficient. Node count must be greater than or equal to zero, and is expressed as
 a positive decimal integer.
@@ -773,7 +775,7 @@ a positive decimal integer.
     1000
     ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-### Unnamed Graph Nodes With Data
+#### Unnamed Graph Nodes With Data
 The following (unnamed) nodes can be referenced by index. Each node has 2D coordinate data.
 
     ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ LSON
@@ -795,7 +797,7 @@ their array-like index:
     ]
     ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-### Named Graph Nodes Without Data
+#### Named Graph Nodes Without Data
 To express a set of named nodes without additional data, use a dictionary with multi-keyed dummy
 data, like so:
 
@@ -803,7 +805,7 @@ data, like so:
     { [ bargaining testing anger shock acceptance depression denial ]: null }
     ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-### Named Graph Nodes With Data
+#### Named Graph Nodes With Data
 To express a set of named nodes with additional data per node, use a dictionary. Each entry
 specifies the node data by name. Here, the seven standard colors of the rainbow are given with their
 CSS color values:
@@ -820,7 +822,7 @@ CSS color values:
     }
     ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-### Graph Nodes With Tabular Data
+#### Graph Nodes With Tabular Data
 Node data may be expressed in the form of a table. Node IDs must be the first column of a node
 table (the column name is arbitrary), and all such ID values must be unique (whether referenced or
 not). Here's an example:
@@ -841,8 +843,8 @@ not). Here's an example:
     %]
     ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-Graph Edges
-------------
+
+### Graph Edges
 Edges are expressed as a set of node pair relationships. A node relationship is either a node index
 or name, followed by a relationship character, followed by the second node index or name.
 
@@ -871,8 +873,7 @@ specifications:
     | `a-b-c`   | **Illegal**: could be `'a-b' - 'c'` or `'a' - 'b-c'`
     | `a-b - c` | **Illegal**: interpreted as `'a' - 'b'`, followed by illegal token `-`
 
-
-### Graph Edges Without Data
+#### Graph Edges Without Data
 Edges without data are specified as an array of edges. Here's an example using node indices:
 
     ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ LSON
@@ -892,7 +893,7 @@ Another example, this time using node names:
     ]
     ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-### Graph Edges With Data
+#### Graph Edges With Data
 Edges with data use a dictionary where each property is a node edge, and the property value is the
 data associated with the edge. This example references named nodes to specify edges colored with CSS
 colors.
@@ -907,7 +908,7 @@ colors.
     }
     ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-### Graph Edges With Tabular Data
+#### Graph Edges With Tabular Data
 Graph edges may be expressed using tabular data. As with node tables, the first column of edge
 tables is special, and expected to hold the edge expressions. The name of the first is not
 significant. Here's an example of edge data using a table:
@@ -926,7 +927,7 @@ significant. Here's an example of edge data using a table:
     %]
     ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-### Directed Graph Edges Via Adjacency Matrix
+#### Directed Graph Edges Via Adjacency Matrix
 Directed graph edges may be expressed via adjacency matrix. In a directed adjacency matrix, each
 edge is found in a square **N**×**N** matrix, where **N** is the number of nodes in the graph. In
 this form, nodes are referenced by index (not by name), and the edge from node **A** to node **B**
@@ -948,7 +949,7 @@ Here's an example of an adjacency matrix for a directed graph of three nodes:
     %]
     ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-### Undirected Graph Edges Via Adjacency Matrix
+#### Undirected Graph Edges Via Adjacency Matrix
 Adjacency matrixes with undirected edges require only an upper triangular matrix, where each entry
 describes an edge between one index and an equal or greater index. Thus, the _i_-th row has
 <b>N</b>-<i>i</i> entries.
@@ -970,8 +971,7 @@ Here's an example of an undirected adjacency matrix:
     ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 
-Graph Examples
----------------
+### Graph Examples
 Indexed nodes without data, edges without data:
 
     ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ LSON
@@ -1051,6 +1051,7 @@ Finally, a railroad (parsing) graph for floating point numbers:
 
 Appendix A: Grammar
 ====================================================================================================
+
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ Text
 lson-file ::= <value>
 
@@ -1165,6 +1166,7 @@ Additional Material
 
 
 
+<!-- Footnotes --------------------------------------------------------------------------------- -->
 [Appendix A: Grammar]:                         #appendix-a-grammar
 [Arrays]:                                      #arrays
 [Bare Value Concatenation]:                    #bare-value-concatenation
