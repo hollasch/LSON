@@ -1116,118 +1116,9 @@ references like so:
 Appendix A: Grammar
 ====================================================================================================
 
-[_The following grammar does not yet include reference syntax._]
+[ _The following grammar does not yet include reference syntax._ ]
 
-<!--
-
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ Text
-lson-file ::= <value>
-
-line-terminator ::= U+000a | U+000b | U+000c | U+000d | U+0085 | U+2028 | U+2029
-
-comment-line-remainder ::= "//" <any character not line-terminator>* <line-terminator>
-comment-block ::= "/*" <any character sequence not containing "*/"> "*/"
-
-whitespace-item ::= <comment-line-remainder> | <comment-block> | <line-terminator>
-    | U+0009 | U+0020 | U+00a0 | U+1680 | U+2000 | U+2001 | U+2002 | U+2003 | U+2004 | U+2005
-    | U+2006 | U+2007 | U+2008 | U+2009 | U+200a | U+2028 | U+2029 | U+202f | U+205f | U+3000
-
-whitespace ::= <whitespace-item>+
-
-value ::= <word> | <string> | <element> | <array> | <dictionary> | &lt;table> | <graph>
-
-string-character ::= <non whitespace character>
-    | "\b" | "\f" | "\n" | "\r" | "\t" | "\u" <hex>{4} | "\u{" <hex>+ "}" | "\" <character>
-
-hex ::= "0" | "1" | "2" | "3" | "4" | "5" | "6" | "7" | "8" | "9"
-      | "a" | "b" | "c" | "d" | "e" | "f"
-      | "A" | "B" | "C" | "D" | "E" | "F"
-
-word ::= <string-character>+
-
-string ::= <unquoted-string> | <quoted-string>
-quoted-string ::= <string-begin-quote> <any <string-character> not matching begin quote>*
-    <string-end-quote> <concatenated-string>*
-unquoted-string ::= <string-character>+ <concatenated-string>*
-
-string-begin-quote ::= "\"" | "'" | "`" | "«" | "‘" | "“"
-string-end-quote   ::= "\"" | "'" | "`" | "»" | "’" | "”"
-
-concatenated-string ::= "+" ( <word> | <string> )
-
-id ::= <string>
-
-terminator ::= "," | ";" | <whitespace> | null-before-closing-delimiter
-
-element ::= <untyped-element> | <typed-element>
-untyped-element ::= "(" <string> ")" | "(("<id> <text> <id>"))"
-typed-element ::= "(" <typeID> ":" <string> ") | "(("<id> <typeID> ":" <text> <id>"))"
-valueless-element ::= "(" <typeID> ":" ")"
-
-dictionary ::= "{" <dictionary-body> "}"
-
-dictionary-body ::= <dictionary-item>*
-dictionary-item ::= <key> ":" <value> <terminator>
-dictionary-key  ::= <id> | "[" <id> (<terminator> <id>)+ "]"
-
-array ::= "[" <array-item>* "]"
-array(n) ::= "[" <array-item>{n} "]"
-array-item ::= <value> <terminator>
-
-table ::= "[#" <table-body> "#]"
-table-body ::= <table-schema> <table-row>*
-
-table-schema ::= "[" <table-feature>* "]"
-table-feature ::= <id> <terminator>
-                | <id> "~" <value> <terminator>
-                | <id> "~" <valueless-element>
-
-table-row ::= <table-row-bare(numFeatures)> | <table-row-bracketed> | <table-row-dictionary>
-table-row-bare(numFeatures) ::= (<table-row-value> <terminator>){numFeatures}
-table-row-bracketed ::= "[" <table-row-value>* "]"
-table-row-value ::= <value> | "~"
-table-row-dictionary ::= "{" <table-row-dictionary-body> "}"
-table-row-dictionary-body ::= <table-row-dictionary-item>*
-table-row-dictionary-item ::= <dictionary-key> ":" (<value> | "~") <terminator>
-
-graph ::= explicit-graph | adjacency-graph
-explicit-graph ::= "[%" <graph-nodes> <explicit-graph-edges> "%]"
-adjacency-graph ::= "[%" <indexed-nodes>(numNodes) <adjacency-matrix>(numNodes) "%]"
-
-"[%" <graph-nodes> <graph-edges> "%]"
-
-graph-nodes ::= <indexed-nodes> | <named-nodes> | <node-table>
-indexed-nodes ::= <counting-number> | <array>(numNodes)
-named-nodes ::= <dictionary>
-node-table ::= < table >
-
-explicit-graph-edges ::= <edge-array> | <edge-dictionary> | <edge-table>
-edge-array ::= "[" <edge>+ "]"
-edge-dictionary ::= "{" (<edge-key> ":" <value> <terminator>)* "}"
-edge-key ::= <edge> | "[" (<edge> <terminator>)+ "]"
-edge-table ::= < table >
-
-adjacency-matrix ::= <directed-adjacency-matrix> | <undirected-adjacency-matrix>
-directed-adjacency-matrix ::= "[" <array>(numNodes){numNodes} "]"
-undirected-adjacency-matrix ::= "[" <array>(numNodes) <array>(numNodes-1) .. <array>(1) "]"
-
-edge ::= <node-ref> <edge-type> <node-ref>
-node-ref ::= <node-index> | <id>
-node-index ::= <counting-number>
-
-edge-type ::= '-' | '↔' | '>' | '→' | '<' | '←'
-
-____
-
-<token>?    Denotes zero or one <token>
-<token>*    Denotes zero or more <token>
-<token>+    Denotes one or more <token>
-<token>{n}  Denotes exactly n <token>s
-<token>{n+} Denotes common n <token>s, where n is one or more
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
--->
-
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 lson-file ::= &lt;value&gt;
 
 line-terminator ::= U+000a | U+000b | U+000c | U+000d | U+0085 | U+2028 | U+2029
@@ -1331,7 +1222,7 @@ ____
 &lt;token&gt;+    Denotes one or more &lt;token&gt;
 &lt;token&gt;{n}  Denotes exactly n &lt;token&gt;s
 &lt;token&gt;{n+} Denotes common n &lt;token&gt;s, where n is one or more
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 
 Additional Material
