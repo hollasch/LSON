@@ -249,7 +249,7 @@ Elements have two components: type and value. The element type is optional, and 
 "unknown" if not specified. At its most basic, an element has the following syntax:
 
     ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ LSON
-    ( <type> : <value> )
+    ( type : value )
     ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 Elements with a declared type may take several forms. For example:
@@ -331,8 +331,8 @@ should be simple to embed a 250-line script inside LSON. In my experience, I've 
 script inside JSON (not because it's good, but because it's necessary).
 
 To this end, elements may employ block delimiters, using a locally-unique identifier.
-Block-delimited elements begin with `((<id>` where `<id>` is an arbitrary string. As soon as the
-character sequence `<id>))` is encountered, the element is closed.
+Block-delimited elements begin with `((id` where `id` is an arbitrary string. As soon as the
+character sequence `id))` is encountered, the element is closed.
 
 Here's an example of a complex element with block delimiters:
 
@@ -504,7 +504,7 @@ For example, a standard JSON-type parser would handle the following ordered list
 
   1. null (`null`)
   2. boolean (`true`, `false`)
-  3. real numbers (`[-]*[<digit>]*[.<digit>*][[eE][+-]?<digit>+]`, or some such syntax)
+  3. real numbers (`[-]*[digit]*[.digit*][[eE][+-]?digit+]`, or some such syntax)
 
 Other common parsers might support CSS values, ±infinity, and so forth. See [Elements.md][] for a
 set of common element types.
@@ -932,7 +932,8 @@ significant. Here's an example of edge data using a table:
 Directed graph edges may be expressed via adjacency matrix. In a directed adjacency matrix, each
 edge is found in a square **N**×**N** matrix, where **N** is the number of nodes in the graph. In
 this form, nodes are referenced by index (not by name), and the edge from node **A** to node **B**
-is found in the <b>A</b>th row, <b>B</b>th column, with that entry containing the data for that edge.
+is found in the <b>A</b>th row, <b>B</b>th column, with that entry containing the data for that
+edge.
 
 Graphs using adjacency matrices must have indexable nodes. Named nodes are not supported in
 conjunction with adjacency matrices.
