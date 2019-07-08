@@ -91,11 +91,12 @@ Example 2
             id: file
             value: File
             popup: {
-                menuitem: [#                 // A table
-                    value   onclick :        // with columns (features) "value" and "onclick"
-                    New     CreateNewDoc()   // Row 1
-                    Open    OpenDoc()        // Row 2
-                    Close   CloseDoc()       // Row 3
+                menuitem: [#                   // A table
+                    [ value   onclick ]        // with columns (features) "value" and "onclick"
+
+                      New     CreateNewDoc()   // Row 1
+                      Open    OpenDoc()        // Row 2
+                      Close   CloseDoc()       // Row 3
                 #]
             }
         }
@@ -216,7 +217,7 @@ Example 4
     {
         menu: {
             header: «SVG Viewer»                // LSON supports six string delimiters
-            items: [# id=(null) label="" :      // A table with default values
+            items: [# [ id~(null) label~"" ]    // A table with default values
                 [Open]                          // Unspecified columns get default values.
                 [OpenNew  "Open New"]
                 []
@@ -247,7 +248,7 @@ Example 4
     {
         menu: {
             header: «SVG Viewer»                // LSON supports six string delimiters
-            items: [# id=(null) label="" :      // A table with default values
+            items: [# [ id~(null) label~"" ]    // A table with default values
                 { id:Open }                     // Unspecified columns get default values.
                 { id:OpenNew label:"Open New"}
                 { }
@@ -412,8 +413,8 @@ A graph example from
         label: “Usual Suspects”
         graph: [%
           // A graph with a table of node data.
-          [# id             label           metadata
-          :  'Roger Kint'   'Roger Kint'    { nickname:'Verbal' actor:'Kevin Spacey' }
+          [# [ id           label           metadata ]
+             'Roger Kint'   'Roger Kint'    { nickname:'Verbal' actor:'Kevin Spacey' }
              'Keyser Söze'  'Keyser Söze'   { actor: 'Kevin Spacey' }
           #]
           {
