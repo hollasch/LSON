@@ -201,7 +201,7 @@ In non-raw strings, escape sequences are processed as follows:
     | `\u{X...}`      | Unicode character from 1-8 hexadecimal digits         |
     | `\u{}`          | Not a legal Unicode escape; yields `u{}`              |
     | `\u{123456790}` | Not a legal Unicode escape; yields `u{1234567890}`    |
-    | `\<any>`        | Yields that character verbatim, such as `\'` or `\\`  |
+    | `\X`            | Yields any character verbatim, such as `\'` or `\\`   |
 
 
 ### String Concatenation
