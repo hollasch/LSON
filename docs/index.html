@@ -527,30 +527,34 @@ Arrays encode ordered lists of items. They have the following properties:
 1. They begin with a left square bracket (`[`, `U+005b`), followed by zero or more values, and
    terminated with a right square bracket (`]`, `U+005d`).
 
-2. Array values may be any LSON value (elements, strings, arrays, tables, or whatever).
+2. Each array element may be any LSON value (elements, strings, arrays, tables, or whatever).
+   Elements may be any combination of types.
 
 3. Each array value is terminated with whitespace, a comma, a semi-colon, or the array closing
    delimeter.
 
-4. Arrays are contiguous. That is, there is no way in LSON to indicate an undefined element. If
-   truly sparse arrays are desired for a particular encoding, it is recommended that dictionaries be
-   used with numeric key values. Encoders should follow the same convention, encoding sparse arrays
-   as dictionaries. An alternative would be to adopt a special word, such as `undefined` to denote
-   undefined values. Interpreting this would depend on a particular encoder/decoder.
+4. Arrays are contiguous. That is, there is no way in LSON to indicate an undefined element, or to
+   specify a sparse array. If truly sparse arrays are desired for a particular encoding, it is
+   recommended that dictionaries be used with numeric key values, or designate a special value to
+   indicate an empty element. Interpretation of such an array would depend on a particular
+   encoder/decoder.
 
 
 Dictionaries
 ----------------------------------------------------------------------------------------------------
 Dictionaries are sets of key-value pairs. Keys are string values, and hence may be either quoted or
-unquoted. Dictionaries have the following properties:
+unquoted. Dictionaries have the following syntax:
 
 1. They begin with a left curly bracket (`{`, `U+007b`), followed by zero or more key-value pairs,
    followed by a right curly bracket (`}`, `U+007d`).
 
-2. Each dictionary pair is terminated with whitespace, a comma, a semi-colon, or the dictionary
-   closing delimeter.
+2. Each dictionary pair is an ID, followed by a colon, followed by the value.
 
-Multiple keys may be specified with a single value, using an array-like syntax:
+3. Key-value pairs are terminated with whitespace, a comma, a semi-colon, or the dictionary closing
+   delimeter.
+
+### Multi-Keys
+Multiple keys may be assigned a single value using an array-like syntax:
 
     ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ LSON
     {
@@ -558,6 +562,10 @@ Multiple keys may be specified with a single value, using an array-like syntax:
         [ green cyan blue violet ]: false
     }
     ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+### Key Redefinition
+The first definition of a key wins -- all subsequent definitions are ignored. It is recommended that
+parsers provide warnings to catch accidental key collisions.
 
 
 Tables
@@ -1073,14 +1081,14 @@ Syntax
 ----------------------------------------------------------------------------------------------------
 References are _defined_ with a unique name and the `=` operator:
 
-    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ LSON
+    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ LSON
     referenceName = item
     ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 This is used wherever you would naturally specify an LSON item. For example, here's a simple
 dictionary of values:
 
-    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ LSON
+    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ LSON
     {
         color: defaultColor = "indigo"
         headings: headingList = [ north=0, 45, east=90, 135, south=180, 225, west=270 ]
@@ -1094,14 +1102,14 @@ In this example, the reference names are `defaultColor`, `headingList`, `north`,
 
 The syntax of a reference _instance_ is
 
-    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ LSON
+    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ LSON
     ^referenceName
     ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 So, to specify a second dictionary similar (but the same as) the above example, one could use
 references like so:
 
-    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ LSON
+    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ LSON
     {
         color: ^defaultColor
         headings: [ ^north, 30, 60, ^east, 120, 150, ^south, 210, 240, ^west, 300, 330 ]
