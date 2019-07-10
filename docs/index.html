@@ -1079,6 +1079,8 @@ References are limited to the following specific types:
 
 Syntax
 ----------------------------------------------------------------------------------------------------
+
+### Reference Definition
 References are _defined_ with a unique name and the `=` operator:
 
     ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ LSON
@@ -1100,6 +1102,7 @@ dictionary of values:
 In this example, the reference names are `defaultColor`, `headingList`, `north`, `east`, `south`,
 `west`, `commonSchema`, and `characters`.
 
+### Reference Instancing
 The syntax of a reference _instance_ is
 
     ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ LSON
@@ -1117,6 +1120,19 @@ references like so:
         round1: [% ^characters /* Same nodes, different edges */ %]
     }
     ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+All reference instances must occur _after_ the definition -- you cannot instance a reference that is
+defined later in the file.
+
+### Reference Scoping
+References are scoped in lexical order only. A reference definition may occur deep inside a data
+structure, and then later instanced deep inside another structure, at any level. This allows
+reference types to be defined implicitly and naturally, and without requiring additional scoping
+or typing syntax.
+
+### Reference Redefinition
+Reference redefinitions are illegal -- once a reference has been defined, all subsequent
+redefinitions of the same name are ignored (and parsers should provide a warning).
 
 
 
