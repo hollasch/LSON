@@ -126,11 +126,11 @@ Terminators
 ----------------------------------------------------------------------------------------------------
 Each item in a sequence must be terminated with whitespace, a closing delimeter of some kind, or
 with a comma (`,`) or semi-colon (`;`). Though not technically whitespace, commas and semi-colons
-serve the same role in separating values.
+serve the same role in separating values, and are treated equivalently.
 
-Since commas and semi-colons are parsed similarly to whitespace, they are not interpreted in any
-syntactically meaningful way. For example, the sequence `a,,,,b,,c` is interpreted as three items
-`a`, `b`, and `c`.
+Since commas and semi-colons are parsed as whitespace, they are not interpreted in any syntactically
+meaningful way. For example, the sequence `a,,,,b,,c` is interpreted as three items `a`, `b`, and
+`c`.
 
 Terminating values with commas or semi-colons is completely optional, and is supported only as an
 aid to readability, at the discretion of the author.
