@@ -1158,7 +1158,8 @@ whitespace-item ::= &lt;comment-line-remainder&gt; | &lt;comment-block&gt; | &lt
 
 whitespace ::= &lt;whitespace-item&gt;+
 
-value ::= &lt;word&gt; | &lt;string&gt; | &lt;element&gt; | &lt;array&gt; | &lt;dictionary&gt; | &lt;table&gt; | &lt;graph&gt;
+value ::= &lt;word&gt; | &lt;string&gt; | &lt;element&gt; | &lt;array&gt; | &lt;dictionary&gt;
+        | &lt;table&gt; | &lt;graph&gt; | &lt;reference-definition&gt; | &lt;reference-instance&gt;
 
 string-character ::= &lt;non whitespace character&gt;
     | "\b" | "\f" | "\n" | "\r" | "\t" | "\u" &lt;hex&gt;{4} | "\u{" &lt;hex&gt;+ "}" | "\" &lt;character&gt;
@@ -1240,6 +1241,9 @@ node-ref ::= &lt;node-index&gt; | &lt;id&gt;
 node-index ::= &lt;counting-number&gt;
 
 edge-type ::= '-' | '↔' | '&gt;' | '→' | '&lt;' | '←'
+
+reference-definition ::= &lt;id&gt; "=" &lt;value&gt;
+reference-instance   ::= "^" &lt;id&gt;
 
 ____
 
