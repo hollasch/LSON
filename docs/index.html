@@ -676,8 +676,8 @@ used as default values:
     [# [ id~(count64:0)  xform~[[1 0][1 0]]  up~[0 1 0]  meta~{label:"none",color:black} ...
     ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-In addition, one can use a valueless element to set the default _element type_ of table features,
-while also requiring an explicit value of that type, like so:
+In addition, one can use a type element to set the default _element type_ of table features, while
+also requiring an explicit value of that type, like so:
 
     ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ LSON
     [#
@@ -690,8 +690,8 @@ while also requiring an explicit value of that type, like so:
         ...
     ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-Default feature types support only for element row values, not higher-order data structures such as
-arrays, dictionaries, graphs or tables.
+Default feature types are only supported for element values, not higher-order data structures
+such as arrays, dictionaries, graphs or tables.
 
 A standard CSV-type table might default all values to the element `(null)`:
 
@@ -1186,7 +1186,7 @@ terminator ::= "," | ";" | &lt;whitespace&gt; | null-before-closing-delimiter
 element ::= &lt;untyped-element&gt; | &lt;typed-element&gt;
 untyped-element ::= "(" &lt;string&gt; ")" | "(("&lt;id&gt; &lt;text&gt; &lt;id&gt;"))"
 typed-element ::= "(" &lt;typeID&gt; ":" &lt;string&gt; ") | "(("&lt;id&gt; &lt;typeID&gt; ":" &lt;text&gt; &lt;id&gt;"))"
-valueless-element ::= "(" &lt;typeID&gt; ":" ")"
+type-element ::= "(" &lt;typeID&gt; ":" ")"
 
 dictionary ::= "{" &lt;dictionary-body&gt; "}"
 
@@ -1204,7 +1204,7 @@ table-body ::= &lt;table-schema&gt; &lt;table-row&gt;*
 table-schema ::= "[" &lt;table-feature&gt;* "]"
 table-feature ::= &lt;id&gt; &lt;terminator&gt;
                 | &lt;id&gt; "~" &lt;value&gt; &lt;terminator&gt;
-                | &lt;id&gt; "~" &lt;valueless-element&gt;
+                | &lt;id&gt; "~" &lt;type-element&gt;
 
 table-row ::= &lt;table-row-bare(numFeatures)&gt; | &lt;table-row-bracketed&gt; | &lt;table-row-dictionary&gt;
 table-row-bare(numFeatures) ::= (&lt;table-row-value&gt; &lt;terminator&gt;){numFeatures}
