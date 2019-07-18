@@ -310,6 +310,10 @@ contain complex values should therefore either be quoted entirely, or contained 
 [Element Value Blocks][] (described below).
 
 
+### The Null Element
+The special element `()` represents an empty, or null element.
+
+
 ### Elements of Type String
 As pointed out earlier, strings are the only element type that LSON recognizes implicitly. Since
 strings are natively supported, string quotes are sufficient to recognize the element type
@@ -1184,10 +1188,12 @@ id ::= &lt;string&gt;
 
 terminator ::= "," | ";" | &lt;whitespace&gt; | null-before-closing-delimiter
 
-element ::= &lt;untyped-element&gt; | &lt;typed-element&gt;
+element ::= &lt;null-element&gt; | &lt;untyped-element&gt; | &lt;typed-element&gt;
+null-element ::= "()"
 untyped-element ::= "(" &lt;string&gt; ")" | "(("&lt;id&gt; &lt;text&gt; &lt;id&gt;"))"
 typed-element ::= "(" &lt;typeID&gt; ":" &lt;string&gt; ") | "(("&lt;id&gt; &lt;typeID&gt; ":" &lt;text&gt; &lt;id&gt;"))"
-type-element ::= "(" &lt;typeID&gt; ":" ")"
+
+typeonly-element ::= "(" &lt;typeID&gt; ":" ")"
 
 dictionary ::= "{" &lt;dictionary-body&gt; "}"
 
@@ -1205,7 +1211,7 @@ table-body ::= &lt;table-schema&gt; &lt;table-row&gt;*
 table-schema ::= "[" &lt;table-feature&gt;* "]"
 table-feature ::= &lt;id&gt; &lt;terminator&gt;
                 | &lt;id&gt; "~" &lt;value&gt; &lt;terminator&gt;
-                | &lt;id&gt; "~" &lt;type-element&gt;
+                | &lt;id&gt; "~" &lt;typeonly-element&gt;
 
 table-row ::= &lt;table-row-bare(numFeatures)&gt; | &lt;table-row-bracketed&gt; | &lt;table-row-dictionary&gt;
 table-row-bare(numFeatures) ::= (&lt;table-row-value&gt; &lt;terminator&gt;){numFeatures}
