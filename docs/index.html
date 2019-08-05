@@ -580,9 +580,6 @@ has an associated label. Tables have the following properties:
   + Tables are delimited with `[#` and `#]` tokens (no whitespace is allowed between delimiter
     characters).
 
-  + Tables do not support implicit null data (because LSON has no native null type). All row
-    dimensions must be specified (though you can define [Default Table Values][] described below).
-
   + Each row feature may be any legal LSON value. So you could have cells of arrays, objects,
     graphs, or even other tables.
 
@@ -697,11 +694,11 @@ also requiring an explicit value of that type, like so:
 Default feature types are only supported for element values, not higher-order data structures
 such as arrays, dictionaries, graphs or tables.
 
-A standard CSV-type table might default all values to the element `(null)`:
+A standard CSV-type table might default all values to the null element:
 
     ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ LSON
     [#
-        [ invoice~(null)  date~(null)  customerid~(null)  amount~(null)  address~(null) ]
+        [ invoice~()  date~()  customerid~()  amount~()  address~() ]
         ...
     #]
     ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -824,10 +821,10 @@ To express a set of named nodes without additional data, use a dictionary with m
 data, like so:
 
     ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ LSON
-    { [ bargaining testing anger shock acceptance depression denial ]: null }
+    { [ bargaining testing anger shock acceptance depression denial ]: () }
     ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-Here, the value `null` is a simple convenience. The actual value could be anything, like `0` or
+Here, the null element is a simple convenience. The actual value could be anything, like `0` or
 `""`.
 
 #### Named Graph Nodes With Data
@@ -1050,11 +1047,13 @@ Finally, a railroad (parsing) graph for floating point numbers:
     ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ LSON
     [%
         // Named nodes without data
-        {[
-          start  wholeDigit    fractionalDigit  exponentCharacter
-          sign   decimalPoint  exponentSign     exponentDigit
-          end
-        ]:null}
+        {
+          [
+            start  wholeDigit    fractionalDigit  exponentCharacter
+            sign   decimalPoint  exponentSign     exponentDigit
+            end
+          ]: ()
+        }
 
         // Edges without data
         [
