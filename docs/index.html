@@ -2,7 +2,7 @@
 
 
                              **LSON: Lucid Serialized Object Notation**
-                                        v0.1.1 / 2019-07-17
+                                        v0.1.2 / 2019-08-05
 
 
 
@@ -745,11 +745,11 @@ Dictionary table rows can contain several kinds of schema-mismatch errors:
 
 Graphs
 ----------------------------------------------------------------------------------------------------
-LSON supports graph data, where a graph is defined by a set of nodes and a set of edges between
-those nodes. Graphs have the following properties:
+LSON supports graph data, where a graph is defined by a set of nodes and a set of edges between node
+pairs. Graphs have the following properties:
 
   + Graphs are delimited with `[%` and `%]` tokens (no whitespace is allowed between delimiter
-    characters.)
+    characters). Inside are two objects: a node set, and an edge set.
   + Each node may or may not have associated data.
   + Each edge may or may not have associated data.
   + Nodes may be unnamed, in which case they are referenced by index.
@@ -774,14 +774,24 @@ Each LSON graph is expressed in the following pattern:
 Graph nodes may be expressed in a number of ways, depending on
 
   - whether they are to be referenced by index or by name, and
-  - whether they have associated data.
+  - whether they have associated data, and
+  - whether they are implicitly or explicitly defined.
 
 Unnamed nodes use an array-like container, while named nodes use a dictionary-like container.
+
+#### Implicitly Defined Nodes
+The simplest node set is specified entirely by the set of all nodes referenced in the edge set. If
+this is sufficient, the node set consists entirely of the keyword `auto`. Implicitly-defined nodes
+have no data. Graphs defined with implicit nodes have no way to specify nodes that are unreferenced
+in the edge set.
 
 #### Unnamed Graph Nodes Without Data
 If nodes are to be referenced by index from 0 onward, and have no data, then simply specifying the
 number of nodes is sufficient. Node count must be greater than or equal to zero, and is expressed as
 a positive decimal integer.
+
+Unlike implicitly-defined nodes, this format provides a way to specify a node that exists but has no
+edges connected to it.
 
     ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ LSON
     1000
@@ -987,6 +997,20 @@ Here's an example of an undirected adjacency matrix:
 
 
 ### Graph Examples
+
+Implicitly-defined nodes:
+
+    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ LSON
+    [%
+        auto
+        [
+            rock → scissors
+            scissors → paper
+            paper → rock
+        ]
+    %]
+    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
 Indexed nodes without data, edges without data:
 
     ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ LSON
@@ -1005,11 +1029,11 @@ Indexed nodes with 2D coordinate data, plus edges without data:
     %]
     ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-The seven stages of grief: named nodes without data, edges without data:
+The seven stages of grief: named nodes without data, edges without data, one node without any edges:
 
     ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ LSON
     [%
-        { [ bargaining testing anger shock acceptance depression denial ]: null }
+        { [bargaining testing anger shock acceptance depression denial combustion]: () }
 
         [   shock → denial
             denial → anger
@@ -1227,7 +1251,7 @@ adjacency-graph ::= "[%" &lt;indexed-nodes&gt;(numNodes) &lt;adjacency-matrix&gt
 
 "[%" &lt;graph-nodes&gt; &lt;graph-edges&gt; "%]"
 
-graph-nodes ::= &lt;indexed-nodes&gt; | &lt;named-nodes&gt; | &lt;node-table&gt;
+graph-nodes ::= "auto" | &lt;indexed-nodes&gt; | &lt;named-nodes&gt; | &lt;node-table&gt;
 indexed-nodes ::= &lt;counting-number&gt; | &lt;array&gt;(numNodes)
 named-nodes ::= &lt;dictionary&gt;
 node-table ::= &lt; table &gt;
