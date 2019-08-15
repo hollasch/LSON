@@ -1,0 +1,228 @@
+<meta charset="utf-8">                       <!-- Markdeep: https://casual-effects.com/markdeep/ -->
+
+
+                             **LSON: Lucid Serialized Object Notation**
+                                        v0.1.2 / 2019-08-05
+
+
+
+Overview
+====================================================================================================
+LSON is a data representation that aims for simplicity and expressiveness of JSON, but differs
+in the following ways:
+
+  + It's intended to be both concise and readable by humans as well as computers. It supports
+    comments. Items are optionally terminated by whitespace, end delimiters, commas, or semi-colons.
+
+  + It does not aim to mirror JavaScript, and thus is not a JavaScript subset. At the same time,
+    LSON is a superset of JSON: any legal JSON file is legal LSON.
+
+  + LSON is focused on data _representation_, not data _usage_. With the single exception of string
+    values, there is no intrinsic support for numbers, boolean, or any other primitive type.
+
+  + LSON supports arbitrary _elements_: domain-specific data values with declared or unknown type.
+    Elements provide support for arbitrary domain-specific values, such as `true`, `null`,
+    `infinity`, `2018-07-02`, `#6b17ec`, `0x1138`, `(x,a,b) => { a &lt;= x && x &lt;= b }` and so
+    forth. LSON encoders and decoders handle both known and unknown types in a consistent and
+    predictable manner.
+
+  + LSON supports four intrinsic data structures:
+    - array
+    - dictionary (a set of name-value pairs)
+    - table
+    - graph
+
+
+
+LSON Example
+====================================================================================================
+The following is an LSON snippet to illustrate various aspects of the notation, before we dive
+deeper:
+
+    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ LSON
+    // Comments are C-style: double slash to end of line, or enclosed with `/*` and `*/`.
+    /* This is an example using slash-star delimeters. */
+
+    // Items may be terminated with whitespace, commas, semi-colons, or object/array terminators.
+
+    {
+        index: {
+            'Gloss Div': {                // There are six legal string-delimeter pairs.
+                title: "S"                // No need to quote strings that lack whitespace.
+                "Gloss List": {
+                    `Gloss Entry`: {
+                        ID:      x112-223
+                        SortAs:  SGML
+                        Acronym: SGML
+                        «Gloss Term»: "Standard Generalized Markup Language"
+
+                        Abbrev: (ISO: 8879:1986)  // Element of some type "ISO", value "8879:1986"
+
+                        ‘Gloss Def’: {
+                            para: "A meta-markup language, used to create markup languages "
+                                + "such as DocBook."
+
+                            “Gloss SeeAlso”: [ 'GML', 'XML', 'HTML' ]
+                            'Gloss See': "markup"
+                        }
+                    }
+                }
+            }
+            EntryCount: (count32:1123)      // Element of some type "count32", value "1123"
+
+            // Table
+            Content: [#
+              [ Term                ; Pages           ; 'See Also'       ]
+              //--------------------;-----------------;------------------;
+                "ABC Dry-Clean Pad" ; (30)            ; null             ;
+                "Abstract grids"    ; (46-58, 92-104) ; "Gridded Layout" ;
+                "Abstract ideas"    ; (37-38, 74-77)  ; null             ;
+                "Acceleration"      ; (408-409)       ; Velocity         ;
+                // ...
+            #]
+        }
+    }
+    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+
+
+File Structure
+====================================================================================================
+
+Whitespace
+----------------------------------------------------------------------------------------------------
+LSON whitespace includes all standard [Unicode whitespace][] characters.
+
+    | Unicode |   Escape   | Description
+    |:-------:|:----------:|:-----------
+    | U+0009  |    `\t`    | Tab
+    | U+000a  |    `\n`    | Newline, or line feed
+    | U+000b  |  `\u{0b}`  | Vertical tab
+    | U+000c  |    `\f`    | Form feed
+    | U+000d  |    `\r`    | Carriage return
+    | U+0020  |  `\u{20}`  | Standard space character
+    | U+0085  |  `\u{85}`  | Next line
+    | U+00a0  |  `\u{a0}`  | No-break space
+    | U+1680  | `\u{1680}` | Ogham space mark
+    | U+2000  | `\u{2000}` | En quad
+    | U+2001  | `\u{2001}` | Em quad (mutton quad)
+    | U+2002  | `\u{2002}` | En space (nut)
+    | U+2003  | `\u{2003}` | Em space (mutton)
+    | U+2004  | `\u{2004}` | Three-per-em-space (thick space)
+    | U+2005  | `\u{2005}` | Four-per-em-space (mid space)
+    | U+2006  | `\u{2006}` | Six-per-em-space
+    | U+2007  | `\u{2007}` | Figure space
+    | U+2008  | `\u{2008}` | Punctuation space
+    | U+2009  | `\u{2009}` | Thin space
+    | U+200a  | `\u{200a}` | Hair space
+    | U+2028  | `\u{2028}` | Line separator
+    | U+2029  | `\u{2029}` | Paragraph separator
+    | U+202f  | `\u{202f}` | Narrow no-break space
+    | U+205f  | `\u{205f}` | Medium mathematical space
+    | U+3000  | `\u{3000}` | Ideographic space
+
+
+Terminators
+----------------------------------------------------------------------------------------------------
+Each item in a sequence must be terminated with whitespace, a closing delimeter of some kind, or
+with a comma (`,`) or semi-colon (`;`). Though not technically whitespace, commas and semi-colons
+serve the same role in separating values, and are treated equivalently.
+
+Since commas and semi-colons are parsed as whitespace, they are not interpreted in any syntactically
+meaningful way. For example, the sequence `a,,,,b,,c` is interpreted as three items `a`, `b`, and
+`c`.
+
+Terminating values with commas or semi-colons is completely optional, and is supported only as an
+aid to readability, at the discretion of the author.
+
+
+Comments
+----------------------------------------------------------------------------------------------------
+    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ LSON
+    // Single line comments run from double forward slashes to end of line.
+
+    /* Slash-star comments:
+    this is probably
+    the best form
+    for block comments. */
+    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+
+
+[Default Table Values]: #datastructures/tables/defaulttablevalues
+[Element Types]:        ./ElementTypes.md
+[Element Value Blocks]: #datavalues/elements/elementvalueblocks
+[Strings]:              #strings
+[Unicode whitespace]:   https://en.wikipedia.org/wiki/Whitespace_character#Unicode
+
+<style>
+    body {
+      background: #f4f4f4;
+    }
+    .md h1, .md h2, .md h3, .md h4, .md h5, .md h6 {
+        border: none;
+        font-family: Georgia;
+    }
+    .md h1 {
+        margin-top: 1.25em;
+        font-size: 200%;
+        color: #333;
+        font-variant: small-caps;
+    }
+    .md h2 {
+        font-size: 165%;
+        color: #333;
+        font-variant: small-caps;
+    }
+    .md h3 {
+        font-size: 125%;
+        /* font-style: italic; */
+        font-weight: normal;
+    }
+    code {
+        background: #e8e4f8;
+    }
+    pre.listing.tilde {
+        background: #ecf8ec;
+        border: solid 2px #dddddd;
+        padding: 1ex;
+    }
+    pre.listing code {
+        background: #ecf8ec;
+    }
+    .md a {
+        font-family: Georgia,Palatino,serif;
+    }
+    .md code {
+        font-family: 'Roboto Mono',Menlo,Consolas,Monospace;
+        font-size: 85%;
+    }
+    .md pre code {
+        font-size: 80%;
+    }
+    .md {
+        font-family: Georgia;
+    }
+    div.longTOC div.tocHeader {
+        display: none;
+    }
+    div.longTOC {
+        padding: 0 4ex;
+        border: solid 2px #eeeeee;
+    }
+    div.longTOC .level2 {
+        margin-left: 3ex;
+    }
+    div.longTOC .level3 {
+        margin-left: 6ex;
+    }
+</style>
+
+<!-- Markdeep ================================================================================== -->
+
+<style class="fallback">body{visibility:hidden;white-space:pre;font-family:monospace}</style>
+<!-- <script src="markdeep.min.js"></script> -->
+<script src="https://casual-effects.com/markdeep/latest/markdeep.min.js"></script>
+<script>window.alreadyProcessedMarkdeep||(document.body.style.visibility="visible")</script>
+
+                                                               <!-- vim: set filetype=markdeep : -->
