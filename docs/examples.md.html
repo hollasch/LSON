@@ -6,7 +6,7 @@ The following are examples of the [LSON](./index.html) format.
 
   - Typed Elements: see examples [3][], [5][], [6][]
   - Tables: see examples [2][], [4][]
-  - Graphs: see examples [5][], [6][]
+  - Graphs: see examples [5][], [6][], [7][]
 
 
 General 1
@@ -472,6 +472,54 @@ LSON
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 
+Abstract Syntax Tree
+====================================================================================================
+The following example shows an abstract syntax tree of the expression
+
+```
+    (-b ± sqrt(b^2 - 4ac)) / 2a
+```
+
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ LSON
+{
+    parsed: "div(plm(neg(b) sqt(sub(exp(b,2), mul(4,a,c)))), mul(2,a))"
+    graph: [%
+        // Nodes
+        {
+            var1: (variable: a)
+            var2: (variable: b)
+            var3: (variable: c)
+
+            con1: (constant: 2)
+            con2: (constant: 4)
+
+            div1: (operation: quotient)
+            exp1: (operation: exponentiation)
+            mul1: (operation: product)
+            mul2: (operation: product)
+            neg1: (operation: negation)
+            plm1: (operation: plusMinus)
+            sqt1: (operation: squareRoot)
+            sub1: (operation: difference)
+        }
+
+        // Edges
+        [
+            div1 → [ plm1 mul1 ]
+            plm1 → [ neg1 sqt1 ]
+            sqt1 → sub1
+            sub1 → [ exp1 mul2 ]
+            exp1 → [ var2 con1 ]
+            mul2 → [ con2 var1 var2 ]
+            mul1 → [ con1 var1 ]
+        ]
+    %]
+}
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+
+
+
 
 [1]: #general1
 [2]: #general2
@@ -479,6 +527,7 @@ LSON
 [4]: #tables
 [5]: #graphs1
 [6]: #graphs2
+[7]: #abstractsyntaxtree
 
 
 <!-- Markdeep: -->
