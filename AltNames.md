@@ -26,7 +26,7 @@ Alternate Names
 # Notation
   - abstratction
   - armature
-  - form
+  - form (see also morphos)
   - format
   - frame
   - gantry
@@ -40,12 +40,15 @@ Alternate Names
   - representation
   - scaffold
   - script
-  - shape
+  - shape (see also morphos)
   - skeleton
   - specification
   - structure
   - translation
   - truss
+
+# Latin/Greek
+  - morphos -- form, shape, outward appearance
 
 # Names
   - dProt (data protocol) - Available
@@ -54,3 +57,8 @@ Alternate Names
   - dataform - taken
   - dlang - commonly used for D language
   - dForm - commonly used
+
+  - morphogen
+  - morphodat
+  - datamorph
+
