@@ -25,26 +25,30 @@ Alternate Names
 
 # Notation
   - abstratction
-  - armature
-  - form (see also morphos)
   - format
-  - frame
-  - gantry
+  - idiom
+  - interchange
   - image
   - language
-  - model
   - portrayal
   - protocol
   - recipe
-  - record
   - representation
+  - translation
+
+# Structure
+  - armature
+  - form (see also morphos)
+  - frame
+  - gantry
+  - model
+  - record
   - scaffold
   - script
   - shape (see also morphos)
   - skeleton
   - specification
   - structure
-  - translation
   - truss
 
 # Latin/Greek
@@ -61,4 +65,10 @@ Alternate Names
   - morphogen
   - morphodat
   - datamorph
+
+  - DISE  / Data Interchange for Structured Elements
+  - GLISD / General Language for the Interchange of Structured Data
+  - SADIL / Structured Arbitrary Data Interchange Language
+  - SADL  / Structured Arbitrary Data Language
+  - SEN   / Structured Element Notation
 
