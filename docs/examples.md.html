@@ -241,15 +241,17 @@ LSON 1
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ LSON
 {
    menu: {
-      header: «SVG Viewer»               // LSON supports six string delimiters
-      items: [# [id~(null) label~""]     // A table with default values
-         [Open]                          // Unspecified columns get default values.
+      header: «SVG Viewer»             // LSON supports six string delimiters
+      items: [#
+         [id:() label:""]              // A table with default values
+
+         [Open]                        // Unspecified columns get default values.
          [OpenNew  "Open New"]
          []
          [Quality]
          [Pause]
          [Mute]
-         [~  "Null"]                     // '~' indicates default feature value
+         [~  "Null"]                   // '~' indicates default feature value
          [Find  "Find..."]
          [FindAgain  "Find Again"]
          [Copy]
@@ -276,7 +278,8 @@ LSON 2
 {
    menu: {
       header: «SVG Viewer»               // LSON supports six string delimiters
-      items: [# [id~(null) label~""]     // A table with default values
+      items: [#
+         [id:(null) label:""]            // A table with default values
          { id:Open }                     // Unspecified columns get default values.
          { id:OpenNew label:"Open New"}
          { }
@@ -455,8 +458,8 @@ LSON
       label: “Usual Suspects”
       graph: [%
          // A graph with a table of node data.
-         [# [id           label         metadata]
-
+         [#
+            [id           label         metadata]
             'Roger Kint'  'Roger Kint'  { nickname:'Verbal' actor:'Kevin Spacey' }
             'Keyser Söze' 'Keyser Söze' { actor: 'Kevin Spacey' }
          #]

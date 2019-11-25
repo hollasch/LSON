@@ -2,7 +2,7 @@
 
 
                              **LSON: Lucid Serialized Object Notation**
-                                        v0.2.0 / 2019-08-16
+                                        v0.2.1 / 2019-11-25
 
 
 
@@ -633,10 +633,10 @@ like so:
 
 ### Default Table Values
 Tables may optionally define default element types or element values (or both) for each feature.
-Defaults follow a tilde (`~`) after the feature name, like so:
+Defaults follow a colon (`:`) after the feature name, like so:
 
     ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ LSON
-    [# [id~0 role~scout speed~10] ...
+    [# [id:0 role:scout speed:10] ...
     ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 When using bracketed tables, default values can be used to set missing values when fewer values are
@@ -644,11 +644,11 @@ specified than there are columns. For example:
 
     ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ LSON
     [#
-        [ id status~idle ttl~120 ]
-        [ a173  running  300 ]    // id = a173, status=running,        ttl=300
-        [ b2fc  init         ]    // id = b2fc, status=init,           ttl=120 (default)
-        [ 781d               ]    // id = 781d, status=idle (default), ttl=120 (default)
-        [                    ]    // Error: feature 'id' has no default value
+        [ id    status:idle  ttl:120 ]
+        [ a173  running      300     ]    // id = a173, status=running,        ttl=300
+        [ b2fc  init                 ]    // id = b2fc, status=init,           ttl=120 (default)
+        [ 781d                       ]    // id = 781d, status=idle (default), ttl=120 (default)
+        [                            ]    // Error: feature 'id' has no default value
     #]
     ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
@@ -657,26 +657,26 @@ feature, allowing for sparse table specifications:
 
     ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ LSON
     [#
-        [ id~0000  status~idle  ttl~120 ]
+        [ id:0000  status:idle  ttl:120 ]
 
-        ~     stopped    0     // id = 0000, status=stopped, ttl=0
-        b2fc  init       ~     // id = b2fc, status=init,    ttl=120
-        781d  ~          240   // id = 781d, status=idle,    ttl=240
-        ~     running    ~     // id = 0000, status=running, ttl=120
+        ~          stopped      0       // id = 0000, status=stopped, ttl=0
+        b2fc       init         ~       // id = b2fc, status=init,    ttl=120
+        781d       ~            240     // id = 781d, status=idle,    ttl=240
+        ~          running      ~       // id = 0000, status=running, ttl=120
     #]
     ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 The above examples use bare values as the default. However, defaults can be any element, like so:
 
     ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ LSON
-    [# [ id~(count32:0) lat~(real:0.00) lon~(real:0.00) strength~(HCategory:1) ...
+    [# [ id:(count32:0) lat:(real:0.00) lon:(real:0.00) strength:(HCategory:1) ...
     ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 Feature defaults can be any legal LSON value, so arrays, dictionaries, tables and graphs can also be
 used as default values:
 
     ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ LSON
-    [# [ id~(count64:0)  xform~[[1 0][1 0]]  up~[0 1 0]  meta~{label:"none",color:black} ...
+    [# [ id:(count64:0)  xform:[[1 0][1 0]]  up:[0 1 0]  meta:{label:"none",color:black} ...
     ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 In addition, one can use a type element to set the default _element type_ of table features, while
@@ -684,8 +684,13 @@ also requiring an explicit value of that type, like so:
 
     ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ LSON
     [#
-        [ id~(count32:)  lat~(real:)  long~(real:)  strength~(HCat:) ]
-        /*____  ______  _______  _ */
+        [
+            id:       (count32:)
+            lat:      (real:)
+            long:     (real:)
+            strength: (HCat:)
+        ]
+        //____  ______  _______  _
         [ 01ca  -12.30   110.41  1 ]  // (count32:01ca), (real:-12.30), (real:110.41), (HCat:1)
         [ 021s       ~    70.58  3 ]  // Error: No default value for 'lat'.
         [ 9afb                     ]  // Error: No default value for 'id', 'lat', 'lon'.
@@ -693,14 +698,11 @@ also requiring an explicit value of that type, like so:
         ...
     ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-Default feature types are only supported for element values, not higher-order data structures
-such as arrays, dictionaries, graphs or tables.
-
 A standard CSV-type table might default all values to the null element:
 
     ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ LSON
     [#
-        [ invoice~()  date~()  customerid~()  amount~()  address~() ]
+        [ invoice:()  date:()  customerid:()  amount:()  address:() ]
         ...
     #]
     ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -714,7 +716,7 @@ omitting the key entirely, or by explicitly using the special value `~`.
 
     ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ LSON
     [#
-        [ a~true, b~1.0, c~"foo", d~none, e~normal, f~100%, g~[[1 0][0 1]] ]
+        [ a:true, b:1.0, c:"foo", d:none, e:normal, f:100%, g:[[1 0][0 1]] ]
         :
         { b:22.3, d:all }                 // Features a,c,e,f,g defined with default values
         { g:rotate(30), f:50%, c:"bar" }  // Features a,b,d,e   defined with default values
@@ -730,7 +732,7 @@ Dictionary table rows can contain several kinds of schema-mismatch errors:
     ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ LSON
     [#
         [
-        a~(boolean:), b, c~"foo", d~none, e~normal, f~100%, g~[[1 0][0 1]]
+            a:(boolean:), b, c:"foo", d:none, e:normal, f:100%, g:[[1 0][0 1]]
         ]
 
         { b:3.7 }
@@ -853,7 +855,7 @@ not). Here's an example:
 
     ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ LSON
     [%
-        [# [nodeID, color~(color:black), weight~(number:0)]
+        [# [nodeID, color:(color:black), weight:(number:0)]
             a107c5, ~,      1.00;
             8c78e5, blue,   1.00;
             73ba4d, ~,      2.30;
@@ -1248,8 +1250,8 @@ table-body ::= &lt;table-schema&gt; &lt;table-row&gt;*
 
 table-schema ::= "[" &lt;table-feature&gt;* "]"
 table-feature ::= &lt;id&gt; &lt;terminator&gt;
-                | &lt;id&gt; "~" &lt;value&gt; &lt;terminator&gt;
-                | &lt;id&gt; "~" &lt;typeonly-element&gt;
+                | &lt;id&gt; ":" &lt;value&gt; &lt;terminator&gt;
+                | &lt;id&gt; ":" &lt;typeonly-element&gt; &lt;terminator&gt;
 
 table-row ::= &lt;table-row-bare(numFeatures)&gt; | &lt;table-row-bracketed&gt; | &lt;table-row-dictionary&gt;
 table-row-bare(numFeatures) ::= (&lt;table-row-value&gt; &lt;terminator&gt;){numFeatures}
