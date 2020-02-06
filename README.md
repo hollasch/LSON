@@ -36,7 +36,8 @@ Here's a list of some of LSON's more interesting features:
 
   5. LSON adds two new data structures to JSON's array and dictionary: table and graph.
 
-You can browse [Examples.md][] for a quick scan of what LSON looks like.
+You can browse https://hollasch.github.io/LSON/examples.md.html for a quick scan of what LSON looks
+like.
 
 
 LSON Tools
