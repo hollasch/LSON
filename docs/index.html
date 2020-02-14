@@ -22,7 +22,7 @@ in the following ways:
 
   + LSON supports arbitrary _elements_: domain-specific data values with declared or unknown type.
     Elements provide support for arbitrary domain-specific values, such as `true`, `null`,
-    `infinity`, `2018-07-02`, `#6b17ec`, `0x1138`, `(x,a,b) => { a &lt;= x && x &lt;= b }` and so
+    `infinity`, `2018-07-02`, `#6b17ec`, `0x1138`, `(x,a,b) => { a <= x && x <= b }` and so
     forth. LSON encoders and decoders handle both known and unknown types in a consistent and
     predictable manner.
 
@@ -1197,116 +1197,116 @@ Appendix A: Grammar
 ( _The following grammar does not yet include reference syntax._ )
 
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-lson-file ::= &lt;value&gt;
+lson-file ::= <value>
 
 line-terminator ::= U+000a | U+000b | U+000c | U+000d | U+0085 | U+2028 | U+2029
 
-comment-line-remainder ::= "//" &lt;any character not line-terminator&gt;* &lt;line-terminator&gt;
+comment-line-remainder ::= "//" &lt;any character not line-terminator&gt;* <line-terminator>
 comment-block ::= "/*" &lt;any character sequence not containing "*/"&gt; "*/"
 
-whitespace-item ::= &lt;comment-line-remainder&gt; | &lt;comment-block&gt; | &lt;line-terminator&gt;
+whitespace-item ::= <comment-line-remainder> | <comment-block> | <line-terminator>
     | U+0009 | U+0020 | U+00a0 | U+1680 | U+2000 | U+2001 | U+2002 | U+2003 | U+2004 | U+2005
     | U+2006 | U+2007 | U+2008 | U+2009 | U+200a | U+2028 | U+2029 | U+202f | U+205f | U+3000
 
-whitespace ::= &lt;whitespace-item&gt;+
+whitespace ::= <whitespace-item>+
 
-value ::= &lt;word&gt; | &lt;string&gt; | &lt;element&gt; | &lt;array&gt; | &lt;dictionary&gt;
-        | &lt;table&gt; | &lt;graph&gt; | &lt;reference-definition&gt; | &lt;reference-instance&gt;
+value ::= <word> | <string> | <element> | <array> | <dictionary>
+        | <table> | <graph> | <reference-definition> | <reference-instance>
 
-string-character ::= &lt;non whitespace character&gt;
-    | "\b" | "\f" | "\n" | "\r" | "\t" | "\u" &lt;hex&gt;{4} | "\u{" &lt;hex&gt;+ "}" | "\" &lt;character&gt;
+string-character ::= <non whitespace character>
+    | "\b" | "\f" | "\n" | "\r" | "\t" | "\u" <hex>{4} | "\u{" <hex>+ "}" | "\" <character>
 
 hex ::= "0" | "1" | "2" | "3" | "4" | "5" | "6" | "7" | "8" | "9"
       | "a" | "b" | "c" | "d" | "e" | "f"
       | "A" | "B" | "C" | "D" | "E" | "F"
 
-word ::= &lt;string-character&gt;+
+word ::= <string-character>+
 
-string ::= &lt;unquoted-string&gt; | &lt;quoted-string&gt;
-quoted-string ::= &lt;string-begin-quote&gt; &lt;any &lt;string-character&gt; not matching begin quote&gt;*
-    &lt;string-end-quote&gt; &lt;concatenated-string&gt;*
-unquoted-string ::= &lt;string-character&gt;+ &lt;concatenated-string&gt;*
+string ::= <unquoted-string> | <quoted-string>
+quoted-string ::= <string-begin-quote> <any <string-character> not matching begin quote>*
+    <string-end-quote> <concatenated-string>*
+unquoted-string ::= <string-character>+ <concatenated-string>*
 
 string-begin-quote ::= "\"" | "'" | "`" | "«" | "‘" | "“"
 string-end-quote   ::= "\"" | "'" | "`" | "»" | "’" | "”"
 
-concatenated-string ::= "+" ( &lt;word&gt; | &lt;string&gt; )
+concatenated-string ::= "+" ( <word> | <string> )
 
-id ::= &lt;string&gt;
+id ::= <string>
 
-terminator ::= "," | ";" | &lt;whitespace&gt; | null-before-closing-delimiter
+terminator ::= "," | ";" | <whitespace> | null-before-closing-delimiter
 
-element ::= &lt;null-element&gt; | &lt;untyped-element&gt; | &lt;typed-element&gt;
+element ::= <null-element> | <untyped-element> | <typed-element>
 null-element ::= "()"
-untyped-element ::= "(" &lt;string&gt; ")" | "(("&lt;id&gt; &lt;text&gt; &lt;id&gt;"))"
-typed-element ::= "(" &lt;typeID&gt; ":" &lt;string&gt; ") | "(("&lt;id&gt; &lt;typeID&gt; ":" &lt;text&gt; &lt;id&gt;"))"
+untyped-element ::= "(" <string> ")" | "(("<id> <text> <id>"))"
+typed-element ::= "(" <typeID> ":" <string> ") | "(("<id> <typeID> ":" <text> <id>"))"
 
-typeonly-element ::= "(" &lt;typeID&gt; ":" ")"
+typeonly-element ::= "(" <typeID> ":" ")"
 
-dictionary ::= "{" &lt;dictionary-body&gt; "}"
+dictionary ::= "{" <dictionary-body> "}"
 
-dictionary-body ::= &lt;dictionary-item&gt;*
-dictionary-item ::= &lt;key&gt; ":" &lt;value&gt; &lt;terminator&gt;
-dictionary-key  ::= &lt;id&gt; | "[" &lt;id&gt; (&lt;terminator&gt; &lt;id&gt;)+ "]"
+dictionary-body ::= <dictionary-item>*
+dictionary-item ::= <key> ":" <value> <terminator>
+dictionary-key  ::= <id> | "[" <id> (<terminator> <id>)+ "]"
 
-array ::= "[" &lt;array-item&gt;* "]"
-array(n) ::= "[" &lt;array-item&gt;{n} "]"
-array-item ::= &lt;value&gt; &lt;terminator&gt;
+array ::= "[" <array-item>* "]"
+array(n) ::= "[" <array-item>{n} "]"
+array-item ::= <value> <terminator>
 
-table ::= "[#" &lt;table-body&gt; "#]"
-table-body ::= &lt;table-schema&gt; &lt;table-row&gt;*
+table ::= "[#" <table-body> "#]"
+table-body ::= <table-schema> <table-row>*
 
-table-schema ::= "[" &lt;table-feature&gt;* "]"
-table-feature ::= &lt;id&gt; &lt;terminator&gt;
-                | &lt;id&gt; ":" &lt;value&gt; &lt;terminator&gt;
-                | &lt;id&gt; ":" &lt;typeonly-element&gt; &lt;terminator&gt;
+table-schema ::= "[" <table-feature>* "]"
+table-feature ::= <id> <terminator>
+                | <id> ":" <value> <terminator>
+                | <id> ":" <typeonly-element> <terminator>
 
-table-row ::= &lt;table-row-bare(numFeatures)&gt; | &lt;table-row-bracketed&gt; | &lt;table-row-dictionary&gt;
-table-row-bare(numFeatures) ::= (&lt;table-row-value&gt; &lt;terminator&gt;){numFeatures}
-table-row-bracketed ::= "[" &lt;table-row-value&gt;* "]"
-table-row-value ::= &lt;value&gt; | "~"
-table-row-dictionary ::= "{" &lt;table-row-dictionary-body&gt; "}"
-table-row-dictionary-body ::= &lt;table-row-dictionary-item&gt;*
-table-row-dictionary-item ::= &lt;dictionary-key&gt; ":" (&lt;value&gt; | "~") &lt;terminator&gt;
+table-row ::= <table-row-bare(numFeatures)> | <table-row-bracketed> | <table-row-dictionary>
+table-row-bare(numFeatures) ::= (<table-row-value> <terminator>){numFeatures}
+table-row-bracketed ::= "[" <table-row-value>* "]"
+table-row-value ::= <value> | "~"
+table-row-dictionary ::= "{" <table-row-dictionary-body> "}"
+table-row-dictionary-body ::= <table-row-dictionary-item>*
+table-row-dictionary-item ::= <dictionary-key> ":" (<value> | "~") <terminator>
 
 graph ::= explicit-graph | adjacency-graph
-explicit-graph ::= "[%" &lt;graph-nodes&gt; &lt;explicit-graph-edges&gt; "%]"
-adjacency-graph ::= "[%" &lt;indexed-nodes&gt;(numNodes) &lt;adjacency-matrix&gt;(numNodes) "%]"
+explicit-graph ::= "[%" <graph-nodes> <explicit-graph-edges> "%]"
+adjacency-graph ::= "[%" <indexed-nodes>(numNodes) <adjacency-matrix>(numNodes) "%]"
 
-"[%" &lt;graph-nodes&gt; &lt;graph-edges&gt; "%]"
+"[%" <graph-nodes> <graph-edges> "%]"
 
-graph-nodes ::= "auto" | &lt;indexed-nodes&gt; | &lt;named-nodes&gt; | &lt;node-table&gt;
-indexed-nodes ::= &lt;counting-number&gt; | &lt;array&gt;(numNodes)
-named-nodes ::= &lt;dictionary&gt;
-node-table ::= &lt; table &gt;
+graph-nodes ::= "auto" | <indexed-nodes> | <named-nodes> | <node-table>
+indexed-nodes ::= <counting-number> | <array>(numNodes)
+named-nodes ::= <dictionary>
+node-table ::= < table >
 
-explicit-graph-edges ::= &lt;edge-array&gt; | &lt;edge-dictionary&gt; | &lt;edge-table&gt;
-edge-array ::= "[" &lt;edge-path&gt;* "]"
-edge-dictionary ::= "{" (&lt;edge-key&gt; ":" &lt;value&gt; &lt;terminator&gt;)* "}"
-edge-key ::= &lt;edge-path&gt; | "[" (&lt;edge-path&gt; &lt;terminator&gt;)+ "]"
-edge-table ::= &lt; table &gt;
+explicit-graph-edges ::= <edge-array> | <edge-dictionary> | <edge-table>
+edge-array ::= "[" <edge-path>* "]"
+edge-dictionary ::= "{" (<edge-key> ":" <value> <terminator>)* "}"
+edge-key ::= <edge-path> | "[" (<edge-path> <terminator>)+ "]"
+edge-table ::= < table >
 
-adjacency-matrix ::= &lt;directed-adjacency-matrix&gt; | &lt;undirected-adjacency-matrix&gt;
-directed-adjacency-matrix ::= "[" &lt;array&gt;(numNodes){numNodes} "]"
-undirected-adjacency-matrix ::= "[" &lt;array&gt;(numNodes) &lt;array&gt;(numNodes-1) .. &lt;array&gt;(1) "]"
+adjacency-matrix ::= <directed-adjacency-matrix> | <undirected-adjacency-matrix>
+directed-adjacency-matrix ::= "[" <array>(numNodes){numNodes} "]"
+undirected-adjacency-matrix ::= "[" <array>(numNodes) <array>(numNodes-1) .. <array>(1) "]"
 
-edge-path ::= &lt;node-ref&gt; &lt;edge-next&gt;+
-edge-next ::= &lt;edge-type&gt; &lt;node-ref&gt;
-node-ref ::= &lt;node-index&gt; | &lt;id&gt;
-node-index ::= &lt;counting-number&gt;
-edge-type ::= '-' | '↔' | '&gt;' | '→' | '&lt;' | '←'
+edge-path ::= <node-ref> <edge-next>+
+edge-next ::= <edge-type> <node-ref>
+node-ref ::= <node-index> | <id>
+node-index ::= <counting-number>
+edge-type ::= '-' | '↔' | '>' | '→' | '<' | '←'
 
-reference-definition ::= &lt;id&gt; "=" &lt;value&gt;
-reference-instance   ::= "^" &lt;id&gt;
+reference-definition ::= <id> "=" <value>
+reference-instance   ::= "^" <id>
 
 ____
 
 (...)       Ordered group of tokens
-&lt;token&gt;?    Denotes zero or one &lt;token&gt;
-&lt;token&gt;*    Denotes zero or more &lt;token&gt;
-&lt;token&gt;+    Denotes one or more &lt;token&gt;
-&lt;token&gt;{n}  Denotes exactly n &lt;token&gt;s
-&lt;token&gt;{n+} Denotes common n &lt;token&gt;s, where n is one or more
+<token>?    Denotes zero or one <token>
+<token>*    Denotes zero or more <token>
+<token>+    Denotes one or more <token>
+<token>{n}  Denotes exactly n <token>s
+<token>{n+} Denotes common n <token>s, where n is one or more
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 
