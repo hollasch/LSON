@@ -898,19 +898,21 @@ it is best to quote the names to avoid confusion. Here are parsing examples for 
     | `a-b>c`     | Interpreted as `'a' ↔ 'b>c'`
     | `a - b - c` | Interpreted as edge `a ↔ b`, node name `'-'`, illegal edge `c`
 
-#### Many-to-One and One-to-Many Edge Definitions
+#### One-to-Many and Many-to-One Edge Definitions
 It is often useful to express the concept having many children, or a node having many parents. To
 encode this, one side or the other of an edge relationship may be a list of node references. For
 example:
 
+    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ LSON
     X → [ A B C D E ]    // Node X has children A, B, C, D, and E.
     [ F G H ] → X        // Node X has parents F, G, and H.
+    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 Note that many-to-many relationship are illegal:
 
+    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ LSON
     [ Q R S ] ↔ [ U V W ]    // Illegal
-
-Multi-node edges cannot be expressed in the adjacency matrix edge notation below.
+    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 #### Graph Edges Without Data
 Edges without data are specified as an array of edges. Here's an example using node indices:
@@ -930,6 +932,12 @@ Another example, this time using node names:
         depression → testing
         testing → acceptance
     ]
+    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+or expressed as a path:
+
+    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ LSON
+    [ shock → denial → anger → bargaining → depression → testing → acceptance ]
     ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 #### Graph Edges With Data
@@ -1273,19 +1281,19 @@ named-nodes ::= &lt;dictionary&gt;
 node-table ::= &lt; table &gt;
 
 explicit-graph-edges ::= &lt;edge-array&gt; | &lt;edge-dictionary&gt; | &lt;edge-table&gt;
-edge-array ::= "[" &lt;edge&gt;+ "]"
+edge-array ::= "[" &lt;edge-path&gt;* "]"
 edge-dictionary ::= "{" (&lt;edge-key&gt; ":" &lt;value&gt; &lt;terminator&gt;)* "}"
-edge-key ::= &lt;edge&gt; | "[" (&lt;edge&gt; &lt;terminator&gt;)+ "]"
+edge-key ::= &lt;edge-path&gt; | "[" (&lt;edge-path&gt; &lt;terminator&gt;)+ "]"
 edge-table ::= &lt; table &gt;
 
 adjacency-matrix ::= &lt;directed-adjacency-matrix&gt; | &lt;undirected-adjacency-matrix&gt;
 directed-adjacency-matrix ::= "[" &lt;array&gt;(numNodes){numNodes} "]"
 undirected-adjacency-matrix ::= "[" &lt;array&gt;(numNodes) &lt;array&gt;(numNodes-1) .. &lt;array&gt;(1) "]"
 
-edge ::= &lt;node-ref&gt; &lt;edge-type&gt; &lt;node-ref&gt;
+edge-path ::= &lt;node-ref&gt; &lt;edge-next&gt;+
+edge-next ::= &lt;edge-type&gt; &lt;node-ref&gt;
 node-ref ::= &lt;node-index&gt; | &lt;id&gt;
 node-index ::= &lt;counting-number&gt;
-
 edge-type ::= '-' | '↔' | '&gt;' | '→' | '&lt;' | '←'
 
 reference-definition ::= &lt;id&gt; "=" &lt;value&gt;
@@ -1293,6 +1301,7 @@ reference-instance   ::= "^" &lt;id&gt;
 
 ____
 
+(...)       Ordered group of tokens
 &lt;token&gt;?    Denotes zero or one &lt;token&gt;
 &lt;token&gt;*    Denotes zero or more &lt;token&gt;
 &lt;token&gt;+    Denotes one or more &lt;token&gt;
