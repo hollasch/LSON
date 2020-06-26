@@ -898,22 +898,6 @@ it is best to quote the names to avoid confusion. Here are parsing examples for 
     | `a-b>c`     | Interpreted as `'a' ↔ 'b>c'`
     | `a - b - c` | Interpreted as edge `a ↔ b`, node name `'-'`, illegal edge `c`
 
-#### One-to-Many and Many-to-One Edge Definitions
-It is often useful to express the concept having many children, or a node having many parents. To
-encode this, one side or the other of an edge relationship may be a list of node references. For
-example:
-
-    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ LSON
-    X → [ A B C D E ]    // Node X has children A, B, C, D, and E.
-    [ F G H ] → X        // Node X has parents F, G, and H.
-    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-Note that many-to-many relationship are illegal:
-
-    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ LSON
-    [ Q R S ] ↔ [ U V W ]    // Illegal
-    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
 #### Graph Edges Without Data
 Edges without data are specified as an array of edges. Here's an example using node indices:
 
