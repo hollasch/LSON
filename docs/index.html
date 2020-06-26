@@ -757,7 +757,7 @@ pairs. Graphs have the following properties:
   + Nodes may be named, in which case they are referenced by name.
   + Edges may be directed or undirected.
   + An edge may leave and arrive at the same node.
-  + There may be many edges between any node pair.
+  + There may be many edges between any pair of nodes.
 
 
 ### General Graph Structure
@@ -787,19 +787,20 @@ have no data. Graphs defined with implicit nodes have no way to specify nodes th
 in the edge set.
 
 #### Unnamed Graph Nodes Without Data
-If nodes are to be referenced by index from 0 onward, and have no data, then simply specifying the
+If nodes are to be referenced by index (from 0 onward), and have no data, then simply specifying the
 number of nodes is sufficient. Node count must be greater than or equal to zero, and is expressed as
 a positive decimal integer.
 
-Unlike implicitly-defined nodes, this format provides a way to specify a node that exists but has no
-edges connected to it.
+Unlike implicitly-defined nodes, this format provides a way to include nodes that exist but have no
+associated edges.
 
     ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ LSON
     1000
     ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 #### Unnamed Graph Nodes With Data
-The following (unnamed) nodes can be referenced by index. Each node has 2D coordinate data.
+Unnamed nodes can be referenced by index in an array of node data. In this example, each node has 2D
+coordinate data, but the array can contain any type of data per node.
 
     ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ LSON
     [  [3 2] [2 2] [2 1] [1 3] [1 2] [1 1]  ]
@@ -807,8 +808,7 @@ The following (unnamed) nodes can be referenced by index. Each node has 2D coord
     //   0     1     2     3     4     5
     ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-Note: in the event that nodes are named with number-like values, they must still be referenced by
-their array-like index:
+Even if nodes have number-like values, they must still be referenced by their array-like index:
 
     ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ LSON
     [
@@ -821,20 +821,20 @@ their array-like index:
     ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 #### Named Graph Nodes Without Data
-To express a set of named nodes without additional data, use a dictionary with multi-keyed dummy
-data, like so:
+To define a set of nodes with names (keys), use a dictionary. To express a set of named nodes
+without additional data, use a dictionary with multi-keyed dummy data, like so:
 
     ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ LSON
     { [ bargaining testing anger shock acceptance depression denial ]: () }
     ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 Here, the null element is a simple convenience. The actual value could be anything, like `0` or
-`""`.
+`""`, but this allows nodes to have an associated name or key.
 
 #### Named Graph Nodes With Data
-To express a set of named nodes with additional data per node, use a dictionary. Each entry
-specifies the node data by name. Here, the seven standard colors of the rainbow are given with their
-CSS color values:
+To express a set of named nodes with additional data per node, use a dictionary, but with actual
+data. Each entry specifies the node data by name. Here, the seven standard colors of the rainbow are
+given with their CSS color values:
 
     ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ LSON
     {
@@ -932,12 +932,6 @@ Another example, this time using node names:
         depression → testing
         testing → acceptance
     ]
-    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-or expressed as a path:
-
-    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ LSON
-    [ shock → denial → anger → bargaining → depression → testing → acceptance ]
     ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 #### Graph Edges With Data
@@ -1281,17 +1275,16 @@ named-nodes ::= <dictionary>
 node-table ::= < table >
 
 explicit-graph-edges ::= <edge-array> | <edge-dictionary> | <edge-table>
-edge-array ::= "[" <edge-path>* "]"
+edge-array ::= "[" <edge>* "]"
 edge-dictionary ::= "{" (<edge-key> ":" <value> <terminator>)* "}"
-edge-key ::= <edge-path> | "[" (<edge-path> <terminator>)+ "]"
+edge-key ::= <edge> | "[" (<edge> <terminator>)+ "]"
 edge-table ::= < table >
 
 adjacency-matrix ::= <directed-adjacency-matrix> | <undirected-adjacency-matrix>
 directed-adjacency-matrix ::= "[" <array>(numNodes){numNodes} "]"
 undirected-adjacency-matrix ::= "[" <array>(numNodes) <array>(numNodes-1) .. <array>(1) "]"
 
-edge-path ::= <node-ref> <edge-next>+
-edge-next ::= <edge-type> <node-ref>
+edge ::= <node-ref> <edge-type> <node-ref>
 node-ref ::= <node-index> | <id>
 node-index ::= <counting-number>
 edge-type ::= '-' | '↔' | '>' | '→' | '<' | '←'

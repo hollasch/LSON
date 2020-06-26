@@ -1,6 +1,6 @@
 LSON: Lucid Serialized Object Notation
 ====================================================================================================
-_“If I had a dime for every developer who thought of creating a better JSON…”_
+_If I had a dime for every developer who thought of creating a better JSON…_
 
 - [LSON Specification][]
 
