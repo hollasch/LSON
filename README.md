@@ -2,7 +2,7 @@ LSON: Lucid Serialized Object Notation
 ====================================================================================================
 _If I had a dime for every developer who thought of creating a better JSON…_
 
-- [LSON Specification][]
+- [LSON Specification](docs/index.html)
 
 About
 ------
@@ -73,7 +73,6 @@ You can find the built release executable in `build/Release/`.
 
 
 
-[Connor Hollasch]:    https://github.com/chollasch/
-[Examples.md]:        https://hollasch.github.io/LSON/examples.md.html
-[Java library]:       https://github.com/chollasch/LSON4J
-[LSON Specification]: https://hollasch.github.io/LSON
+[Connor Hollasch]: https://github.com/chollasch/
+[Examples.md]:     https://hollasch.github.io/LSON/examples.md.html
+[Java library]:    https://github.com/chollasch/LSON4J
