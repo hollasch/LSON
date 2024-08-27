@@ -2,7 +2,8 @@ LSON: Lucid Serialized Object Notation
 ====================================================================================================
 _If I had a dime for every developer who thought of creating a better JSON…_
 
-- [LSON Specification](docs/index.html)
+- [LSON Specification][spec]
+- [LSON Specification (repo local)][spec-repo]
 
 About
 ------
@@ -36,8 +37,7 @@ Here's a list of some of LSON's more interesting features:
 
   5. LSON adds two new data structures to JSON's array and dictionary: table and graph.
 
-You can browse https://hollasch.github.io/LSON/examples.md.html for a quick scan of what LSON looks
-like.
+You can [browse the examples][examples] for a quick scan of what LSON looks like.
 
 
 LSON Tools
@@ -54,8 +54,8 @@ Building
 This project uses the CMake build tool. CMake is a meta-build system that locates and uses your
 local development tools to build the project if possible.
 
-To build, first install [CMake][https://cmake.org/]. Then go to the project root directory and run
-the following command:
+To build, first install [CMake][]. Then go to the project root directory and run the following
+command:
 
     cmake -B build
 
@@ -73,6 +73,9 @@ You can find the built release executable in `build/Release/`.
 
 
 
+[CMake]:           https://cmake.org/
 [Connor Hollasch]: https://github.com/chollasch/
-[Examples.md]:     https://hollasch.github.io/LSON/examples.md.html
+[examples]:        https://hollasch.github.io/LSON/examples.md.html
 [Java library]:    https://github.com/chollasch/LSON4J
+[spec-repo]:       docs/index.html
+[spec]:            https://hollasch.github.io/LSON/
